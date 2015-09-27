@@ -21,7 +21,7 @@ public class BedrijfsTak {
 	
 	@Column(name="sector_naam")
 	private String sectorNaam;
-	
+
 	protected BedrijfsTak(){}
 	
 	public BedrijfsTak(String sectorCode, String sectorNaam){
@@ -35,4 +35,28 @@ public class BedrijfsTak {
 				bedrijfsId, sectorCode, sectorNaam);
 	}
 	
+	//Getters and Setters
+	public long getBedrijfsId() {
+		return bedrijfsId;
+	}
+
+	public void setBedrijfsId(long bedrijfsId) {
+		this.bedrijfsId = bedrijfsId;
+	}
+
+	public String getSectorCode() {
+		return sectorCode;
+	}
+
+	public void setSectorCode(String sectorCode) {
+		this.sectorCode = sectorCode;
+	}
+
+	public String getSectorNaam() {
+		return sectorNaam;
+	}
+
+	public void setSectorNaam(String sectorNaam) {
+		this.sectorNaam = sectorNaam;
+	}
 }

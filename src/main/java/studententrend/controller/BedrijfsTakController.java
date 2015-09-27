@@ -24,7 +24,12 @@ public class BedrijfsTakController {
 			produces = {"application/json"})
 	@ResponseBody
 	public List<BedrijfsTak> bedrijfsTak() {
-		List<BedrijfsTak> bedrijfsTak = (List<BedrijfsTak>) bedrijfsTakRepository.findAll();
-		return bedrijfsTak;
+		
+		List<BedrijfsTak> bedrijfsTakken = (List<BedrijfsTak>) bedrijfsTakRepository.findAll();
+		for(BedrijfsTak bedrijfsTak : bedrijfsTakken){
+			System.out.println(bedrijfsTak.toString());
+		}
+		
+		return bedrijfsTakken;
 	}
 }
