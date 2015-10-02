@@ -48,6 +48,8 @@ local.properties
 
 # sbteclipse plugin
 .target
+target
+*target/
 
 # TeXlipse plugin
 .texlipse
