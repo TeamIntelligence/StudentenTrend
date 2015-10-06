@@ -5,15 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.ForeignKey;
 
 @Entity
 @Table(name="PLAATSEN")
-@SecondaryTable(name="PROVINCIES", pkJoinColumns = @PrimaryKeyJoinColumn(name="PROV_ID"))
 public class Plaats {
 	
 	@Id

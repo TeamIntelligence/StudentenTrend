@@ -8,6 +8,6 @@ import studententrend.model.IscedCode;
 import studententrend.model.SbiCode;
 
 public interface IscedCodeRepository extends CrudRepository<IscedCode, Long>{
-	List<SbiCode> findByIscedCode(String iscedCode);
+	List<SbiCode> findByIscedCode(long iscedCode);
 	List<SbiCode> findByIscedNaam(String iscedNaam);
 }

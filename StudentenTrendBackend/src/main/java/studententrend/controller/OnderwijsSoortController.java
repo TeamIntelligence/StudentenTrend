@@ -1,6 +1,5 @@
 package studententrend.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import studententrend.model.Kwartaal;
 import studententrend.model.OnderwijsSoort;
 import studententrend.model.dao.OnderwijsSoortRepository;
 

@@ -1,6 +1,5 @@
 package studententrend.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import studententrend.model.Plaats;
 import studententrend.model.Provincie;
-import studententrend.model.dao.PlaatsRepository;
 import studententrend.model.dao.ProvincieRepository;
 
 @RestController
