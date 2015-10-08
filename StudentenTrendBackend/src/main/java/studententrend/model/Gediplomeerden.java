@@ -8,11 +8,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="HO_INGESCHREVENEN")
-public class HoIngeschrevene {
+@Table(name="HO_GEDIPLOMEERDEN")
+public class Gediplomeerden {
 	@Id
-	@Column(name = "HI_ID")
-	private long hiId;
+	@Column(name = "HG_ID")
+	private long hgId;
 
 	@ManyToOne
 	@JoinColumn(name="JAARTAL")
@@ -26,29 +26,33 @@ public class HoIngeschrevene {
 	@JoinColumn(name="ISCED_CODE")
 	private IscedCode iscedCode;
 
+	@Column(name = "DIPLOMA")
+	private String diploma;
+
 	@Column(name = "AANTAL")
 	private int aantal;
 	
-	protected HoIngeschrevene(){}
+	protected Gediplomeerden(){}
 
 	
-	public HoIngeschrevene(long hiId, Jaartal jaartal, OnderwijsSoort ondCode, IscedCode iscedCode, String diploma, int aantal) {
-		this.hiId = hiId;
+	public Gediplomeerden(long hgId, Jaartal jaartal, OnderwijsSoort ondCode, IscedCode iscedCode, String diploma, int aantal) {
+		this.hgId = hgId;
 		this.jaartal = jaartal;
 		this.ondCode = ondCode;
 		this.iscedCode = iscedCode;
+		this.diploma = diploma;
 		this.aantal = aantal;
 	}
 
 	@Override
 	public String toString(){
-		return String.format("HO_INGESCHREVENEN [HI_ID='%d', JAARTAL='%d', OND_CODE=%s, ISCED_CODE=%d, AANTAL=%d]",
-				hiId, jaartal.getJaartal(), ondCode.getOndCode(), iscedCode.getIscedCode(), aantal);
+		return String.format("HO_GEDIPLOMEERDEN [HG_ID='%d', JAARTAL='%d', OND_CODE=%s, ISCED_CODE=%d, DIPLOMA=%s, AANTAL=%d]",
+				hgId, jaartal.getJaartal(), ondCode.getOndCode(), iscedCode.getIscedCode(), diploma, aantal);
 	}
 
 
-	public long getHiId() {
-		return hiId;
+	public long getHgId() {
+		return hgId;
 	}
 
 
@@ -64,6 +68,11 @@ public class HoIngeschrevene {
 
 	public IscedCode getIscedCode() {
 		return iscedCode;
+	}
+
+
+	public String getDiploma() {
+		return diploma;
 	}
 
 
