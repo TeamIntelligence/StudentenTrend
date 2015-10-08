@@ -56,13 +56,13 @@ public class HoGediplomeerde {
 	}
 
 
-	public Jaartal getJaartal() {
-		return jaartal;
+	public int getJaartal() {
+		return jaartal.getJaartal();
 	}
 
 
-	public OnderwijsSoort getOndCode() {
-		return ondCode;
+	public String getOndCode() {
+		return ondCode.getOndCode();
 	}
 
 

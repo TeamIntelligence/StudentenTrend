@@ -35,16 +35,12 @@ public class Plaats {
 		return String.format("PLAATSEN [PLAATS_ID='%d', PROVINCIE=%s, PLAATS_NAAM=%s]", plaatsId, provincie.getProvNaam(), plaatsNaam);
 	}
 	
-	public int getPlaatsId() {
-		return plaatsId;
-	}
-
 	public String getPlaatsNaam() {
 		return plaatsNaam;
 	}
 
-	public Provincie getProvincie() {
-		return provincie;
+	public String getProvincie() {
+		return provincie.getProvNaam();
 	}
 
 //	public void setPlaatsId(int plaatsId) {

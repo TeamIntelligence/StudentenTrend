@@ -28,10 +28,6 @@ public class Provincie {
 		return String.format("PROVINCIES [PROV_ID=%d, PROV_NAAM=%s]", provId, provNaam);
 	}
 
-	public int getProvId() {
-		return provId;
-	}
-
 	public String getProvNaam() {
 		return provNaam;
 	}
