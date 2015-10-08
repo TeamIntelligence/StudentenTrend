@@ -58,20 +58,20 @@ public class WoonSituatie {
 		return wsId;
 	}
 
-	public Jaartal getJaartal() {
-		return jaartal;
+	public int getJaartal() {
+		return jaartal.getJaartal();
 	}
 
-	public Kwartaal getKwartaal() {
-		return kwartaal;
+	public int getKwartaal() {
+		return kwartaal.getKwartaal();
 	}
 
 	public Plaats getPlaats() {
 		return plaats;
 	}
 
-	public OnderwijsSoort getOndCode() {
-		return ondCode;
+	public String getOndCode() {
+		return ondCode.getOndCode();
 	}
 
 	public int getInwonend() {

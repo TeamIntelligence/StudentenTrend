@@ -54,13 +54,13 @@ public class Vacature {
 	}
 
 
-	public Jaartal getJaartal() {
-		return jaartal;
+	public int getJaartal() {
+		return jaartal.getJaartal();
 	}
 
 
-	public Kwartaal getKwartaal() {
-		return kwartaal;
+	public int getKwartaal() {
+		return kwartaal.getKwartaal();
 	}
 
 
