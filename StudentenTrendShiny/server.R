@@ -7,6 +7,7 @@ shinyServer(function(input, output) {
       sliderInput("yearRangeSlider","Jaren", min = 1, 
                   max   = 8,
                   value = 3
+                  #test van Anne
       )
     } else if (input$voortgangType == "uitschrijf"){
       sliderInput("yearRangeSlider","Jaren", min = 1, 
