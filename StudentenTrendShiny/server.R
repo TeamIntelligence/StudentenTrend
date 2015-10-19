@@ -54,7 +54,7 @@ shinyServer(function(input, output) {
       }
     } 
   })
-  
+  #CHANGE
   output$voortgangsPercentages <- renderPlot({
     customMean <- function(dataIn) {
       i <- 0
