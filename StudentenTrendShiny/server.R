@@ -1,7 +1,7 @@
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
-
+# Hoi Tim, groetjes Ilsa
   output$yearRange <- renderUI({
     if(is.null(input$voortgangType)){
       sliderInput("yearRangeSlider","Jaren", min = 1, 
@@ -55,7 +55,7 @@ shinyServer(function(input, output) {
       }
     } 
   })
-  
+  #CHANGE
   output$voortgangsPercentages <- renderPlot({
     customMean <- function(dataIn) {
       i <- 0
