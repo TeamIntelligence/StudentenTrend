@@ -53,3 +53,4 @@ target
 
 # TeXlipse plugin
 .texlipse
+.Rproj.user
