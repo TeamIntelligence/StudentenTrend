@@ -22,7 +22,6 @@ public class Vacature {
 	@JoinColumn(name="KWARTAAL")
 	private Kwartaal kwartaal;
 	
-	
 	@ManyToOne
 	@JoinColumn(name="SBI_CODE")
 	private SbiCode sbiCode;
@@ -72,4 +71,6 @@ public class Vacature {
 	public int getAantal() {
 		return aantal;
 	}
+	
+	
 }

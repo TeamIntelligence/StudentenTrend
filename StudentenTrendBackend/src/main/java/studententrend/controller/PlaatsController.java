@@ -88,7 +88,7 @@ public class PlaatsController {
 		ArrayList<Plaats> plaatsen = new ArrayList<Plaats>();
 		
 		for(Provincie prov : provincies) {
-			plaatsen.addAll(plaatsRepository.findByProvincie(prov));
+			plaatsen.addAll(plaatsRepository.findByProvincie(prov.getProvNaam()));
 		}
 		
 		

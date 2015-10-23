@@ -49,10 +49,9 @@ public class GediplomeerdenController {
 		List<OnderwijsSoort> onderwijs = (List<OnderwijsSoort>) onderwijsSoortRepository.findByOndCode(ondCode);
 		List<Gediplomeerden> gediplomeerden = null;
 		for(OnderwijsSoort soort : onderwijs){
-			gediplomeerden = (List<Gediplomeerden>) gediplomeerdenRepository.findByOndCode(soort);	
+			gediplomeerden = (List<Gediplomeerden>) gediplomeerdenRepository.findByOndCode(soort.getOndCode());	
 		}
 				
 		return gediplomeerden;
-	}
-	
+	}	
 }
