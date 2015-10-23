@@ -11,7 +11,7 @@ public class Application {
 	
 	public static void main(String[] args) {
 		Configuration cfg = new Configuration();
-		cfg.addResource("hibernate.cfg.xml");
+		cfg.addResource("hibernate.cfg.xml"); 
 		
 		SpringApplication.run(Application.class, args);
 	}
