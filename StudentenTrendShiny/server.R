@@ -43,12 +43,12 @@ shinyServer(function(input, output) {
           plotTitle <- "Studenten per startjaar voor verscheidene opleidingen"
         }
         
-        svSub <- studievoortgang[which(studievoortgang$iscedCode$iscedNaam == input$selectStudy),]
+        svSub <- studievoortgang[which(studievoortgang$iscedCode$iscedNaam %in% input$selectStudy),]
         
         ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal, fill=svSub$iscedCode$iscedNaam), environment=environment()) +
           xlab("Jaar") +
           ylab("Aantal Studenten") +
-          geom_bar(stat = "identity")+
+          geom_bar(stat = "identity", position="dodge")+
           ggtitle(plotTitle) +
           scale_fill_manual(values=rainbow(length(input$selectStudy)),name="Opleidings Sector")
       }
