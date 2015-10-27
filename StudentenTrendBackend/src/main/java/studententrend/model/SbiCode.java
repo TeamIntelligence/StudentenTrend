@@ -1,8 +1,15 @@
 package studententrend.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -15,6 +22,12 @@ public class SbiCode {
 	
 	@Column(name="SBI_NAAM")
 	private String sbiNaam;
+
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name="ISCED_SBI_CODES", joinColumns={
+		@JoinColumn(name="SBI_CODE", nullable=false, updatable=false)
+	}, inverseJoinColumns={@JoinColumn(name="ISCED_CODE", nullable=false, updatable=false)})
+	private Set<IscedCodeConv> iscedCodes = new HashSet<IscedCodeConv>(0);
 	
 	protected SbiCode(){}
 	
@@ -29,21 +42,19 @@ public class SbiCode {
 				sbiCode, sbiNaam);
 	}
 	
-	//Getters and Setters
 	public String getSbiCode() {
 		return sbiCode;
 	}
 
-//	public void setSbiCode(String sbiCode) {
-//		this.sbiCode = sbiCode;
-//	}
-
 	public String getSbiNaam() {
 		return sbiNaam;
 	}
-
-//	public void setSbiNaam(String sbiNaam) {
-//		this.sbiNaam = sbiNaam;
-//	}
 	
+	public Set<IscedCodeConv> getIscedCodes() {
+		return iscedCodes;
+	}
+	
+	public void setIscedCodes(Set<IscedCodeConv> iscedCodes) {
+		this.iscedCodes = iscedCodes;
+	}
 }

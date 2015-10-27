@@ -49,7 +49,7 @@ public class IngeschrevenenController {
 		List<OnderwijsSoort> onderwijs = (List<OnderwijsSoort>) onderwijsSoortRepository.findByOndCode(ondCode);
 		List<Ingeschrevenen> ingeschrevenen = null;
 		for(OnderwijsSoort soort : onderwijs){
-			ingeschrevenen = (List<Ingeschrevenen>) ingeschrevenenRepository.findByOndCode(soort);	
+			ingeschrevenen = (List<Ingeschrevenen>) ingeschrevenenRepository.findByOndCode(soort.getOndCode());	
 		}
 				
 		return ingeschrevenen;

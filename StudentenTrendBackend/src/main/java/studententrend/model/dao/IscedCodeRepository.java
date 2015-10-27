@@ -5,9 +5,8 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 import studententrend.model.IscedCode;
-import studententrend.model.SbiCode;
 
 public interface IscedCodeRepository extends CrudRepository<IscedCode, Long>{
-	List<SbiCode> findByIscedCode(long iscedCode);
-	List<SbiCode> findByIscedNaam(String iscedNaam);
+	List<IscedCode> findByIscedCode(long iscedCode);
+	List<IscedCode> findByIscedNaam(String iscedNaam);
 }
