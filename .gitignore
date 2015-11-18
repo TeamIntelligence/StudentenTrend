@@ -54,3 +54,5 @@ target
 # TeXlipse plugin
 .texlipse
 .Rproj.user
+.Rhistory
+.Rdata
