@@ -1,62 +1,21 @@
-# Hallo dit is Ramon
-# Define server logic required to draw a histogram
-shinyServer(function(input, output) {
-# Hoi Tim, groetjes Anne
-# Hoi Tim, doei
-  output$yearRange <- renderUI({
-    if(is.null(input$voortgangType)){
-      sliderInput("yearRangeSlider","Jaren", min = 1, 
-                  max   = 8,
-                  value = 3
-                  #test van Anne
+VoortgangsPercentagesUI <- function(PageName) {
+  return(
+    tabItem(tabName = PageName,
+      fluidRow(
+        box(width=4, height = "100%", footer = "Gemiddelde afstudeer/Uitschrijf percentages per studie binnen ... jaar na aanvang",
+            radioButtons("voortgangType", "Soort", 
+                         choices = list("Uitschrijf percentages" = "uitschrijf", 
+                                        "Afstudeer percentages"  = "afgestudeerd")
+            ),
+            uiOutput    ("yearRange")
+        )
+        ,box(width=8, height = 800, plotOutput("voortgangsPercentages", height=750))
       )
-    } else if (input$voortgangType == "uitschrijf"){
-      sliderInput("yearRangeSlider","Jaren", min = 1, 
-                  max   = 8,
-                  value = 3
-      )
-    } else {
-      sliderInput("yearRangeSlider","Jaren", min = 3, 
-                  max   = 8,
-                  value = 3
-      )
-    }
-  })
-  
-  
-  output$aantalStudentenPlot <- renderPlot({
-    
-    if (!is.null(input$selectStudy)){
-      if(length(input$selectStudy) == 1){
-        plotTitle <- paste("Aantal studenten per startjaar voor opleidings-sector", input$selectStudy)
-        svSub     <- studievoortgang[which(studievoortgang$iscedCode$iscedNaam == input$selectStudy),]
-        
-        ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal), environment=environment()) +
-          xlab("Jaar") +
-          ylab("Aantal Studenten") +
-          geom_bar(stat = "identity", fill="red", alpha = 1/2)+
-          ggtitle(plotTitle)
-      } 
-      else{
-        names     <- paste(input$selectStudy, collapse = ', ')
-        plotTitle <- paste("Studenten per startjaar voor:", names)
-        
-        if (nchar(plotTitle) > 100){
-          plotTitle <- "Studenten per startjaar voor verscheidene opleidingen"
-        }
-        
-        svSub <- studievoortgang[which(studievoortgang$iscedCode$iscedNaam == input$selectStudy),]
-        
-        ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal, fill=svSub$iscedCode$iscedNaam), environment=environment()) +
-          xlab("Jaar") +
-          ylab("Aantal Studenten") +
-          geom_bar(stat = "identity")+
-          ggtitle(plotTitle) +
-          scale_fill_manual(values=rainbow(length(input$selectStudy)),name="Opleidings Sector")
-      }
-    } 
-  })
-  #CHANGE
+    )
+  )
+}
+
+VoortgangsPercentagesServer <- function(input, output) {
   output$voortgangsPercentages <- renderPlot({
     customMean <- function(dataIn) {
       i <- 0
@@ -65,11 +24,9 @@ shinyServer(function(input, output) {
       for(row in dataIn){
         if(row == 0){
           if(zeroes == 0){
-            zeroes = zeroes + 1
-            i      = i + 1
-          } else {
-            zeroes = zeroes + 1
+            i = i + 1
           }
+          zeroes = zeroes + 1
         } else {
           sum = sum + row
           i   = i + 1
@@ -102,19 +59,17 @@ shinyServer(function(input, output) {
                                                     "9" = c("iscedCode", "hboGediplomeerd9Jaar", "woGediplomeerd9Jaar")
                             )
       )
-    
       
       svSub <- switch (input$voortgangType,
                        "uitschrijf" = aggregate (studievoortgang[, columnNames][,2], list(studievoortgang$iscedCode$iscedNaam), customMean),
                        "afgestudeerd" = aggregate (studievoortgang[, columnNames][,2] + studievoortgang[, columnNames][,3], list(studievoortgang$iscedCode$iscedNaam), customMean)
-                      )
+      )
       yLim <- switch (input$voortgangType,
                       "uitschrijf" = 35,
                       "afgestudeerd" = 100
-                      )
+      )
       
       colnames(svSub) <- c("sector", "mean")
-      print (svSub)
       svSub$mean <- as.numeric(svSub$mean)
       
       ggplot(svSub, aes(x = svSub$sector, y = svSub$mean, fill=svSub$sector), environment=environment()) +
@@ -124,11 +79,6 @@ shinyServer(function(input, output) {
         scale_fill_manual(values=rainbow(length(svSub$sector)),name="Opleidings Sector") +
         coord_cartesian(ylim=c(0,yLim)) + 
         theme(axis.text.x=element_blank())
-        
     }
   })
-})
-
-
-
-
+}

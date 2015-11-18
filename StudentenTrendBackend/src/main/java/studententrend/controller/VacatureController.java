@@ -32,21 +32,4 @@ public class VacatureController {
 		
 		return vacatures;
 	}
-	
-
-	@RequestMapping(
-			value = "/vacatures/isced", 
-			method = RequestMethod.GET,
-			headers = "Accept=application/json", 
-			produces = {"application/json"})
-	@ResponseBody
-	public List<Vacature> vacaturesAllIsced() {
-		List<Vacature> vacatures = (List<Vacature>) vacatureRepository.findAll();
-		
-		for(Vacature vacature : vacatures){
-			System.out.println(vacature.toString() + '\n');
-		}
-		
-		return vacatures;
-	}
 }
