@@ -54,6 +54,11 @@ target
 # TeXlipse plugin
 .texlipse
 .Rproj.user
+<<<<<<< HEAD
 
 # R 
 .Rhistory
+=======
+.Rhistory
+.Rdata
+>>>>>>> master
