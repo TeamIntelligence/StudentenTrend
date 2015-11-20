@@ -7,6 +7,7 @@ GetPages <- function() {
       ,list("Haalbaarheid", tabName="VoortgangsPercentages", icon=icon("bar-chart"))
       ,list("Gediplomeerde studenten", tabName="StudentenGediplomeerden", icon=icon("bar-chart"))
       ,list("Aantal vacatures", tabName = "AantalVacatures", icon=icon("bar-chart"))
+      ,list("Ingeschreven studenten",tabName = "StudentenIngeschreven",icon=icon("bar-chart"))
       )
   )
 }
