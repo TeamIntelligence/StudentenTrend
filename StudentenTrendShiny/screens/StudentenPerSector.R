@@ -49,7 +49,7 @@ StudentenPerSectorServer <- function(input, output) {
           plotTitle <- "Studenten per startjaar voor verscheidene opleidingen"
         }
         
-        svSub <- studievoortgang[which(studievoortgang$iscedCode$iscedNaam == input$selectStudy),]
+        svSub <- studievoortgang[which(studievoortgang$iscedCode$iscedNaam %in% input$selectStudy),]
         
         ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal, fill=svSub$iscedCode$iscedNaam), environment=environment()) +
           xlab("Jaar") +
