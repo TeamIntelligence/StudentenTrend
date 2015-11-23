@@ -22,6 +22,13 @@ LogList <- function(var, nameOf="") {
   str(var, list.len = 5)
 }
 
+LogCharacter <- function(var, nameOf) {
+  print(paste("Logging: ",nameOf))
+  print(paste("Class is: ",class(var)))
+  print(paste("Value is: ",var))
+  print(paste("it is ", length(var), " long"))
+}
+
 LogNum <- function(var, nameOf) {
   print(paste("Logging: ",nameOf))
   print(paste("Class is: ",class(var)))
