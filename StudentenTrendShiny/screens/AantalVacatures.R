@@ -1,23 +1,19 @@
 AantalVacaturesUI <- function(PageName){
   return(
+    
     tabItem(tabName = PageName,
-      # Application title
-      titlePanel("Histogram van aantal vacatures"),
-      
-      # Sidebar
-      sidebarLayout(
-        sidebarPanel(
-          checkboxGroupInput("checkGroup",
-                             label = h3("SBI"),
-                             choices = unique(vacatures$sbiCode$sbiNaam),
-                             selected = unique(vacatures$sbiCode$sbiNaam)
-          )
-        ),
-        # Show a plot of the generated distribution
-        mainPanel(
-          plotOutput("VacaPlot")
-        )
-      )
+            fluidRow(
+            # Application title
+            titlePanel("Histogram van aantal vacatures"),              
+              box(width=4, height = "100%",
+               checkboxGroupInput("checkGroup",
+                                  label = h3("SBI"),
+                                  choices = unique(vacatures$sbiCode$sbiNaam),
+                                  selected = unique(vacatures$sbiCode$sbiNaam)
+               )            
+              )
+              ,box(width=8, height = 400, plotOutput("VacaPlot", height=400))
+            )
     )
   )
 }
