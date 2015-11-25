@@ -4,16 +4,34 @@ AantalVacaturesUI <- function(PageName){
     tabItem(tabName = PageName,
             fluidRow(
             # Application title
-            titlePanel("Histogram van aantal vacatures"),              
+              titlePanel("Aantal vacatures"),
               box(width=4, height = "100%",
-               checkboxGroupInput("checkGroup",
-                                  label = h3("SBI"),
-                                  choices = unique(vacatures$sbiCode$sbiNaam),
-                                  selected = unique(vacatures$sbiCode$sbiNaam)
-               )            
+                  
+                  selectInput("AantalVacatures_Select",
+                              "Selecteer een of meerdere bedrijfssectoren om weer te geven:",
+                              choices = vacatures$sbiCode.sbiNaam,
+                              multiple = TRUE,
+                              selectize = TRUE,
+                              selected = 1
+                  ),
+                  
+                  checkboxInput("AantalVacatures_AlleSectoren",
+                                "Geef alle bedrijfssectoren weer"
+                  )
+                  
+#                   checkboxInput("AantalVacatures_TotaalGeselecteerd",
+#                                 "Totaal lijn weergeven van de geselecteerde bedrijfssectoren"
+#                   ),
+#                   
+#                   checkboxInput("AantalVacatures_Totaal",
+#                                 "Totaal lijn weergeven"
+#                   ),
+                  
+                  
               )
-              ,box(width=8, height = 400, plotOutput("VacaPlot", height=400))
-            )
+              ,box(width=8, height = 600, plotOutput("VacaPlot", height=600))
+            )  
+            
     )
   )
 }
@@ -21,13 +39,40 @@ AantalVacaturesUI <- function(PageName){
 AantalVacaturesServer <- function(input,output){
   output$VacaPlot <- renderPlot({
     
-    vacSub <- vacatures[which(vacatures$sbiCode$sbiNaam %in% input$checkGroup),]
+    
+    AantalVacatures_vacSub <<- vacatures[vacatures$sbiCode.sbiNaam %in% input$AantalVacatures_Select,]
+    
+    
+    
+    if(input$AantalVacatures_AlleSectoren == FALSE){ #als je niet alles wilt, alleen dan kijken naar de gekozen vacatures
+      AantalVacatures_vacSub <- AantalVacatures_vacSub[AantalVacatures_vacSub$sbiCode.sbiNaam %in% input$AantalVacatures_Select,]
+    }
+    
+    #plotten en titel laten afhangen
+    if ( (!is.null(input$AantalVacatures_Select)) | (input$AantalVacatures_AlleSectoren==TRUE) ){ #minimaal 1 vacature, of alle vacatures
+      if(length(input$AantalVacatures_Select) == 1){ #1vacature
+        plotTitle <- paste("Aantal vacatures \nper jaar verdeeld per bedrijfssector", input$AantalVacatures_Select)
+      } 
+      else{ # meerdere vacatures, met namen in de titel
+        names     <- paste(input$AantalVacatures_Select, collapse = ', ')
+        plotTitle <- paste("Aantal vacatures voor:", names)
+        
+        if (nchar(plotTitle) > 100){ #te lange naam aanpassen
+          plotTitle <- "Aantal vacatures voor verscheidene bedrijfssectoren"
+        }
+        
+      }
+    
+    
     # draw the histogram
-    ggplot(vacSub, aes(x=vacSub$jaartal,y=vacSub$aantal, fill=vacSub$sbiCode$sbiNaam),environment = environment()) +
+    ggplot(AantalVacatures_vacSub, aes(x=jaartal)) +
       xlab("Jaar") + 
       ylab("Aantal vacatures") +
-      geom_bar(stat = "identity") +
-      ggtitle("Aantal vacatures per jaar per SBI") +
-      scale_fill_manual(values=rainbow(20),name="SBI")
+      ggtitle(plotTitle) +
+      geom_line(aes(y=aantal, group=sbiCode.sbiNaam, color=sbiCode.sbiNaam)) + 
+      geom_point(aes(y=aantal, group=sbiCode.sbiNaam, color=sbiCode.sbiNaam)) +
+      labs(color = "Bedrijfssectoren") 
+    }
+    
   })
 }

@@ -39,5 +39,5 @@ source("utils/FileLoader.R")
 
 studievoortgang <- fromJSON("http://188.166.3.196:8080/studenten/studievoortgang")
 studenten_gediplomeerden <- fromJSON("http://188.166.3.196:8080/studenten/gediplomeerden",flatten=TRUE)
-vacatures <- fromJSON("http://188.166.3.196:8080/vacatures")
+vacatures <- fromJSON("http://188.166.3.196:8080/vacatures",flatten=TRUE)
 studenten_ingeschrevenen <- fromJSON("http://188.166.3.196:8080/studenten/ingeschrevenen",flatten=TRUE)
