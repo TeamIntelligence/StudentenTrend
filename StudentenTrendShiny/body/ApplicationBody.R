@@ -1,15 +1,15 @@
-#Load the whole application body section dynamically
+# Load the whole application body section dynamically
 LoadApplicationBody <- function() {
   # Get all the pages that are currently in this application
   Pages <- GetPages()
   TabItems <- NULL
   
-  #Loop throught those pages and call the UI function for it
+  # Loop throught those pages and call the UI function for it
   for(Page in Pages) {
     Item         <- CallUIFunction(Page)
     NewList      <- NULL
     
-    #If the UI function is found add it to the layout
+    # If the UI function is found add it to the layout
     if(!is.null(Item)) {
       if(is.null(TabItems)) {
         TabItems <- list(Item)

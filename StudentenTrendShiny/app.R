@@ -1,14 +1,14 @@
-#load our files
+# Load our files
 source("FileLoader.R")
 
-#Build the UI sections
+# Build the UI sections
 ui <- dashboardPage(
    dashboardHeader(title = "StudentenTrend")
   ,dashboardSidebar(BuildSideBarMenu())
   ,dashboardBody(LoadApplicationBody())
 )
 
-#Call the Server functions
+# Call the Server functions
 server <- function(input, output) {
   # Get all the pages that are currently in this application
   Pages <- GetPages()
@@ -18,7 +18,9 @@ server <- function(input, output) {
     # Loop through the children and try to find SubMenuItems
     for(i in 1:length(Page)) {
       SubItem <- Page[i]
+      # Determine if the SubItem is really a SubItem 
       if(!is.null(SubItem) && names(SubItem) == "" && class(SubItem[[1]]) != "character") {
+        # Fill a list object and call the server function
         SubItem <- list(tabName=GetPageNameSubItem(SubItem))
         CallServerFunction(Page=SubItem, input, output)
       }
@@ -28,5 +30,5 @@ server <- function(input, output) {
   }
 }
 
-#Run the application
+# Run the application
 shinyApp(ui, server)

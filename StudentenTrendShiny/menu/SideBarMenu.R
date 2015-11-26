@@ -1,4 +1,4 @@
-#Gets all the pages that are currently within the application
+# Gets all the pages that are currently within the application
 GetPages <- function() {
   return(
     list(
@@ -12,15 +12,13 @@ GetPages <- function() {
   )
 }
 
-#Builds the sidebar menu dynamically based on the items inside the GetPages() function
+# Builds the sidebar menu dynamically based on the items inside the GetPages() function
 BuildSideBarMenu <- function() {
   MenuItems <- GetPages()
   SideBarItems <- NULL
   
-  #Loop throught the pages and create an menuitem on the left hand side
+  # Loop throught the pages and create an menuitem on the left hand side
   for(item in MenuItems) {
-    test123 <<- item
-    
     if(is.null(SideBarItems)) {
       SideBarItems <- list(do.call(menuItem, item))
     } else {

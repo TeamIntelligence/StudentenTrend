@@ -34,8 +34,14 @@ if(!require(data.table)) {
 }
 library(data.table)
 
-studievoortgang <- fromJSON("http://188.166.3.196:8080/studenten/studievoortgang")
-studenten_gediplomeerden <- fromJSON("http://188.166.3.196:8080/studenten/gediplomeerden",flatten=TRUE)
-vacatures <- fromJSON("http://188.166.3.196:8080/vacatures",flatten=TRUE)
-vacatures_jaartallen <- fromJSON("http://188.166.3.196:8080/vacatures/jaartallen",flatten=TRUE)
-studenten_ingeschrevenen <- fromJSON("http://188.166.3.196:8080/studenten/ingeschrevenen",flatten=TRUE)
+LoadFromServer <- function(vName, ...) {
+  if(!exists(vName, envir=.GlobalEnv)) {
+    assign(vName, do.call(fromJSON, list(...)), envir=.GlobalEnv)
+  }
+}
+
+LoadFromServer("studievoortgang", "http://188.166.3.196:8080/studenten/studievoortgang")
+LoadFromServer("studenten_gediplomeerden", "http://188.166.3.196:8080/studenten/gediplomeerden",flatten=TRUE)
+LoadFromServer("vacatures", "http://188.166.3.196:8080/vacatures",flatten=TRUE)
+LoadFromServer("vacatures_jaartallen", "http://188.166.3.196:8080/vacatures/jaartallen",flatten=TRUE)
+LoadFromServer("studenten_ingeschrevenen", "http://188.166.3.196:8080/studenten/ingeschrevenen",flatten=TRUE)
