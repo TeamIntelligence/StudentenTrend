@@ -3,8 +3,7 @@ LoadFolder <- function(path) {
   sapply(file.sources,source,.GlobalEnv)
 }
 
-source("utils/Util.R")
-source("utils/LogVar.R")
+LoadFolder("utils")
 LoadFolder("menu")
 LoadFolder("body")
 LoadFolder("screens")

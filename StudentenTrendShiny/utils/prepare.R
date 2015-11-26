@@ -34,9 +34,6 @@ if(!require(data.table)) {
 }
 library(data.table)
 
-#load our files
-source("utils/FileLoader.R")
-
 studievoortgang <- fromJSON("http://188.166.3.196:8080/studenten/studievoortgang")
 studenten_gediplomeerden <- fromJSON("http://188.166.3.196:8080/studenten/gediplomeerden",flatten=TRUE)
 vacatures <- fromJSON("http://188.166.3.196:8080/vacatures")
