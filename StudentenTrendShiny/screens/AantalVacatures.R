@@ -2,38 +2,37 @@ AantalVacaturesUI <- function(PageName){
   return(
     
     tabItem(tabName = PageName,
-            fluidRow(
-            # Application title
-              titlePanel("Aantal vacatures"),
-              box(width=5, height = 150,
-                  
-                  selectInput("AantalVacatures_Select",
-                              "Selecteer een of meerdere bedrijfssectoren om weer te geven:",
-                              choices = vacatures$sbiCode.sbiNaam,
-                              multiple = TRUE,
-                              selectize = TRUE,
-                              selected = 1
-                  ),
-                  
-                  checkboxInput("AantalVacatures_AlleSectoren",
-                                "Geef alle bedrijfssectoren weer"
-                  )
-                  
-              ),
-              box(width=7, height=150,
-                  checkboxInput("AantalVacatures_TotaalGeselecteerd",
-                                "Totaal lijn weergeven van de geselecteerde bedrijfssectoren"
-                  ),
-                  
-                  checkboxInput("AantalVacatures_Totaal",
-                                "Totaal lijn weergeven"
-                  )
-                  
-              )
-              ,box(width=5, height = 470, plotOutput("VacaPlot", height = 450))
-              ,box(width=7, height = 470, plotOutput("VacaBarPlot", height=450))
-            )  
+      # Page title
+      titlePanel("Aantal vacatures"),
+      fluidRow(
+        box(width=5, height = 150,
             
+            selectInput("AantalVacatures_Select",
+                        "Selecteer een of meerdere bedrijfssectoren om weer te geven:",
+                        choices = vacatures$sbiCode.sbiNaam,
+                        multiple = TRUE,
+                        selectize = TRUE,
+                        selected = 1
+            ),
+            
+            checkboxInput("AantalVacatures_AlleSectoren",
+                          "Geef alle bedrijfssectoren weer"
+            )
+            
+        ),
+        box(width=7, height=150,
+            checkboxInput("AantalVacatures_TotaalGeselecteerd",
+                          "Totaal lijn weergeven van de geselecteerde bedrijfssectoren"
+            ),
+            
+            checkboxInput("AantalVacatures_Totaal",
+                          "Totaal lijn weergeven"
+            )
+            
+        )
+        ,box(width=5, height = 470, plotOutput("VacaPlot", height = 450))
+        ,box(width=7, height = 470, plotOutput("VacaBarPlot", height=450))
+      )   
     )
   )
 }

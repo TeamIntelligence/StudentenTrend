@@ -2,17 +2,16 @@
 StudentenPerSectorUI <- function(PageName) {
   return(
     tabItem(tabName = PageName,
+      titlePanel("Studenten per opleidings-sector"),
+      
       fluidRow(
-         box(width=4, height = "100%", footer = "Je kan ook typen om te zoeken",
-             selectInput("StudentenPerSector_selectStudy"
-                         ,"Selecteer een of meerdere studiesectoren om weer te geven:"
-                         ,choices = unique(studievoortgang$iscedCode$iscedNaam)
-                         ,multiple = TRUE
-                         ,selectize = TRUE
-                         ,selected = 1
-             )
-         )
-        ,box(width=8, height = 800, plotOutput("StudentenPerSector_aantalStudentenPlot", height=750))
+        box(width=12, height = 170, uiOutput("StudentenPerSector_selectStudy"),
+            
+            checkboxInput("StudentenPerSector_AlleStudies",
+                          "Geef alle studies weer"
+            )
+        )
+        ,box(width=12, height = 470, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450))
       )
     )
   )
@@ -21,11 +20,30 @@ StudentenPerSectorUI <- function(PageName) {
 #The Server function for the StudentenPerSector page
 StudentenPerSectorServer <- function(input, output) {
   
+  output$StudentenPerSector_selectStudy <- renderUI({
+    if(input$StudentenPerSector_AlleStudies == TRUE){  #Alles studies selecteren
+      selectInput("StudentenPerSector_selectStudyImp",
+                  "Selecteer een of meerdere studiesectoren om weer te geven:",
+                  choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
+                  multiple = TRUE,
+                  selectize = TRUE,
+                  selected = studenten_ingeschrevenen$iscedCode.iscedNaam
+      )
+    } else { 
+      selectInput("StudentenPerSector_selectStudyImp",
+                  "Selecteer een of meerdere studiesectoren om weer te geven:",
+                  choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
+                  multiple = TRUE,
+                  selectize = TRUE
+      )
+    }   
+  })
+  
   output$StudentenPerSector_aantalStudentenPlot <- renderPlot({
-    if (!is.null(input$StudentenPerSector_selectStudy)) {
-      if(length(input$StudentenPerSector_selectStudy) == 1) {
-        plotTitle <- paste("Aantal studenten per startjaar voor opleidings-sector", input$StudentenPerSector_selectStudy)
-        svSub     <- studievoortgang[which(studievoortgang$iscedCode$iscedNaam == input$StudentenPerSector_selectStudy),]
+    if (!is.null(input$StudentenPerSector_selectStudyImp)) {
+      if(length(input$StudentenPerSector_selectStudyImp) == 1) {
+        plotTitle <- paste("Aantal studenten per startjaar voor opleidings-sector", input$StudentenPerSector_selectStudyImp)
+        svSub     <- studievoortgang[which(studievoortgang$iscedCode$iscedNaam == input$StudentenPerSector_selectStudyImp),]
         
         ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal), environment=environment()) +
           xlab("Jaar") +
@@ -33,21 +51,21 @@ StudentenPerSectorServer <- function(input, output) {
           geom_bar(stat = "identity", fill="red", alpha = 1/2)+
           ggtitle(plotTitle)
       } else {
-        names     <- paste(input$StudentenPerSector_selectStudy, collapse = ', ')
+        names     <- paste(input$StudentenPerSector_selectStudyImp, collapse = ', ')
         plotTitle <- paste("Studenten per startjaar voor:", names)
         
         if (nchar(plotTitle) > 100) {
           plotTitle <- "Studenten per startjaar voor verscheidene opleidingen"
         }
         
-        svSub <- studievoortgang[which(studievoortgang$iscedCode$iscedNaam %in% input$StudentenPerSector_selectStudy),]
+        svSub <- studievoortgang[which(studievoortgang$iscedCode$iscedNaam %in% input$StudentenPerSector_selectStudyImp),]
         
         ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal, fill=svSub$iscedCode$iscedNaam), environment=environment()) +
           xlab("Jaar") +
           ylab("Aantal Studenten") +
           geom_bar(stat = "identity")+
           ggtitle(plotTitle) +
-          scale_fill_manual(values=rainbow(length(input$StudentenPerSector_selectStudy)),name="Opleidings Sector")
+          scale_fill_manual(values=rainbow(length(input$StudentenPerSector_selectStudyImp)),name="Opleidings Sector")
       }
     } 
   })

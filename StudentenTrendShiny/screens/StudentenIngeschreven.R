@@ -1,44 +1,38 @@
 StudentenIngeschrevenUI <- function(PageName){
-  return(
-    
-         
-    tabItem(tabName = PageName,
-            fluidRow(
-            # Application title
-            titlePanel("Ingeschreven studenten"),
-              box(width=4, height = 170,
-                uiOutput("StudentenIngeschreven_SelectStudy"
-                ),
-                
-                checkboxInput("StudentenIngeschreven_AlleStudies",
-                              "Selecteer alle studies"
-                )
-                
-              ),
-              box(width = 4, height = 170,
-                radioButtons("StudentenIngeschreven_StudieNiveau",
-                             "Studie Niveau", 
-                             choices = list("HBO" = "HBO", 
-                                            "WO"  = "WO",
-                                            "HBO en WO" = "HBOWO")
-                )
-              ),
-              box(width = 4, height = 170,
-                checkboxInput("StudentenIngeschreven_Totaalselect",
-                              "Totaal lijn weergeven van de geselecteerde studies"
-                ),
-                checkboxInput("StudentenIngeschreven_Totaal",
-                            "Totaal lijn weergeven"
-                )
-                
-              )
-              
-              # Show a plot of the generated distribution
-              ,box(width=5, height = 470, plotOutput("aantalIngeschrevenPlot", height=450))
-              ,box(width=7, height = 470, plotOutput("aantalIngeschrevenBarPlot", height=450))
-              )
-            )
-          )
+  return(  
+  tabItem(tabName = PageName,
+    # Page title
+    titlePanel("Ingeschreven studenten"),
+    fluidRow(
+      box(width=4, height = 170, uiOutput("StudentenIngeschreven_SelectStudy"),
+        checkboxInput("StudentenIngeschreven_AlleStudies",
+                      "Selecteer alle studies"
+        )
+      ),
+      box(width = 4, height = 170,
+        radioButtons("StudentenIngeschreven_StudieNiveau",
+                     "Studie Niveau", 
+                     choices = list("HBO" = "HBO", 
+                                    "WO"  = "WO",
+                                    "HBO en WO" = "HBOWO")
+        )
+      ),
+      box(width = 4, height = 170,
+        checkboxInput("StudentenIngeschreven_Totaalselect",
+                      "Totaal lijn weergeven van de geselecteerde studies"
+        ),
+        checkboxInput("StudentenIngeschreven_Totaal",
+                    "Totaal lijn weergeven"
+        )
+        
+      )
+      
+      # Show a plot of the generated distribution
+      ,box(width=5, height = 470, plotOutput("aantalIngeschrevenPlot", height=450))
+      ,box(width=7, height = 470, plotOutput("aantalIngeschrevenBarPlot", height=450))
+      )
+    )
+  )
 }
 
 

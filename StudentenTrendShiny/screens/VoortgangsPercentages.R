@@ -1,16 +1,21 @@
 VoortgangsPercentagesUI <- function(PageName) {
   return(
     tabItem(tabName = PageName,
+      titlePanel("Voortgangspercentages per studie"),
+      
       fluidRow(
-        box(width=4, height = "100%", footer = "Gemiddelde afstudeer/uitschrijf percentages per studie binnen ... jaar na aanvang",
+        box(width=4, height = 170, footer = "Gemiddelde afstudeer/uitschrijf percentages per studie binnen ... jaar na aanvang",
             radioButtons("VoortgangsPercentages_voortgangType", "Soort", 
                          choices = list("Uitschrijf percentages" = "uitschrijf", 
                                         "Afstudeer percentages"  = "afgestudeerd")
-            ),
-            uiOutput    ("VoortgangsPercentages_yearRange"), 
-            uiOutput    ("VoortgangsPercentages_percentageRadio")
-        )
-        ,box(width=8, height = 800, plotOutput("VoortgangsPercentages_plot", height=750))
+            )
+        ),
+        box(width=4, height = 170, uiOutput("VoortgangsPercentages_yearRange")),
+        box(width=4, height = 170,uiOutput("VoortgangsPercentages_percentageRadio"))
+         
+        
+        # Show a plot of the generated distribution
+        ,box(width=12, height = 470, plotOutput("VoortgangsPercentages_plot", height=450))
       )
     )
   )

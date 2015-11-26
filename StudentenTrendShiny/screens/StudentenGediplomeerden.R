@@ -2,55 +2,53 @@ StudentenGediplomeerdenUI <- function(PageName){
   return(
     
     tabItem(tabName = PageName, 
-            fluidRow(
-              # Application title
-              titlePanel("Gediplomeerde studenten"),
-              box(width=4, height = 170, #background = "maroon",
-                
-                  selectInput("StudentenGediplomeerden_StudySelect",
-                              "Selecteer een of meerdere studiesectoren om weer te geven:",
-                              choices = studenten_gediplomeerden$iscedCode.iscedNaam,
-                              multiple = TRUE,
-                              selectize = TRUE,
-                              selected = 1
-                              
-                  ),
-                  
-                  #Hoogte handmatig aanpassen van alle select inputs
-                  tags$style(type='text/css',".selectize-input { height: 59px; overflow: auto;}"),
-                  
-                  checkboxInput("StudentenGediplomeerden_AlleStudies",
-                                "Geef alle studies weer"
-                  )
-              ),
-              box(width=4, height = 170,
-                radioButtons("StudentenGediplomeerden_StudieNiveau",
-                             "Studie Niveau", 
-                             choices = list("HBO" = "HBO", 
-                                            "WO Bachelor"  = "WOB",
-                                            "WO Master" = "WOM",
-                                            "HBO en WO Master" = "HBOWO")
-                )
+        # Page title
+        titlePanel("Gediplomeerde studenten"),
+        fluidRow(
+          box(width=4, height = 170, #background = "maroon",
+            selectInput("StudentenGediplomeerden_StudySelect",
+                        "Selecteer een of meerdere studiesectoren om weer te geven:",
+                        choices = studenten_gediplomeerden$iscedCode.iscedNaam,
+                        multiple = TRUE,
+                        selectize = TRUE,
+                        selected = 1
+                        
+            ),
+            
+            #Hoogte handmatig aanpassen van alle select inputs
+            tags$style(type='text/css',".selectize-input { height: 59px; overflow: auto;}"),
+            
+            checkboxInput("StudentenGediplomeerden_AlleStudies",
+                          "Geef alle studies weer"
+            )
+          ),
+          box(width=4, height = 170,
+            radioButtons("StudentenGediplomeerden_StudieNiveau",
+                         "Studie Niveau", 
+                         choices = list("HBO" = "HBO", 
+                                        "WO Bachelor"  = "WOB",
+                                        "WO Master" = "WOM",
+                                        "HBO en WO Master" = "HBOWO")
+            )
+          ),
+          
+          box(width=4, height = 170,
+              
+              checkboxInput("StudentenGediplomeerden_TotaalGeselecteerd",
+                            "Totaal lijn weergeven van de geselecteerde studies"
               ),
               
-              box(width=4, height = 170,
-                  
-                  checkboxInput("StudentenGediplomeerden_TotaalGeselecteerd",
-                                "Totaal lijn weergeven van de geselecteerde studies"
-                  ),
-                  
-                  checkboxInput("StudentenGediplomeerden_Totaal",
-                                "Totaal lijn weergeven"
-                  )
+              checkboxInput("StudentenGediplomeerden_Totaal",
+                            "Totaal lijn weergeven"
               )
-                  
-            
-            ,box(width=5, height = 470, plotOutput("DiploPlot", height=450))
-            ,box(width=7, height = 470, plotOutput("DiploBarPlot", height=450))
-            )
           )
+              
+        
+        ,box(width=5, height = 470, plotOutput("DiploPlot", height=450))
+        ,box(width=7, height = 470, plotOutput("DiploBarPlot", height=450))
+        )
+      )
     )
-
 }
 
 StudentenGediplomeerdenServer <- function(input, output){
