@@ -1,4 +1,5 @@
-source("utils/prepare.R")
+#load our files
+source("FileLoader.R")
 
 #Build the UI sections
 ui <- dashboardPage(
@@ -12,10 +13,15 @@ server <- function(input, output) {
   # Get all the pages that are currently in this application
   Pages <- GetPages()
   
-  #Loop throught those pages and call the Server function for it
+  # Loop through those pages and call the Server function for it
   for(Page in Pages) {
-    for(SubItem in Page["subItems"]) {
-      CallServerFunction(Page=SubItem, input, output)
+    # Loop through the children and try to find SubMenuItems
+    for(i in 1:length(Page)) {
+      SubItem <- Page[i]
+      if(!is.null(SubItem) && names(SubItem) == "" && class(SubItem[[1]]) != "character") {
+        SubItem <- list(tabName=GetPageNameSubItem(SubItem))
+        CallServerFunction(Page=SubItem, input, output)
+      }
     }
     
     CallServerFunction(Page=Page, input, output)

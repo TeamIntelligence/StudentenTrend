@@ -6,34 +6,26 @@ LoadApplicationBody <- function() {
   
   #Loop throught those pages and call the UI function for it
   for(Page in Pages) {
-    FunctionName <- paste(Page["tabName"], "UI", sep="")
-    Item         <- NULL
-    
-    #Try to call the UI function, if not exist log it
-    tryCatch({
-      Item <- do.call(FunctionName, list(Page["tabName"]) ) 
-    }
-    ,error = function(cond) {
-      Item <<- tabItem(tabName = Page["tabName"],
-        fluidRow(
-          box(width=12, height = 800, title = paste("De ", Page["tabName"], " pagina is niet gevonden!")
-          )
-        )
-      )
-      
-      message(paste("Could not find the UI function of: ", Page["tabName"]))
-    })
-    
-    if(is.null(Item)) {
-      Item <- get("Item", envir = .GlobalEnv)
-      remove("Item", envir = .GlobalEnv)
-    }
+    Item         <- CallUIFunction(Page)
+    NewList      <- NULL
     
     #If the UI function is found add it to the layout
     if(!is.null(Item)) {
       if(is.null(TabItems)) {
         TabItems <- list(Item)
+        NewList  <- TRUE
       } else {
+        TabItems[[length(TabItems)+1]] <- Item
+        NewList  <- FALSE
+      }
+    }
+    
+    for(i in 1:length(Page)) {
+      SubItem <- Page[i]
+      if(!is.null(SubItem) && names(SubItem) == "" && class(SubItem[[1]]) != "character") {
+        SubItem <- list(tabName=GetPageNameSubItem(SubItem))
+        Item    <- CallUIFunction(Page=SubItem)
+        
         TabItems[[length(TabItems)+1]] <- Item
       }
     }
