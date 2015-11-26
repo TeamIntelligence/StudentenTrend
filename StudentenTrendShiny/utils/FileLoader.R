@@ -4,6 +4,7 @@ LoadFolder <- function(path) {
 }
 
 source("utils/Util.R")
+source("utils/LogVar.R")
 LoadFolder("menu")
 LoadFolder("body")
 LoadFolder("screens")
