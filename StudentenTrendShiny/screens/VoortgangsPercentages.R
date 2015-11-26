@@ -96,7 +96,7 @@ VoortgangsPercentagesServer <- function(input, output) {
       }
       return(data)
     }
-    if(is.null(morphedSet)){
+    if(!exists("morphedSet") || is.null(morphedSet)){
       morphedSet <- morphSet(studievoortgang)
     }    
     
