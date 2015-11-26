@@ -14,15 +14,11 @@ server <- function(input, output) {
   
   #Loop throught those pages and call the Server function for it
   for(Page in Pages) {
-    FunctionName <- paste(Page["tabName"], "Server", sep="")
-    
-    #Try to call the server function, if not exist log it
-    tryCatch({
-      do.call(FunctionName, list(input, output) ) 
+    for(SubItem in Page["subItems"]) {
+      CallServerFunction(Page=SubItem, input, output)
     }
-    ,error = function(cond) {
-      message(paste("Could not find the Server function of: ", Page["tabName"]))
-    })
+    
+    CallServerFunction(Page=Page, input, output)
   }
 }
 

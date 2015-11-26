@@ -32,4 +32,21 @@ public class VacatureController {
 		
 		return vacatures;
 	}
+	
+
+	@RequestMapping(
+			value = "/vacatures/jaartallen", 
+			method = RequestMethod.GET,
+			headers = "Accept=application/json", 
+			produces = {"application/json"})
+	@ResponseBody
+	public List<Vacature> vacaturesAllJaartallen() {
+		List<Vacature> vacatures = (List<Vacature>) vacatureRepository.findByAlleJaartal();
+		
+		for(Vacature vacature : vacatures){
+			System.out.println(vacature.toString() + '\n');
+		}
+		
+		return vacatures;
+	}
 }
