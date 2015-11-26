@@ -3,6 +3,7 @@ LoadFolder <- function(path) {
   sapply(file.sources,source,.GlobalEnv)
 }
 
+LoadFolder("util")
 LoadFolder("menu")
 LoadFolder("body")
 LoadFolder("screens")
