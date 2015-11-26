@@ -49,34 +49,20 @@ AantalVacaturesServer <- function(input,output){
     if(input$AantalVacatures_AlleSectoren == FALSE){ #als je niet alles wilt, alleen dan kijken naar de gekozen vacatures
       AantalVacatures_vacSub <<- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% input$AantalVacatures_Select,]
     }
-    
-    #plotten en titel laten afhangen
-    if ( (!is.null(input$AantalVacatures_Select)) | (input$AantalVacatures_AlleSectoren==TRUE) ){ #minimaal 1 vacature, of alle vacatures
-      if(length(input$AantalVacatures_Select) == 1){ #1vacature
-        plotTitle <- paste("Aantal vacatures \nper jaar verdeeld per bedrijfssector", input$AantalVacatures_Select)
-      } 
-      else{ # meerdere vacatures, met namen in de titel
-        names     <- paste(input$AantalVacatures_Select, collapse = ', ')
-        plotTitle <- paste("Aantal vacatures voor:", names)
-        
-        if (nchar(plotTitle) > 100){ #te lange naam aanpassen
-          plotTitle <- "Aantal vacatures voor verscheidene bedrijfssectoren"
-        }
-        
-      }
+
     
     
     # draw the histogram
     ggplot(AantalVacatures_vacSub, aes(x=jaartal)) +
       xlab("Jaar") + 
       ylab("Aantal vacatures") +
-      ggtitle(plotTitle) +
+      ggtitle("Aantal vacatures per sector") +
       geom_line(aes(y=aantal, color=sbiCode.sbiNaam))+
       geom_point(aes(y=aantal, color=sbiCode.sbiNaam))+ 
       theme(legend.position="none")
-    }
     
   })
+  
   output$VacaBarPlot <- renderPlot({
     
     
@@ -88,29 +74,15 @@ AantalVacaturesServer <- function(input,output){
       AantalVacatures_vacBarSub <<- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% input$AantalVacatures_Select,]
     }
     
-    #plotten en titel laten afhangen
-    if ( (!is.null(input$AantalVacatures_Select)) | (input$AantalVacatures_AlleSectoren==TRUE) ){ #minimaal 1 vacature, of alle vacatures
-      if(length(input$AantalVacatures_Select) == 1){ #1vacature
-        plotTitle <- paste("Aantal vacatures \nper jaar verdeeld per bedrijfssector", input$AantalVacatures_Select)
-      } 
-      else{ # meerdere vacatures, met namen in de titel
-        names     <- paste(input$AantalVacatures_Select, collapse = ', ')
-        plotTitle <- paste("Aantal vacatures voor:", names)
-        
-        if (nchar(plotTitle) > 100){ #te lange naam aanpassen
-          plotTitle <- "Aantal vacatures voor verscheidene bedrijfssectoren"
-        }
-        
-      }
+
       
       # draw the histogram
       ggplot(AantalVacatures_vacBarSub, aes(x=jaartal)) +
         xlab("Jaar") + 
         ylab("Aantal vacatures") +
-        ggtitle(plotTitle) +
+        ggtitle("Aantal vacatures per sector") +
         geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
         labs(fill = "Bedrijfssectoren") 
-    }
     
   })
 }

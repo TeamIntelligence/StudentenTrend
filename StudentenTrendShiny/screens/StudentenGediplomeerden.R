@@ -5,21 +5,25 @@ StudentenGediplomeerdenUI <- function(PageName){
             fluidRow(
               # Application title
               titlePanel("Gediplomeerde studenten"),
-              box(width=4, height = 150, #background = "maroon",
-                  
+              box(width=4, height = 170, #background = "maroon",
+                
                   selectInput("StudentenGediplomeerden_StudySelect",
                               "Selecteer een of meerdere studiesectoren om weer te geven:",
                               choices = studenten_gediplomeerden$iscedCode.iscedNaam,
                               multiple = TRUE,
                               selectize = TRUE,
                               selected = 1
+                              
                   ),
+                  
+                  #Hoogte handmatig aanpassen van alle select inputs
+                  tags$style(type='text/css',".selectize-input { height: 59px; overflow: auto;}"),
                   
                   checkboxInput("StudentenGediplomeerden_AlleStudies",
                                 "Geef alle studies weer"
                   )
               ),
-              box(width=4, height = 150,
+              box(width=4, height = 170,
                 radioButtons("StudentenGediplomeerden_StudieNiveau",
                              "Studie Niveau", 
                              choices = list("HBO" = "HBO", 
@@ -29,7 +33,7 @@ StudentenGediplomeerdenUI <- function(PageName){
                 )
               ),
               
-              box(width=4, height = 150,
+              box(width=4, height = 170,
                   
                   checkboxInput("StudentenGediplomeerden_TotaalGeselecteerd",
                                 "Totaal lijn weergeven van de geselecteerde studies"
@@ -72,31 +76,15 @@ StudentenGediplomeerdenServer <- function(input, output){
       StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_StudySelect,]
     }
     
-    #plotten en titel laten afhangen
-    if ( (!is.null(input$StudentenGediplomeerden_StudySelect)) | (input$StudentenGediplomeerden_AlleStudies==TRUE) ){ #minimaal 1 studie, of alle studies
-      if(length(input$StudentenGediplomeerden_StudySelect) == 1){ #1studie
-        plotTitle <- paste("Aantal gediplomeerde bachelor studenten \nper jaar verdeeld per studie", input$StudentenGediplomeerden_StudySelect)
-      } 
-      else{ # meerdere studies, met namen in de titel
-        names     <- paste(input$StudentenGediplomeerden_StudySelect, collapse = ', ')
-        plotTitle <- paste("Aantal gediplomeerde bachelor studenten voor:", names)
-        
-        if (nchar(plotTitle) > 100){ #te lange naam aanpassen
-          plotTitle <- "Aantal gediplomeerde bachelor studenten voor verscheidene opleidingen"
-        }
-        
-      }
-      
-      
+    
       ggplot(StudentenGediplomeerden_StudieSub, aes(x=jaartal)) + 
         xlab("Jaar") +  
         ylab("Aantal studenten") + 
-        ggtitle(plotTitle) +
+        ggtitle("Aantal gediplomeerde studenten") +
         geom_line(aes(y=aantal, color=iscedCode.iscedNaam)) + 
         geom_point(aes(y=aantal, color=iscedCode.iscedNaam)) +
         labs(color = "Studierichting")+ 
         theme(legend.position="none")
-    } 
   })
   
   output$DiploBarPlot <- renderPlot({
@@ -121,30 +109,14 @@ StudentenGediplomeerdenServer <- function(input, output){
       StudentenGediplomeerden_StudieBarSub <- StudentenGediplomeerden_StudieBarSub[StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_StudySelect,]
     }
     
-    #plotten en titel laten afhangen
-    if ( (!is.null(input$StudentenGediplomeerden_StudySelect)) | (input$StudentenGediplomeerden_AlleStudies==TRUE) ){ #minimaal 1 studie, of alle studies
-      if(length(input$StudentenGediplomeerden_StudySelect) == 1){ #1studie
-        plotTitle <- paste("Aantal gediplomeerde bachelor studenten \nper jaar verdeeld per studie", input$StudentenGediplomeerden_StudySelect)
-      } 
-      else{ # meerdere studies, met namen in de titel
-        names     <- paste(input$StudentenGediplomeerden_StudySelect, collapse = ', ')
-        plotTitle <- paste("Aantal gediplomeerde bachelor studenten voor:", names)
-        
-        if (nchar(plotTitle) > 100){ #te lange naam aanpassen
-          plotTitle <- "Aantal gediplomeerde bachelor studenten voor verscheidene opleidingen"
-        }
-        
-      }
-      
-      
+    
       ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
         xlab("Jaar") +  
         ylab("Aantal studenten") + 
-        ggtitle(plotTitle) +
+        ggtitle("Aantal gediplomeerde studenten") +
         geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
         labs(color = "Studierichting")
 
-    } 
   })
   
 }  
