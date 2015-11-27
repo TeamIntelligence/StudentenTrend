@@ -14,7 +14,7 @@ DashboardUI <- function(PageName) {
 DashboardServer <- function(input, output) {
   output$Dashboard_introText <- renderUI({
     HTML("StudentenTrend is een applicatie die inzichtelijk maakt wat er omtrent studenten en vacatures binnen Nederland gebeurd. 
-      Deze applicatie bevat diverse grafieken die informatie  geven over bijvoorbeeld het aantal afgestudeerde studenten per studiesector 
+      Deze applicatie bevat diverse grafieken die informatie geven over bijvoorbeeld het aantal afgestudeerde studenten per studiesector 
       binnen Nederland. Ook is duidelijk te zien hoeveel studenten er staan ingeschreven en hoeveel de opleiding ook daadwerkelijk voltooien.
       Om wat aan deze data te hebben is ook het aantal vacatures nodig. Hiervoor hebben wij ook de data beschikbaar van het aantal banen per 
       sector binnen Nederland. <br /><br />
