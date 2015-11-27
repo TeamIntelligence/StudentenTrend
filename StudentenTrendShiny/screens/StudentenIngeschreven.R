@@ -58,37 +58,6 @@ StudentenIngeschrevenServer <- function(input, output){
     }   
   })
   
-  output$aantalIngeschrevenBarPlot <- renderPlot({
-    #data aanpassen nav keuzes gebruiker: studieniveau
-    siBarSub <- switch (input$StudentenIngeschreven_StudieNiveau,
-                     "HBO" = studenten_ingeschrevenen[studenten_ingeschrevenen$ondCode == "HBO",],
-                     "WO" = studenten_ingeschrevenen[studenten_ingeschrevenen$ondCode == "WO",],
-                     "HBOWO" = aggregate(studenten_ingeschrevenen$aantal, by=list(iscedNaam=studenten_ingeschrevenen$iscedCode.iscedNaam,jaartal=studenten_ingeschrevenen$jaartal), FUN=sum)
-    )
-    #namen kolomtitels van de nieuwe gevormde data aanpassen
-    if(input$StudentenIngeschreven_StudieNiveau == "HBOWO"){
-      colnames(siBarSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
-    } 
-    
-    #data aanpassen nav keuze gebruiker: studie(s)
-    siBarSub <- siBarSub[siBarSub$iscedCode.iscedNaam %in% input$StudentenIngeschreven_SelectStudyImp,]
-    
-    #plotten en titel laten afhangen
-    
-    plotTitle <- paste("Aantal ingeschreven bachelor studenten \nper jaar verdeeld per studie")
-    
-    #normale enkele barplot
-    ggplot(siBarSub, 
-           aes(x=jaartal)) + 
-      xlab("Jaar") +  
-      ylab("Aantal studenten") + 
-      ggtitle(plotTitle) +
-      geom_bar(stat = "identity",aes(y=aantal, fill=iscedCode.iscedNaam))+
-      labs(fill = "Studierichting") 
-     
-  })
-    
-
   
   
   output$aantalIngeschrevenPlot <- renderPlot({
@@ -202,8 +171,7 @@ StudentenIngeschrevenServer <- function(input, output){
       
       ##keuze maken welke studies
       totaalaantalselect <- studenten_ingeschrevenen[studenten_ingeschrevenen$iscedCode.iscedNaam %in% input$StudentenIngeschreven_SelectStudyImp,]
-      LogVar(totaalaantalselect, "totaal aantal select")
-      
+    
       #Totaal berekenen
       totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=list(ondCode=totaalaantalselect$ondCode,jaartal=totaalaantalselect$jaartal), FUN=sum)
       colnames(totaalaantalselect)<-c("ondCode","jaartal", "aantal")
@@ -315,8 +283,42 @@ StudentenIngeschrevenServer <- function(input, output){
     
     
     
-  } 
+  })
   
-  )
+  
+  output$aantalIngeschrevenBarPlot <- renderPlot({
+    #data aanpassen nav keuzes gebruiker: studieniveau
+    siBarSub <- switch (input$StudentenIngeschreven_StudieNiveau,
+                        "HBO" = studenten_ingeschrevenen[studenten_ingeschrevenen$ondCode == "HBO",],
+                        "WO" = studenten_ingeschrevenen[studenten_ingeschrevenen$ondCode == "WO",],
+                        "HBOWO" = aggregate(studenten_ingeschrevenen$aantal, by=list(iscedNaam=studenten_ingeschrevenen$iscedCode.iscedNaam,jaartal=studenten_ingeschrevenen$jaartal), FUN=sum)
+    )
+    #namen kolomtitels van de nieuwe gevormde data aanpassen
+    if(input$StudentenIngeschreven_StudieNiveau == "HBOWO"){
+      colnames(siBarSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
+    } 
+    
+    #data aanpassen nav keuze gebruiker: studie(s)
+    siBarSub <- siBarSub[siBarSub$iscedCode.iscedNaam %in% input$StudentenIngeschreven_SelectStudyImp,]
+    
+    #plotten en titel laten afhangen
+    
+    plotTitle <- paste("Aantal ingeschreven bachelor studenten \nper jaar verdeeld per studie")
+    
+    #normale enkele barplot
+    ggplot(siBarSub, 
+           aes(x=jaartal)) + 
+      xlab("Jaar") +  
+      ylab("Aantal studenten") + 
+      ggtitle(plotTitle) +
+      geom_bar(stat = "identity",aes(y=aantal, fill=iscedCode.iscedNaam))+
+      labs(fill = "Studierichting") 
+    
+  })
+  
+  
+  
+  
+  
   
 }
