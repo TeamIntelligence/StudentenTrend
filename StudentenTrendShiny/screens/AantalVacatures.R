@@ -7,7 +7,12 @@ AantalVacaturesUI <- function(PageName){
       fluidRow(
         box(width=5, height = 150, 
             
-            uiOutput("AantalVacatures_Select"),
+            selectInput("AantalVacatures_SelectImp",
+                        "Selecteer een of meerdere bedrijfssectoren om weer te geven:",
+                        choices = vacatures$sbiCode.sbiNaam,
+                        multiple = TRUE,
+                        selectize = TRUE
+            ),
             
             checkboxInput("AantalVacatures_AlleSectoren",
                           "Selecteer alle bedrijfssectoren"
@@ -31,26 +36,7 @@ AantalVacaturesUI <- function(PageName){
   )
 }
 
-AantalVacaturesServer <- function(input,output){
-  
-  output$AantalVacatures_Select <- renderUI({
-    if(input$AantalVacatures_AlleSectoren == TRUE){  #Alles bedrijfssectoren selecteren
-      selectInput("AantalVacatures_SelectImp",
-                  "Selecteer een of meerdere bedrijfssectoren om weer te geven:",
-                  choices = vacatures$sbiCode.sbiNaam,
-                  multiple = TRUE,
-                  selectize = TRUE,
-                  selected = vacatures$sbiCode.sbiNaam
-      )
-    } else { 
-      selectInput("AantalVacatures_SelectImp",
-                  "Selecteer een of meerdere bedrijfssectoren om weer te geven:",
-                  choices = vacatures$sbiCode.sbiNaam,
-                  multiple = TRUE,
-                  selectize = TRUE
-      )
-    } 
-  })
+AantalVacaturesServer <- function(input,output, session){
 
   output$VacaPlot <- renderPlot({
     
@@ -184,5 +170,19 @@ AantalVacaturesServer <- function(input,output){
         geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
         labs(fill = "Bedrijfssectoren") 
     
+  })
+  
+  observe({
+    trueFalse = length(input$AantalVacatures_SelectImp) == length(unique(vacatures$sbiCode.sbiNaam))
+    updateCheckboxInput(session, "AantalVacatures_AlleSectoren", value = trueFalse)
+  })
+  
+  observeEvent(input$AantalVacatures_AlleSectoren, {
+    trueFalse = length(input$AantalVacatures_SelectImp) == length(unique(vacatures$sbiCode.sbiNaam))
+    if(input$AantalVacatures_AlleSectoren == T && !trueFalse){
+      updateSelectInput(session, "AantalVacatures_SelectImp",
+                        selected = vacatures$sbiCode.sbiNaam
+      )
+    }
   })
 }

@@ -21,7 +21,7 @@ VoortgangsPercentagesUI <- function(PageName) {
   )
 }
 
-VoortgangsPercentagesServer <- function(input, output) {
+VoortgangsPercentagesServer <- function(input, output, session) {
   
   
   output$VoortgangsPercentages_yearRange <- renderUI({
