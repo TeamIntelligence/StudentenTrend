@@ -5,13 +5,28 @@ StudentenPerSectorUI <- function(PageName) {
       titlePanel("Eerstejaarsstudenten"),
       
       fluidRow(
-        box(width=12, height = 170, uiOutput("StudentenPerSector_selectStudy"),
+
+
+        box(width=6, height = 170, uiOutput("StudentenPerSector_selectStudy"),
             
             checkboxInput("StudentenPerSector_AlleStudies",
                           "Geef alle studies weer"
             )
+        ),
+        
+        box(width = 6, height = 170,
+            checkboxInput("StudentenEerstejaars_Totaalselect",
+                          "Totaal lijn weergeven van de geselecteerde studies"
+            ),
+            checkboxInput("StudentenEerstejaars_Totaal",
+                          "Totaal lijn weergeven"
+            )
+            
         )
-        ,box(width=12, height = 470, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450))
+        
+        # Show a plot of the generated distribution
+        ,box(width=5, height = 470, plotOutput("StudentenPerSector_aantalStudentenBarPlot", height=450))
+        ,box(width=7, height = 470, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450))
       )
     )
   )
@@ -39,7 +54,7 @@ StudentenPerSectorServer <- function(input, output) {
     }   
   })
   
-  output$StudentenPerSector_aantalStudentenPlot <- renderPlot({
+  output$StudentenPerSector_aantalStudentenBarPlot <- renderPlot({
     if (!is.null(input$StudentenPerSector_selectStudyImp)) {
       if(length(input$StudentenPerSector_selectStudyImp) == 1) {
         plotTitle <- paste("Aantal studenten per startjaar voor opleidings-sector", input$StudentenPerSector_selectStudyImp)
