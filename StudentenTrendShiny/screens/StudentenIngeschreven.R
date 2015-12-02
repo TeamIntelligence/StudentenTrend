@@ -45,27 +45,6 @@ StudentenIngeschrevenUI <- function(PageName){
 
 StudentenIngeschrevenServer <- function(input, output, session){
   
-  output$StudentenIngeschreven_SelectStudy <- renderUI({
-    if(input$StudentenIngeschreven_AlleStudies == TRUE){  #Alles studies selecteren
-      selectInput("StudentenIngeschreven_SelectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE,
-                  selected = studenten_ingeschrevenen$iscedCode.iscedNaam
-      )
-    } else { 
-      selectInput("StudentenIngeschreven_SelectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE
-      )
-    }   
-  })
-  
-  
-  
   output$aantalIngeschrevenPlot <- renderPlot({
     
     #data aanpassen nav keuzes gebruiker: studieniveau

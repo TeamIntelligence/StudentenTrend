@@ -51,39 +51,6 @@ StudentenGediplomeerdenUI <- function(PageName){
 
 StudentenGediplomeerdenServer <- function(input, output, session){
   
-  
-  
-  output$StudentenGediplomeerden_SelectStudy <- renderUI({
-    if(input$StudentenGediplomeerden_AlleStudies == TRUE){  #Alles studies selecteren
-      selectInput("StudentenGediplomeerden_SelectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_gediplomeerden$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE,
-                  selected = studenten_gediplomeerden$iscedCode.iscedNaam
-      )
-    } else { 
-      selectInput("StudentenGediplomeerden_SelectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_gediplomeerden$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE
-      )
-    }   
-  })
-
-  
-#   selectInput("StudentenGediplomeerden_SelectStudy",
-#               "Selecteer een of meerdere studiesectoren om weer te geven:",
-#               choices = studenten_gediplomeerden$iscedCode.iscedNaam,
-#               multiple = TRUE,
-#               selectize = TRUE,
-#               selected = 1
-#               
-#   ),
-  
-  
-  
   output$DiploPlot <- renderPlot({
     
     #HBO BACH en WO MAST
