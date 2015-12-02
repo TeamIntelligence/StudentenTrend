@@ -113,9 +113,7 @@ StudentenGediplomeerdenServer <- function(input, output){
         
         ##keuze maken welke studies: Als HBOWO: eerst dataset goed filteren en daarmee verder. Anders vanuit origineel werken
      
-        
-        
-######DOETNIETGOED    
+  
         if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
           totaalaantalselect <- HWSet[HWSet$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,] #wordt imp
           
@@ -137,7 +135,7 @@ StudentenGediplomeerdenServer <- function(input, output){
                                       "HBOWO" = aggregate(totaalaantalselect$aantal, by=list(jaartal=totaalaantalselect$jaartal), FUN=sum)
         )                             
                                       
-       #namen veranderen voor legenda                                       
+       #namen veranderen voor in legenda                                       
         if (input$StudentenGediplomeerden_StudieNiveau == "HBO"){
           totaalaantalselect$ondCode = "Totaal geselecteerde HBO Bachelor studies"
         }
@@ -378,7 +376,7 @@ StudentenGediplomeerdenServer <- function(input, output){
         ylab("Aantal studenten") + 
         ggtitle("Aantal gediplomeerde studenten") +
         geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
-        labs(color = "Studierichting")
+        labs(fill = "Studierichting")
 
   })
   

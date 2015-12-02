@@ -4,7 +4,7 @@ VoortgangsPercentagesUI <- function(PageName) {
       titlePanel("Voortgangspercentages per studie"),
       
       fluidRow(
-        box(width=4, height = 170, footer = "Gemiddelde afstudeer/uitschrijf percentages per studie binnen ... jaar na aanvang",
+        box(width=4, height = 170, footer = "Gemiddelde afstudeer/uitschrijf percentages per studie van HBO en WO binnen ... jaar na aanvang",
             radioButtons("VoortgangsPercentages_voortgangType", "Soort", 
                          choices = list("Uitschrijf percentages" = "uitschrijf", 
                                         "Afstudeer percentages"  = "afgestudeerd")

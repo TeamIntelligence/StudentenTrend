@@ -2,7 +2,7 @@
 StudentenPerSectorUI <- function(PageName) {
   return(
     tabItem(tabName = PageName,
-      titlePanel("Studenten per opleidings-sector"),
+      titlePanel("Eerstejaarsstudenten"),
       
       fluidRow(
         box(width=12, height = 170, uiOutput("StudentenPerSector_selectStudy"),
