@@ -134,8 +134,7 @@ StudentenIngeschrevenServer <- function(input, output){
       if (input$StudentenIngeschreven_StudieNiveau == "WO"){
         totaalaantal$ondCode = "Totaal WO"
       }
-      
-      
+
       
       #plotten
       ggplot(totaalaantal,   
@@ -287,6 +286,7 @@ StudentenIngeschrevenServer <- function(input, output){
   
   
   output$aantalIngeschrevenBarPlot <- renderPlot({
+    
     #data aanpassen nav keuzes gebruiker: studieniveau
     siBarSub <- switch (input$StudentenIngeschreven_StudieNiveau,
                         "HBO" = studenten_ingeschrevenen[studenten_ingeschrevenen$ondCode == "HBO",],
@@ -305,6 +305,49 @@ StudentenIngeschrevenServer <- function(input, output){
     
     plotTitle <- paste("Aantal ingeschreven bachelor studenten \nper jaar verdeeld per studie")
     
+    
+    
+    if (input$StudentenIngeschreven_Totaal == TRUE ){
+      totaalaantal <- aggregate(studenten_ingeschrevenen$aantal, by=list(ondCode=studenten_ingeschrevenen$ondCode,jaartal=studenten_ingeschrevenen$jaartal), FUN=sum)
+      colnames(totaalaantal)<-c("ondCode","jaartal","aantal")
+      
+      #keuze maken welk studie niveau
+      totaalaantal <- switch (input$StudentenIngeschreven_StudieNiveau,
+                              "HBO" = totaalaantal[totaalaantal$ondCode == "HBO",],
+                              "WO" = totaalaantal[totaalaantal$ondCode == "WO",],
+                              "HBOWO" = aggregate(totaalaantal$aantal, by=list(jaartal=totaalaantal$jaartal), FUN=sum)
+      )        
+      if (input$StudentenIngeschreven_StudieNiveau == "HBOWO"){
+        colnames(totaalaantal)<-c("jaartal","aantal")
+        totaalaantal$ondCode = "Totaal HBO en WO"
+      }
+      if (input$StudentenIngeschreven_StudieNiveau == "HBO"){
+        totaalaantal$ondCode = "Totaal HBO"
+      }
+      if (input$StudentenIngeschreven_StudieNiveau == "WO"){
+        totaalaantal$ondCode = "Totaal WO"
+      }
+      
+      
+      ggplot(siBarSub, 
+             aes(x=jaartal)) + 
+        xlab("Jaar") +  
+        ylab("Aantal studenten") + 
+        ggtitle(plotTitle) +
+        geom_bar(data = siBarSub, stat = "identity",
+                  aes(y=aantal, fill=iscedCode.iscedNaam))+
+        geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
+                                          group=ondCode,
+                                          color=ondCode)) + 
+        geom_point(data=totaalaantal, aes(y=aantal, 
+                                          group=ondCode,
+                                          color=ondCode)) +
+        labs(color = "Totaallijn")+ 
+        labs(fill = "Studierichting") 
+      
+      
+    } else{
+    
     #normale enkele barplot
     ggplot(siBarSub, 
            aes(x=jaartal)) + 
@@ -313,6 +356,8 @@ StudentenIngeschrevenServer <- function(input, output){
       ggtitle(plotTitle) +
       geom_bar(stat = "identity",aes(y=aantal, fill=iscedCode.iscedNaam))+
       labs(fill = "Studierichting") 
+    }
+    
     
   })
   
