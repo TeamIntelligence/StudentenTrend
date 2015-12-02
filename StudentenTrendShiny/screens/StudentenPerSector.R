@@ -29,8 +29,8 @@ StudentenPerSectorUI <- function(PageName) {
         )
         
         # Show a plot of the generated distribution
-        ,box(width=5, height = 470, plotOutput("StudentenPerSector_aantalStudentenBarPlot", height=450))
-        ,box(width=7, height = 470, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450))
+        ,box(width=5, height = 470, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450))
+        ,box(width=7, height = 470, plotOutput("StudentenPerSector_aantalStudentenBarPlot", height=450))
       )
     )
   )

@@ -74,16 +74,17 @@ AantalVacaturesServer <- function(input,output, session){
          
          geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
                                           group=soort,
-                                          color=soort)) + 
+                                          color=soort), color = "black") + 
          geom_point(data=totaalaantal, aes(y=aantal, 
                                            group=soort,
-                                           color=soort)) +
+                                           color=soort), color = "black") +
          geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal select lijn
                                                 group=soort,
-                                                color=soort)) + 
+                                                color=soort), color = "gray48") + 
          geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                  group=soort,
-                                                 color=soort)) +
+                                                 color=soort), color = "gray48") +
+         labs(color = "Bedrijfssector")+
          theme(legend.position="none")
      }
      else if (input$AantalVacatures_TotaalSelect == TRUE ){
@@ -108,10 +109,11 @@ AantalVacaturesServer <- function(input,output, session){
                         color=sbiCode.sbiNaam))+ 
          geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal select lijn
                                                 group=soort,
-                                                color=soort)) + 
+                                                color=soort), color = "gray48") + 
          geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                  group=soort,
-                                                 color=soort)) +
+                                                 color=soort), color = "gray48") +
+         labs(color = "Bedrijfssector")+
          theme(legend.position="none")
        
        ##############
@@ -136,10 +138,11 @@ AantalVacaturesServer <- function(input,output, session){
                         color=sbiCode.sbiNaam))+ 
          geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
                                           group=soort,
-                                          color=soort)) + 
+                                          color=soort), color = "black") + 
          geom_point(data=totaalaantal, aes(y=aantal, 
                                            group=soort,
-                                           color=soort)) +
+                                           color=soort), color = "black") +
+         labs(color = "Bedrijfssector")+
          theme(legend.position="none")
      }
      else{
@@ -153,6 +156,7 @@ AantalVacaturesServer <- function(input,output, session){
                        color=sbiCode.sbiNaam))+
          geom_point(aes(y=aantal, 
                         color=sbiCode.sbiNaam))+ 
+         labs(color = "Bedrijfssector")+
          theme(legend.position="none")
      }
     
@@ -161,15 +165,112 @@ AantalVacaturesServer <- function(input,output, session){
   output$VacaBarPlot <- renderPlot({
 
     AantalVacatures_vacBarSub <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% input$AantalVacatures_SelectImp,]
-
-      # draw the histogram
-      ggplot(AantalVacatures_vacBarSub, aes(x=jaartal)) +
-        xlab("Jaar") + 
-        ylab("Aantal vacatures") +
-        ggtitle("Aantal vacatures per sector") +
-        geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
-        labs(fill = "Bedrijfssectoren") 
     
+      
+      if (input$AantalVacatures_Totaal == TRUE && input$AantalVacatures_TotaalSelect == TRUE ){ 
+        
+        ##allebei de lijnen
+        
+        ##select lijn
+        #Totaal berekenen
+        totaalaantalselect <- aggregate(AantalVacatures_vacBarSub$aantal, by=list(jaartal=AantalVacatures_vacBarSub$jaartal), FUN=sum)
+        colnames(totaalaantalselect)<-c("jaartal", "aantal")
+        totaalaantalselect$soort = "Totale geselecteerde vacatures"
+        
+        #totaallijn
+        #Totaal berekenen
+        totaalaantal <- aggregate(vacatures_jaartallen$aantal, by=list(jaartal=vacatures_jaartallen$jaartal), FUN=sum)
+        colnames(totaalaantal)<-c("jaartal","aantal") 
+        totaalaantal$soort = "Totale vacatures" 
+        
+        
+          # draw the histogram
+          ggplot(AantalVacatures_vacBarSub, aes(x=jaartal)) +
+          xlab("Jaar") + 
+          ylab("Aantal vacatures") +
+          ggtitle("Aantal vacatures per sector") +
+          geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
+          geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal select lijn
+                                                 group=soort,
+                                                 color="gray48")) + 
+          geom_point(data=totaalaantalselect, aes(y=aantal, 
+                                                  group=soort,
+                                                  color= "gray48")) +
+          geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
+                                           group=soort,
+                                           color= "black")) + 
+          geom_point(data=totaalaantal, aes(y=aantal, 
+                                            group=soort,
+                                            color="black")) +
+          scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
+          labs(color = "Totaallijn")+
+          labs(fill = "Bedrijfssector")
+      }
+      else if (input$AantalVacatures_TotaalSelect == TRUE ){
+        #alleen select
+        
+        
+        ##select lijn
+        #Totaal select berekenen
+        totaalaantalselect <- aggregate(AantalVacatures_vacBarSub$aantal, by=list(jaartal=AantalVacatures_vacBarSub$jaartal), FUN=sum)
+        colnames(totaalaantalselect)<-c("jaartal", "aantal")
+        totaalaantalselect$soort = "Totale geselecteerde vacatures"
+        
+        # draw the histogram
+        ggplot(AantalVacatures_vacBarSub, aes(x=jaartal)) +
+          xlab("Jaar") + 
+          ylab("Aantal vacatures") +
+          ggtitle("Aantal vacatures per sector") +
+          geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
+          geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal select lijn
+                                               group=soort,
+                                               color="gray48")) + 
+          geom_point(data=totaalaantalselect, aes(y=aantal, 
+                                                  group=soort,
+                                                  color= "gray48")) +
+          scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
+          labs(color = "Totaallijn")+
+          labs(fill = "Bedrijfssector")
+        
+        ##############
+      }
+      else if (input$AantalVacatures_Totaal == TRUE ){
+        #alleen totaal
+        
+        #totaallijn
+        #Totaal berekenen
+        totaalaantal <- aggregate(vacatures_jaartallen$aantal, by=list(jaartal=vacatures_jaartallen$jaartal), FUN=sum)
+        colnames(totaalaantal)<-c("jaartal","aantal") 
+        totaalaantal$soort = "Totale vacatures" 
+
+        # draw the histogram
+        ggplot(AantalVacatures_vacBarSub, aes(x=jaartal)) +
+          xlab("Jaar") + 
+          ylab("Aantal vacatures") +
+          ggtitle("Aantal vacatures per sector") +
+          geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
+          geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
+                                           group=soort,
+                                           color= "black")) + 
+          geom_point(data=totaalaantal, aes(y=aantal, 
+                                            group=soort,
+                                            color="black")) +
+          scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
+          labs(color = "Totaallijn")+
+          labs(fill = "Bedrijfssector")
+      }
+      else{
+        #normale enkele plot
+        
+        ggplot(AantalVacatures_vacBarSub, aes(x=jaartal)) +
+          xlab("Jaar") + 
+          ylab("Aantal vacatures") +
+          ggtitle("Aantal vacatures per sector") +
+          geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
+          labs(fill = "Bedrijfssector") 
+      }
+      
+      
   })
   
   observe({
