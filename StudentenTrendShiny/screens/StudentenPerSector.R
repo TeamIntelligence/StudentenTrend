@@ -5,7 +5,12 @@ StudentenPerSectorUI <- function(PageName) {
       titlePanel("Eerstejaarsstudenten"),
       
       fluidRow(
-        box(width=12, height = 170, uiOutput("StudentenPerSector_selectStudy"),
+        box(width=12, height = 170, 
+            selectInput("StudentenPerSector_selectStudyImp",
+                        "Selecteer een of meerdere studiesectoren om weer te geven:",
+                        choices = studievoortgang$iscedCode$iscedNaam,
+                        multiple = TRUE,
+                        selectize = TRUE),
             
             checkboxInput("StudentenPerSector_AlleStudies",
                           "Geef alle studies weer"
@@ -18,26 +23,7 @@ StudentenPerSectorUI <- function(PageName) {
 }
 
 #The Server function for the StudentenPerSector page
-StudentenPerSectorServer <- function(input, output) {
-  
-  output$StudentenPerSector_selectStudy <- renderUI({
-    if(input$StudentenPerSector_AlleStudies == TRUE){  #Alles studies selecteren
-      selectInput("StudentenPerSector_selectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE,
-                  selected = studenten_ingeschrevenen$iscedCode.iscedNaam
-      )
-    } else { 
-      selectInput("StudentenPerSector_selectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE
-      )
-    }   
-  })
+StudentenPerSectorServer <- function(input, output, session) {
   
   output$StudentenPerSector_aantalStudentenPlot <- renderPlot({
     if (!is.null(input$StudentenPerSector_selectStudyImp)) {
@@ -68,5 +54,19 @@ StudentenPerSectorServer <- function(input, output) {
           scale_fill_manual(values=rainbow(length(input$StudentenPerSector_selectStudyImp)),name="Opleidings Sector")
       }
     } 
+  })
+  observe({
+    trueFalse = length(input$StudentenPerSector_selectStudyImp) == length(unique(studievoortgang$iscedCode$iscedNaam))
+
+    updateCheckboxInput(session, "StudentenPerSector_AlleStudies", value = trueFalse)
+    
+  })
+  observeEvent(input$StudentenPerSector_AlleStudies, {
+    trueFalse = length(input$StudentenPerSector_selectStudyImp) == length(unique(studievoortgang$iscedCode$iscedNaam))
+    if(input$StudentenPerSector_AlleStudies == T && !trueFalse){
+      updateSelectInput(session, "StudentenPerSector_selectStudyImp",
+                        selected = studievoortgang$iscedCode$iscedNaam
+      )
+    }
   })
 }

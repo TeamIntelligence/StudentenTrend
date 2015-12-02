@@ -5,7 +5,14 @@ StudentenGediplomeerdenUI <- function(PageName){
         # Page title
         titlePanel("Gediplomeerde studenten"),
         fluidRow(
-          box(width=4, height = 170, uiOutput("StudentenGediplomeerden_SelectStudy"),
+          box(width=4, height = 170,
+              selectInput("StudentenGediplomeerden_SelectStudyImp",
+                          "Selecteer een of meerdere studiesectoren om weer te geven:",
+                          choices = studenten_gediplomeerden$iscedCode.iscedNaam,
+                          multiple = TRUE,
+                          selectize = TRUE
+              ),
+              
               checkboxInput("StudentenGediplomeerden_AlleStudies",
                             "Selecteer alle studies"
               ),
@@ -42,7 +49,7 @@ StudentenGediplomeerdenUI <- function(PageName){
     )
 }
 
-StudentenGediplomeerdenServer <- function(input, output){
+StudentenGediplomeerdenServer <- function(input, output, session){
   
   
   
@@ -378,6 +385,21 @@ StudentenGediplomeerdenServer <- function(input, output){
         geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
         labs(fill = "Studierichting")
 
+  })
+  
+  observe({
+    trueFalse = length(input$StudentenGediplomeerden_SelectStudyImp) == length(unique(studenten_gediplomeerden$iscedCode.iscedNaam))
+
+    updateCheckboxInput(session, "StudentenGediplomeerden_AlleStudies", value = trueFalse)
+  })
+  
+  observeEvent(input$StudentenGediplomeerden_AlleStudies, {
+    trueFalse = length(input$StudentenGediplomeerden_SelectStudyImp) == length(unique(studenten_gediplomeerden$iscedCode.iscedNaam))
+    if(input$StudentenGediplomeerden_AlleStudies == T && !trueFalse){
+      updateSelectInput(session, "StudentenGediplomeerden_SelectStudyImp",
+                        selected = studenten_gediplomeerden$iscedCode.iscedNaam
+      )
+    }
   })
   
 }  
