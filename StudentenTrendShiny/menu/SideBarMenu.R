@@ -3,8 +3,8 @@ GetPages <- function() {
   return(
     list(
        list("Dashboard", tabName="Dashboard", icon=icon("dashboard"))
-      ,list("Studenten per sector", tabName="StudentenPerSector", icon=icon("bar-chart"))
-      ,list("Haalbaarheid", tabName="VoortgangsPercentages", icon=icon("bar-chart"))
+      ,list("Eerstejaarsstudenten", tabName="StudentenPerSector", icon=icon("bar-chart"))
+      ,list("Voortgangspercentages", tabName="VoortgangsPercentages", icon=icon("bar-chart"))
       ,list("Gediplomeerde studenten", tabName="StudentenGediplomeerden", icon=icon("bar-chart"))
       ,list("Aantal vacatures", tabName = "AantalVacatures", icon=icon("bar-chart"))
       ,list("Ingeschreven studenten",tabName = "StudentenIngeschreven",icon=icon("bar-chart"))
