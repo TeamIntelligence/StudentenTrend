@@ -5,41 +5,41 @@ StudentenPerSectorUI <- function(PageName) {
       titlePanel("Eerstejaarsstudenten"),
       
       fluidRow(
-        box(width=12, height = 170, uiOutput("StudentenPerSector_selectStudy"),
+        box(width=6, height = 170, 
+            selectInput("StudentenPerSector_selectStudyImp",
+                        "Selecteer een of meerdere studiesectoren om weer te geven:",
+                        choices = studievoortgang$iscedCode$iscedNaam,
+                        multiple = TRUE,
+                        selectize = TRUE),
+
             
             checkboxInput("StudentenPerSector_AlleStudies",
                           "Geef alle studies weer"
             )
+        ),
+        
+        box(width = 6, height = 170,
+            checkboxInput("StudentenEerstejaars_Totaalselect",
+                          "Totaal lijn weergeven van de geselecteerde studies"
+            ),
+            checkboxInput("StudentenEerstejaars_Totaal",
+                          "Totaal lijn weergeven"
+            )
+            
         )
-        ,box(width=12, height = 470, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450))
+        
+        # Show a plot of the generated distribution
+        ,box(width=5, height = 470, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450))
+        ,box(width=7, height = 470, plotOutput("StudentenPerSector_aantalStudentenBarPlot", height=450))
       )
     )
   )
 }
 
 #The Server function for the StudentenPerSector page
-StudentenPerSectorServer <- function(input, output) {
+StudentenPerSectorServer <- function(input, output, session) {
   
-  output$StudentenPerSector_selectStudy <- renderUI({
-    if(input$StudentenPerSector_AlleStudies == TRUE){  #Alles studies selecteren
-      selectInput("StudentenPerSector_selectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE,
-                  selected = studenten_ingeschrevenen$iscedCode.iscedNaam
-      )
-    } else { 
-      selectInput("StudentenPerSector_selectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE
-      )
-    }   
-  })
-  
-  output$StudentenPerSector_aantalStudentenPlot <- renderPlot({
+  output$StudentenPerSector_aantalStudentenBarPlot <- renderPlot({
     if (!is.null(input$StudentenPerSector_selectStudyImp)) {
       if(length(input$StudentenPerSector_selectStudyImp) == 1) {
         plotTitle <- paste("Aantal studenten per startjaar voor opleidings-sector", input$StudentenPerSector_selectStudyImp)
@@ -68,5 +68,19 @@ StudentenPerSectorServer <- function(input, output) {
           scale_fill_manual(values=rainbow(length(input$StudentenPerSector_selectStudyImp)),name="Opleidings Sector")
       }
     } 
+  })
+  observe({
+    trueFalse = length(input$StudentenPerSector_selectStudyImp) == length(unique(studievoortgang$iscedCode$iscedNaam))
+
+    updateCheckboxInput(session, "StudentenPerSector_AlleStudies", value = trueFalse)
+    
+  })
+  observeEvent(input$StudentenPerSector_AlleStudies, {
+    trueFalse = length(input$StudentenPerSector_selectStudyImp) == length(unique(studievoortgang$iscedCode$iscedNaam))
+    if(input$StudentenPerSector_AlleStudies == T && !trueFalse){
+      updateSelectInput(session, "StudentenPerSector_selectStudyImp",
+                        selected = studievoortgang$iscedCode$iscedNaam
+      )
+    }
   })
 }

@@ -5,7 +5,14 @@ StudentenGediplomeerdenUI <- function(PageName){
         # Page title
         titlePanel("Gediplomeerde studenten"),
         fluidRow(
-          box(width=4, height = 170, uiOutput("StudentenGediplomeerden_SelectStudy"),
+          box(width=4, height = 170,
+              selectInput("StudentenGediplomeerden_SelectStudyImp",
+                          "Selecteer een of meerdere studiesectoren om weer te geven:",
+                          choices = studenten_gediplomeerden$iscedCode.iscedNaam,
+                          multiple = TRUE,
+                          selectize = TRUE
+              ),
+              
               checkboxInput("StudentenGediplomeerden_AlleStudies",
                             "Selecteer alle studies"
               ),
@@ -42,40 +49,7 @@ StudentenGediplomeerdenUI <- function(PageName){
     )
 }
 
-StudentenGediplomeerdenServer <- function(input, output){
-  
-  
-  
-  output$StudentenGediplomeerden_SelectStudy <- renderUI({
-    if(input$StudentenGediplomeerden_AlleStudies == TRUE){  #Alles studies selecteren
-      selectInput("StudentenGediplomeerden_SelectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_gediplomeerden$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE,
-                  selected = studenten_gediplomeerden$iscedCode.iscedNaam
-      )
-    } else { 
-      selectInput("StudentenGediplomeerden_SelectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_gediplomeerden$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE
-      )
-    }   
-  })
-
-  
-#   selectInput("StudentenGediplomeerden_SelectStudy",
-#               "Selecteer een of meerdere studiesectoren om weer te geven:",
-#               choices = studenten_gediplomeerden$iscedCode.iscedNaam,
-#               multiple = TRUE,
-#               selectize = TRUE,
-#               selected = 1
-#               
-#   ),
-  
-  
+StudentenGediplomeerdenServer <- function(input, output, session){
   
   output$DiploPlot <- renderPlot({
     
@@ -198,16 +172,16 @@ StudentenGediplomeerdenServer <- function(input, output){
                                     color=iscedCode.iscedNaam)) +
           geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
                                            group=ondCode,
-                                           color=ondCode)) + 
+                                           color=ondCode), color = "black") + 
           geom_point(data=totaalaantal, aes(y=aantal, 
                                             group=ondCode,
-                                            color=ondCode)) +
+                                            color=ondCode), color = "black") +
           geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal select lijn
                                                  group=ondCode,
-                                                 color=ondCode)) + 
+                                                 color=ondCode), color = "gray48") + 
           geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                   group=ondCode,
-                                                  color=ondCode)) +
+                                                  color=ondCode), color = "gray48") +
           labs(color = "Studierichting")+ 
           theme(legend.position="none")
         
@@ -261,10 +235,10 @@ StudentenGediplomeerdenServer <- function(input, output){
                                     color=iscedCode.iscedNaam)) +
           geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal geslecteerde lijn
                                                  group=ondCode,
-                                                 color=ondCode)) + 
+                                                 color=ondCode), color = "gray48") + 
           geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                   group=ondCode,
-                                                  color=ondCode)) +
+                                                  color=ondCode), color = "gray48") +
           labs(color = "Studierichting")+ 
           theme(legend.position="none")
         
@@ -313,10 +287,10 @@ StudentenGediplomeerdenServer <- function(input, output){
                                     color=iscedCode.iscedNaam)) +
           geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
                                            group=ondCode,
-                                           color=ondCode)) + 
+                                           color=ondCode), color = "black") + 
           geom_point(data=totaalaantal, aes(y=aantal, 
                                             group=ondCode,
-                                            color=ondCode)) +
+                                            color=ondCode), color = "black") +
           labs(color = "Studierichting")+ 
           theme(legend.position="none")
       }
@@ -370,14 +344,237 @@ StudentenGediplomeerdenServer <- function(input, output){
 #       StudentenGediplomeerden_StudieBarSub <- StudentenGediplomeerden_StudieBarSub[StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,]
 #     }
     
-    
-      ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
-        xlab("Jaar") +  
-        ylab("Aantal studenten") + 
-        ggtitle("Aantal gediplomeerde studenten") +
-        geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
-        labs(fill = "Studierichting")
 
+    
+      if (input$StudentenGediplomeerden_Totaal == TRUE & input$StudentenGediplomeerden_TotaalSelect == TRUE ){ 
+        
+        ##allebei de lijnen
+        
+        ##select lijn
+        
+        
+        ##keuze maken welke studies: Als HBOWO: eerst dataset goed filteren en daarmee verder. Anders vanuit origineel werken
+        
+        
+        if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
+          totaalaantalselect <- HWBarSet[HWBarSet$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,] #wordt imp
+          
+        }
+        else {
+          totaalaantalselect <- studenten_gediplomeerden[studenten_gediplomeerden$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,] #wordt imp
+        }
+        
+        #Totaal berekenen
+        totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=list(ondCode=totaalaantalselect$ondCode,jaartal=totaalaantalselect$jaartal,diploma=totaalaantalselect$diploma), FUN=sum)
+        colnames(totaalaantalselect)<-c("ondCode","jaartal","diploma", "aantal")
+        
+        
+        #keuze maken welk studie niveau
+        totaalaantalselect <- switch (input$StudentenGediplomeerden_StudieNiveau,
+                                      "HBO" = totaalaantalselect[totaalaantalselect$ondCode == "HBO" & totaalaantalselect$diploma == "Bachelor",] ,
+                                      "WOB" = totaalaantalselect[totaalaantalselect$ondCode == "WO" & totaalaantalselect$diploma == "Bachelor",],
+                                      "WOM"= totaalaantalselect[totaalaantalselect$ondCode == "WO" & totaalaantalselect$diploma == "Wo-master",],
+                                      "HBOWO" = aggregate(totaalaantalselect$aantal, by=list(jaartal=totaalaantalselect$jaartal), FUN=sum)
+        )                             
+        
+        #namen veranderen voor in legenda                                       
+        if (input$StudentenGediplomeerden_StudieNiveau == "HBO"){
+          totaalaantalselect$ondCode = "Totaal geselecteerde HBO Bachelor studies"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "WOB"){
+          totaalaantalselect$ondCode = "Totaal geselecteerde WO Bachelor studies"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "WOM"){
+          totaalaantalselect$ondCode = "Totaal geselecteerde WO Master studies"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
+          colnames(totaalaantalselect)<-c("jaartal","aantal")
+          totaalaantalselect$ondCode = "Totaal geselecteerde HBO Bachelor en WO Master studies"
+        }
+        
+        
+        #totaallijn
+        #Totaal berekenen
+        totaalaantal <- aggregate(studenten_gediplomeerden$aantal, by=list(ondCode=studenten_gediplomeerden$ondCode,jaartal=studenten_gediplomeerden$jaartal,diploma=studenten_gediplomeerden$diploma), FUN=sum)
+        colnames(totaalaantal)<-c("ondCode","jaartal","diploma", "aantal")
+        
+        
+        
+        #keuze maken welk studie niveau
+        
+        totaalaantal <- switch (input$StudentenGediplomeerden_StudieNiveau,
+                                "HBO" = totaalaantal[totaalaantal$ondCode == "HBO" & totaalaantal$diploma == "Bachelor",] ,
+                                "WOB" = totaalaantal[totaalaantal$ondCode == "WO" & totaalaantal$diploma == "Bachelor",],
+                                "WOM"= totaalaantal[totaalaantal$ondCode == "WO" & totaalaantal$diploma == "Wo-master",],
+                                "HBOWO" = aggregate(HWBarSet$aantal, by=list(jaartal=HWBarSet$jaartal), FUN=sum)
+        )
+        #namen voor legenda
+        if (input$StudentenGediplomeerden_StudieNiveau == "HBO"){
+          totaalaantal$ondCode = "Totaal HBO Bachelor"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "WOB"){
+          totaalaantal$ondCode = "Totaal WO Bachelor"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "WOM"){
+          totaalaantal$ondCode = "Totaal WO Master"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
+          colnames(totaalaantal)<-c("jaartal","aantal")
+          totaalaantal$ondCode = "Totaal HBO Bachelor en WO Master"
+        }
+        
+        
+        
+        #plotten
+        
+        ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
+          xlab("Jaar") +  
+          ylab("Aantal studenten") + 
+          ggtitle("Aantal gediplomeerde studenten") +
+          geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
+          geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal lijn
+                                                 group=ondCode,
+                                                 color="gray48")) +
+          geom_point(data=totaalaantalselect, aes(y=aantal, 
+                                                  group=ondCode,
+                                                  color="gray48")) +
+          geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
+                                           group=ondCode,
+                                           color= "black")) + 
+          geom_point(data=totaalaantal, aes(y=aantal, 
+                                            group=ondCode,
+                                            color="black")) +
+          
+          scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
+          labs(color = "Totaallijn")+
+          labs(fill = "Studierichting")
+        
+        
+        
+      }
+      else if (input$StudentenGediplomeerden_TotaalSelect == TRUE ){
+        #alleen select
+        
+        ##keuze maken welke studies
+        totaalaantalselect <- studenten_gediplomeerden[studenten_gediplomeerden$iscedCode.iscedNaam %in%  input$StudentenGediplomeerden_SelectStudyImp,] #wordt imp
+        
+        #Totaal berekenen
+        totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=list(ondCode=totaalaantalselect$ondCode,jaartal=totaalaantalselect$jaartal, diploma=totaalaantalselect$diploma), FUN=sum)
+        colnames(totaalaantalselect)<-c("ondCode","jaartal","diploma", "aantal")
+        
+        
+        #keuze maken welk studie niveau
+        totaalaantalselect <- switch (input$StudentenGediplomeerden_StudieNiveau,
+                                      "HBO" = totaalaantalselect[totaalaantalselect$ondCode == "HBO" & totaalaantalselect$diploma == "Bachelor",] ,
+                                      "WOB" = totaalaantalselect[totaalaantalselect$ondCode == "WO" & totaalaantalselect$diploma == "Bachelor",],
+                                      "WOM"= totaalaantalselect[totaalaantalselect$ondCode == "WO" & totaalaantalselect$diploma == "Wo-master",],
+                                      "HBOWO" = aggregate(HWBarSet$aantal, by=list(jaartal=HWBarSet$jaartal), FUN=sum)
+        )       
+        
+        #namen veranderen voor legenda                                       
+        if (input$StudentenGediplomeerden_StudieNiveau == "HBO"){
+          totaalaantalselect$ondCode = "Totaal geselecteerde HBO Bachelor studies"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "WOB"){
+          totaalaantalselect$ondCode = "Totaal geselecteerde WO Bachelor studies"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "WOM"){
+          totaalaantalselect$ondCode = "Totaal geselecteerde WO Master studies"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
+          colnames(totaalaantalselect)<-c("jaartal","aantal")
+          totaalaantalselect$ondCode = "Totaal geselecteerde HBO Bachelor en WO Master studies"
+        }
+        
+        
+        ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
+          xlab("Jaar") +  
+          ylab("Aantal studenten") + 
+          ggtitle("Aantal gediplomeerde studenten") +
+          geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
+          geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal lijn
+                                                 group=ondCode,
+                                                 color= "gray48")) + 
+          geom_point(data=totaalaantalselect, aes(y=aantal, 
+                                                  group=ondCode,
+                                                  color="gray48")) +
+          scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
+          labs(color = "Totaallijn")+
+          labs(fill = "Studierichting") 
+        
+        
+        ##############
+      }
+      else if (input$StudentenGediplomeerden_Totaal == TRUE ){
+        #alleen totaal
+        #Totaal berekenen
+        totaalaantal <- aggregate(studenten_gediplomeerden$aantal, by=list(ondCode=studenten_gediplomeerden$ondCode,jaartal=studenten_gediplomeerden$jaartal,diploma=studenten_gediplomeerden$diploma), FUN=sum)
+        colnames(totaalaantal)<-c("ondCode","jaartal","diploma", "aantal")
+        
+        #keuze maken welk studie niveau
+        
+        totaalaantal <- switch (input$StudentenGediplomeerden_StudieNiveau,
+                                "HBO" = totaalaantal[totaalaantal$ondCode == "HBO" & totaalaantal$diploma == "Bachelor",] ,
+                                "WOB" = totaalaantal[totaalaantal$ondCode == "WO" & totaalaantal$diploma == "Bachelor",],
+                                "WOM"= totaalaantal[totaalaantal$ondCode == "WO" & totaalaantal$diploma == "Wo-master",],
+                                "HBOWO" = aggregate(HWBarSet$aantal, by=list(jaartal=HWBarSet$jaartal), FUN=sum)
+        )
+        
+        if (input$StudentenGediplomeerden_StudieNiveau == "HBO"){
+          totaalaantal$ondCode = "Totaal HBO Bachelor"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "WOB"){
+          totaalaantal$ondCode = "Totaal WO Bachelor"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "WOM"){
+          totaalaantal$ondCode = "Totaal WO Master"
+        }
+        if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
+          colnames(totaalaantal)<-c("jaartal","aantal")
+          totaalaantal$ondCode = "Totaal HBO Bachelor en WO Master"
+        }
+        
+        ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
+          xlab("Jaar") +  
+          ylab("Aantal studenten") + 
+          ggtitle("Aantal gediplomeerde studenten") +
+          geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
+          geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
+                                           group=ondCode,
+                                           color= "black")) + 
+          geom_point(data=totaalaantal, aes(y=aantal, 
+                                            group=ondCode,
+                                            color="black")) +
+          scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
+          labs(color = "Totaallijn")+
+          labs(fill = "Studierichting") 
+      }
+      else{
+        #normale enkele plot
+        ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
+          xlab("Jaar") +  
+          ylab("Aantal studenten") + 
+          ggtitle("Aantal gediplomeerde studenten") +
+          geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) +
+          labs(fill = "Studierichting") 
+      }  
+      
+      
+  })
+  
+  observe({
+    trueFalse = length(input$StudentenGediplomeerden_SelectStudyImp) == length(unique(studenten_gediplomeerden$iscedCode.iscedNaam))
+
+    updateCheckboxInput(session, "StudentenGediplomeerden_AlleStudies", value = trueFalse)
+  })
+  
+  observeEvent(input$StudentenGediplomeerden_AlleStudies, {
+    trueFalse = length(input$StudentenGediplomeerden_SelectStudyImp) == length(unique(studenten_gediplomeerden$iscedCode.iscedNaam))
+    if(input$StudentenGediplomeerden_AlleStudies == T && !trueFalse){
+      updateSelectInput(session, "StudentenGediplomeerden_SelectStudyImp",
+                        selected = studenten_gediplomeerden$iscedCode.iscedNaam
+      )
+    }
   })
   
 }  

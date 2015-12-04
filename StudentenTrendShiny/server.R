@@ -1,5 +1,5 @@
 # Call the Server functions
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   # Get all the pages that are currently in this application
   Pages <- GetPages()
   
@@ -12,10 +12,10 @@ shinyServer(function(input, output) {
       if(!is.null(SubItem) && names(SubItem) == "" && class(SubItem[[1]]) != "character") {
         # Fill a list object and call the server function
         SubItem <- list(tabName=GetPageNameSubItem(SubItem))
-        CallServerFunction(Page=SubItem, input, output)
+        CallServerFunction(Page=SubItem, input, output, session)
       }
     }
     
-    CallServerFunction(Page=Page, input, output)
+    CallServerFunction(Page=Page, input, output, session)
   }
 })
