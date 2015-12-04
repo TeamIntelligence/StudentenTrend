@@ -40,6 +40,23 @@ LoadFromServer <- function(vName, ...) {
   }
 }
 
+CUSTOMCOLORARRAY <- sample(c("tan4", "tomato3",
+                      "violetred", "turquoise4", 
+                      "wheat3", "steelblue3", 
+                      "salmon", "orchid", 
+                      "orange4", "limegreen", 
+                      "olivedrab1", "lightgoldenrod2", 
+                      "orange", "hotpink",
+                      "indianred2", "khaki", 
+                      "lightblue", "lightblue4",
+                      "khaki4", "navyblue",
+                      "lightcoral", "aquamarine",
+                      "orchid4", "purple",
+                      "gold", "palegreen4",
+                      "seagreen1", "peru",
+                      "red", "yellow4"))
+
+
 LoadFromServer("studievoortgang", "http://188.166.3.196:8080/studenten/studievoortgang")
 LoadFromServer("studenten_gediplomeerden", "http://188.166.3.196:8080/studenten/gediplomeerden",flatten=TRUE)
 LoadFromServer("vacatures", "http://188.166.3.196:8080/vacatures",flatten=TRUE)
