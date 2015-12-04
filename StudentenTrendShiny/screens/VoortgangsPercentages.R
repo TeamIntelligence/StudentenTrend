@@ -10,8 +10,8 @@ VoortgangsPercentagesUI <- function(PageName) {
                                         "Afstudeer percentages"  = "afgestudeerd")
             )
         ),
-        box(width=4, height = 170, uiOutput("VoortgangsPercentages_yearRange")),
-        box(width=4, height = 170,uiOutput("VoortgangsPercentages_percentageRadio"))
+        box(width=4, height = 170, sliderInput("VoortgangsPercentages_yearRangeSlider","Jaren", min = 3, max = 9, value = 3)),
+        box(width=4, height = 170, uiOutput("VoortgangsPercentages_percentageRadio"))
          
         
         # Show a plot of the generated distribution
@@ -22,17 +22,6 @@ VoortgangsPercentagesUI <- function(PageName) {
 }
 
 VoortgangsPercentagesServer <- function(input, output, session) {
-  
-  
-  output$VoortgangsPercentages_yearRange <- renderUI({
-    if(is.null(input$VoortgangsPercentages_voortgangType)) {
-      sliderInput("VoortgangsPercentages_yearRangeSlider","Jaren", min = 1, max = 8, value = 3)
-    } else if (input$VoortgangsPercentages_voortgangType == "uitschrijf") {
-      sliderInput("VoortgangsPercentages_yearRangeSlider","Jaren", min = 1, max = 8, value = 3)
-    } else {
-      sliderInput("VoortgangsPercentages_yearRangeSlider","Jaren", min = 3, max = 8, value = 3)
-    }
-  })
   
   output$VoortgangsPercentages_percentageRadio <- renderUI({
     if(input$VoortgangsPercentages_voortgangType == "uitschrijf"){
@@ -101,33 +90,20 @@ VoortgangsPercentagesServer <- function(input, output, session) {
       }
       return(data)
     }
+    
     if(!exists("morphedSet") || is.null(morphedSet)){
       morphedSet <- morphSet(studievoortgang)
     }    
     
-    if(!is.null(input$VoortgangsPercentages_yearRangeSlider)){
-      columnNames <- switch(input$VoortgangsPercentages_voortgangType, 
-                            "uitschrijf" = switch (input$VoortgangsPercentages_yearRangeSlider,
-                                                   "1" = c("iscedCode", "uitgeschreven1Jaar"),
-                                                   "2" = c("iscedCode", "uitgeschreven2Jaar"),
-                                                   "3" = c("iscedCode", "uitgeschreven3Jaar"),
-                                                   "4" = c("iscedCode", "uitgeschreven4Jaar"),
-                                                   "5" = c("iscedCode", "uitgeschreven5Jaar"),
-                                                   "6" = c("iscedCode", "uitgeschreven6Jaar"),
-                                                   "7" = c("iscedCode", "uitgeschreven7Jaar"),
-                                                   "8" = c("iscedCode", "uitgeschreven8Jaar")
-                            ),
-                            "afgestudeerd" = switch(input$VoortgangsPercentages_yearRangeSlider,
-                                                    "2" = c("iscedCode", "hboGediplomeerd2Jaar", "woGediplomeerd2Jaar"),
-                                                    "3" = c("iscedCode", "hboGediplomeerd3Jaar", "woGediplomeerd3Jaar"),
-                                                    "4" = c("iscedCode", "hboGediplomeerd4Jaar", "woGediplomeerd4Jaar"),
-                                                    "5" = c("iscedCode", "hboGediplomeerd5Jaar", "woGediplomeerd5Jaar"),
-                                                    "6" = c("iscedCode", "hboGediplomeerd6Jaar", "woGediplomeerd6Jaar"),
-                                                    "7" = c("iscedCode", "hboGediplomeerd7Jaar", "woGediplomeerd7Jaar"),
-                                                    "8" = c("iscedCode", "hboGediplomeerd8Jaar", "woGediplomeerd8Jaar"),
-                                                    "9" = c("iscedCode", "hboGediplomeerd9Jaar", "woGediplomeerd9Jaar")
-                            )
-      )
+    if(!is.null(input$VoortgangsPercentages_yearRangeSlider) && !is.null(input$VoortgangsPercentages_check)){
+      columnNames <- if(input$VoortgangsPercentages_voortgangType == "uitschrijf"){
+                        c("iscedCode", 
+                          paste("uitgeschreven", input$VoortgangsPercentages_yearRangeSlider, "Jaar", sep = ""))
+                      } else {
+                        c("iscedCode", 
+                          paste("hboGediplomeerd", input$VoortgangsPercentages_yearRangeSlider, "Jaar", sep = ""), 
+                          paste("woGediplomeerd", input$VoortgangsPercentages_yearRangeSlider, "Jaar", sep = ""))
+                      }
       
       if(input$VoortgangsPercentages_check == "morphSet"){
         svSet <- morphedSet
@@ -165,5 +141,16 @@ VoortgangsPercentagesServer <- function(input, output, session) {
         theme(axis.text.x=element_blank()) +
         ggtitle(plotTitle)
     }
+  })
+  observe({
+    
+    if(input$VoortgangsPercentages_voortgangType == "uitschrijf"){
+      updateSliderInput(session = session, "VoortgangsPercentages_yearRangeSlider", value = 2,
+                        min = 2, max = 8)
+    } else {
+      updateSliderInput(session = session, "VoortgangsPercentages_yearRangeSlider", value = 3,
+                        min = 3, max = 9)
+    }
+    
   })
 }
