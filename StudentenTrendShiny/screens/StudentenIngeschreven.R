@@ -4,7 +4,13 @@ StudentenIngeschrevenUI <- function(PageName){
     # Page title
     titlePanel("Ingeschreven studenten"),
     fluidRow(
-      box(width=4, height = 170, uiOutput("StudentenIngeschreven_SelectStudy"),
+      box(width=4, height = 170, 
+        selectInput("StudentenIngeschreven_SelectStudyImp",
+                    "Selecteer een of meerdere studiesectoren om weer te geven:",
+                    choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
+                    multiple = TRUE,
+                    selectize = TRUE
+        ),
         checkboxInput("StudentenIngeschreven_AlleStudies",
                       "Selecteer alle studies"
         )
@@ -37,28 +43,7 @@ StudentenIngeschrevenUI <- function(PageName){
 
 
 
-StudentenIngeschrevenServer <- function(input, output){
-  
-  output$StudentenIngeschreven_SelectStudy <- renderUI({
-    if(input$StudentenIngeschreven_AlleStudies == TRUE){  #Alles studies selecteren
-      selectInput("StudentenIngeschreven_SelectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE,
-                  selected = studenten_ingeschrevenen$iscedCode.iscedNaam
-      )
-    } else { 
-      selectInput("StudentenIngeschreven_SelectStudyImp",
-                  "Selecteer een of meerdere studiesectoren om weer te geven:",
-                  choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
-                  multiple = TRUE,
-                  selectize = TRUE
-      )
-    }   
-  })
-  
-  
+StudentenIngeschrevenServer <- function(input, output, session){
   
   output$aantalIngeschrevenPlot <- renderPlot({
     
@@ -363,7 +348,20 @@ StudentenIngeschrevenServer <- function(input, output){
   
   
   
-  
+  observe({
+    trueFalse = length(input$StudentenIngeschreven_SelectStudyImp) == length(unique(studenten_ingeschrevenen$iscedCode.iscedNaam))
+    
+    updateCheckboxInput(session, "StudentenIngeschreven_AlleStudies", value = trueFalse)
+    
+  })
+  observeEvent(input$StudentenIngeschreven_AlleStudies, {
+    trueFalse = length(input$StudentenIngeschreven_SelectStudyImp) == length(unique(studenten_ingeschrevenen$iscedCode.iscedNaam))
+    if(input$StudentenIngeschreven_AlleStudies == T && !trueFalse){
+      updateSelectInput(session, "StudentenIngeschreven_SelectStudyImp",
+                        selected = studenten_ingeschrevenen$iscedCode.iscedNaam
+      )
+    }
+  })
   
   
 }
