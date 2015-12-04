@@ -40,7 +40,7 @@ LoadFromServer <- function(vName, ...) {
   }
 }
 
-LoadFromServer("studievoortgang", "http://188.166.3.196:8080/studenten/studievoortgang")
+LoadFromServer("studievoortgang", "http://188.166.3.196:8080/studenten/studievoortgang",flatten=TRUE)
 LoadFromServer("studenten_gediplomeerden", "http://188.166.3.196:8080/studenten/gediplomeerden",flatten=TRUE)
 LoadFromServer("vacatures", "http://188.166.3.196:8080/vacatures",flatten=TRUE)
 LoadFromServer("vacatures_jaartallen", "http://188.166.3.196:8080/vacatures/jaartallen",flatten=TRUE)
