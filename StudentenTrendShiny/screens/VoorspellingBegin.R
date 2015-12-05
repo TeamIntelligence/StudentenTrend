@@ -1,4 +1,9 @@
+# If the forecast package is not installed yet, install it
+if(!require(forecast)) {
+  install.packages("forecast")
+}
 library(forecast)
+
 HBOWOsub <- aggregate(studenten_ingeschrevenen$aantal, by=list(iscedNaam=studenten_ingeschrevenen$iscedCode.iscedNaam,jaartal=studenten_ingeschrevenen$jaartal), FUN=sum)
 
 mydata <- tapply(HBOWOsub$x, HBOWOsub$iscedNaam, ts, start=1990, 2014, frequency=1)
