@@ -43,11 +43,9 @@ CallServerFunction <- function(Page, ...) {
   FunctionName <- paste(Page["tabName"], "Server", sep="")
   
   #Try to call the server function, if not exist log it
-  tryCatch({
+  if(exists(FunctionName, envir=.GlobalEnv)) {
     do.call(FunctionName, list(...) ) 
-  }
-  ,error = function(cond) {
-    message(cond)
+  } else {
     message(paste("Could not find the Server function of: ", Page["tabName"]))
-  })
+  }
 }
