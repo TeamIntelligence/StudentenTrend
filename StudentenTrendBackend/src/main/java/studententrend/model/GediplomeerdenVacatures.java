@@ -29,25 +29,25 @@ public class GediplomeerdenVacatures {
 	@JoinColumn(name="SOI_CODE")
 	private SoiCode soiCode;
 	
-	@Column(name="DIRECT")
-	private int direct;
+	@Column(name="DIRECT", nullable=true)
+	private Integer direct;
 	
-	@Column(name="BINNEN_EEN_JAAR")
-	private int binnenEenJaar;
+	@Column(name="BINNEN_EEN_JAAR", nullable=true)
+	private Integer binnenEenJaar;
 	
-	@Column(name="BINNEN_TWEE_JAAR")
-	private int binnenTweeJaar;
+	@Column(name="BINNEN_TWEE_JAAR", nullable=true)
+	private Integer binnenTweeJaar;
 	
-	@Column(name="BINNEN_DRIE_JAAR")
-	private int binnenDrieJaar;
+	@Column(name="BINNEN_DRIE_JAAR", nullable=true)
+	private Integer binnenDrieJaar;
 	
 	protected GediplomeerdenVacatures(){}
 	
 	
 	
 	public GediplomeerdenVacatures(int gediplVacId, String ondCode,
-			int jaartal, SbiCode93 sbiCode93, SoiCode soiCode, int direct,
-			int binnenEenJaar, int binnenTweeJaar, int binnenDrieJaar) {
+			int jaartal, SbiCode93 sbiCode93, SoiCode soiCode, Integer direct,
+			Integer binnenEenJaar, Integer binnenTweeJaar, Integer binnenDrieJaar) {
 		this.gediplVacId = gediplVacId;
 		this.ondCode = ondCode;
 		this.jaartal = jaartal;
@@ -89,19 +89,19 @@ public class GediplomeerdenVacatures {
 		return soiCode;
 	}
 
-	public int getDirect() {
+	public Integer getDirect() {
 		return direct;
 	}
 
-	public int getBinnenEenJaar() {
+	public Integer getBinnenEenJaar() {
 		return binnenEenJaar;
 	}
 
-	public int getBinnenTweeJaar() {
+	public Integer getBinnenTweeJaar() {
 		return binnenTweeJaar;
 	}
 
-	public int getBinnenDrieJaar() {
+	public Integer getBinnenDrieJaar() {
 		return binnenDrieJaar;
 	}
 }
