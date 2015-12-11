@@ -2,10 +2,14 @@
 StudentenPerSectorUI <- function(PageName) {
   return(
     tabItem(tabName = PageName,
-      titlePanel("Eerstejaarsstudenten"),
-      
       fluidRow(
-        box(width=6, height = 170, 
+        box(width = 12, title = "Eerstejaarsstudenten",
+            p("Op deze pagina vindt u het aantal eerstejaarsstudenten per studiesector over de periode 1995 tot en met 2012. HBO en WO is samengenomen. U kunt zelf kiezen welke studiesectoren u wilt weergeven. Daarnaast kunt u ook een totaallijn weergeven van alle studies of een totaallijn van de studies die u geselecteerd hebt."),
+            p("De grafiek biedt inzicht hoeveel studenten elk jaar starten binnen een bepaalde studie sector. Er kan vervolgens uit opgemaakt worden of studies binnen een bepaalde studiesector groeien of afnemen."),
+            collapsible = T
+            ),
+                             
+        box(width=6, height = 170,
             selectInput("StudentenPerSector_selectStudyImp",
                         "Selecteer een of meerdere studiesectoren om weer te geven:",
                         choices = studievoortgang$iscedCode.iscedNaam,
@@ -29,8 +33,14 @@ StudentenPerSectorUI <- function(PageName) {
         )
         
         # Show a plot of the generated distribution
-        ,box(width=5, height = 470, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450))
-        ,box(width=7, height = 470, plotOutput("StudentenPerSector_aantalStudentenBarPlot", height=450))
+        ,
+        tabBox( width=12, height=550,
+          tabPanel("Huidig", 
+                   box(width=5, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450)), 
+                   box(width=7, plotOutput("StudentenPerSector_aantalStudentenBarPlot", height=450))
+                   ),
+          tabPanel("Voorspelling", textOutput("HOI"))
+        )
       )
     )
   )

@@ -1,10 +1,16 @@
 VoortgangsPercentagesUI <- function(PageName) {
   return(
     tabItem(tabName = PageName,
-      titlePanel("Voortgangspercentages per studie"),
       
-      fluidRow(
-        box(width=4, height = 170, footer = "Gemiddelde afstudeer/uitschrijf percentages per studie van HBO en WO binnen ... jaar na aanvang",
+        fluidRow(
+          box(width = 12, title = "Voortgangspercentages per studie",
+              p("Op deze pagina vindt u de afstudeer- en uitschrijfpercentages per studiesector, gemiddeld genomen over de periode 1995 tot en met 2012. HBO en WO is samengenomen. U kunt zelf kiezen van hoeveel jaar na aanvang u dit percentage wilt zien. Daarnaast kunt u ook kiezen of u dit percentage ten opzichte van alle studenten wilt zien of alleen ten opzichte van alle uitgeschreven of gediplomeerde studenten wilt zien."),
+              p("De grafiek biedt vervolgens inzicht hoe lang studenten over het algemeen over hun opleiding doen en hoezeer de studies voldoen aan hun verwachtingen."),
+              collapsible = T
+              ),
+              
+          
+          box(width=4, height = 170, 
             radioButtons("VoortgangsPercentages_voortgangType", "Soort", 
                          choices = list("Uitschrijf percentages" = "uitschrijf", 
                                         "Afstudeer percentages"  = "afgestudeerd")
@@ -104,7 +110,7 @@ VoortgangsPercentagesServer <- function(input, output, session) {
                           paste("hboGediplomeerd", input$VoortgangsPercentages_yearRangeSlider, "Jaar", sep = ""), 
                           paste("woGediplomeerd", input$VoortgangsPercentages_yearRangeSlider, "Jaar", sep = ""))
                       }
-      LogVar(columnNames)
+
       if(input$VoortgangsPercentages_check == "morphSet"){
         svSet <- morphedSet
         

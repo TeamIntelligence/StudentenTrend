@@ -3,8 +3,11 @@ AantalVacaturesUI <- function(PageName){
     
     tabItem(tabName = PageName,
       # Page title
-      titlePanel("Aantal vacatures"),
       fluidRow(
+        box(width=12, collapsible = T, title = "Aantal vacatures", 
+            p("Op deze pagina vindt u het aantal vacatures per bedrijfssector over de periode 1997 tot en met 2015. U kunt zelf kiezen welke bedrijfssectoren u wilt weergeven. Verder kan u ook een totaallijn weergeven van alle bedrijfssectoren of een totaallijn van de bedrijfssectoren die u geselecteerd hebt."),
+            p("De grafiek biedt inzicht hoeveel vacatures er elk jaar zijn voor een bepaalde bedrijfssector. Er kan vervolgens uit opgemaakt worden of het aantal vacatures een groei of een daling doormaakt. Zo is de Dot-com bubble, die barstte in het jaar 2000, duidelijk te zien in de grafiek, evenals de economische crisis die in Nederland uitbrak in het jaar 2008.")
+            ),
         box(width=5, height = 150, 
             
             selectInput("AantalVacatures_SelectImp",

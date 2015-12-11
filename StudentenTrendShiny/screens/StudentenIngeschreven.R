@@ -2,8 +2,11 @@ StudentenIngeschrevenUI <- function(PageName){
   return(  
   tabItem(tabName = PageName,
     # Page title
-    titlePanel("Ingeschreven studenten"),
     fluidRow(
+      box(width = 12, collapsible = T, title="Ingeschreven studenten",
+          p("Op deze pagina vindt u het aantal ingeschreven studenten per studiesector over de periode 1990 tot en met 2014. U kunt zelf kiezen welke studiesectoren u wilt weergeven. Daarnaast kunt u ook zelf een keuze maken tussen HBO en WO. Verder kan u ook een totaallijn weergeven van alle studies of een totaallijn van de studies die u geselecteerd hebt."),
+          p("De grafiek biedt inzicht hoeveel studenten elk jaar ingeschreven zijn voor een studie binnen een bepaalde studiesector. Er kan vervolgens uit opgemaakt worden hoe een studie binnen een bepaalde studiesector zich ontwikkeld qua grootte.")
+          ),
       box(width=4, height = 170, 
         selectInput("StudentenIngeschreven_SelectStudyImp",
                     "Selecteer een of meerdere studiesectoren om weer te geven:",

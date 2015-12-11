@@ -1,9 +1,8 @@
 DashboardUI <- function(PageName) {
   return(
     tabItem(tabName = PageName,
-      titlePanel("Welkom bij StudentenTrend!"),
       fluidRow(
-        box(width=12, height=500,
+        box(width=12, height=500, title = "Welkom bij StudentenTrend!",  
             htmlOutput("Dashboard_introText")
         )
       )
@@ -13,15 +12,13 @@ DashboardUI <- function(PageName) {
 
 DashboardServer <- function(input, output, session) {
   output$Dashboard_introText <- renderUI({
-    HTML("StudentenTrend is een applicatie die inzichtelijk maakt wat er omtrent studenten en vacatures binnen Nederland gebeurd. 
-      Deze applicatie bevat diverse grafieken die informatie geven over bijvoorbeeld het aantal afgestudeerde studenten per studiesector 
-      binnen Nederland. Ook is duidelijk te zien hoeveel studenten er staan ingeschreven en hoeveel de opleiding ook daadwerkelijk voltooien.
-      Om wat aan deze data te hebben is ook het aantal vacatures nodig. Hiervoor hebben wij ook de data beschikbaar van het aantal banen per 
-      sector binnen Nederland. <br /><br />
-      Deze applicatie bevat ook voorspellingen voor het aantal banen, ingeschreven studenten en afgestudeerde studenten. Hiervoor gebruiken we 
-      bestaande data en doen hier voorspellingen mee. <br /><br />
-         
-      Veel Succes!"
+    HTML("StudentenTrend is een applicatie die inzichtelijk maakt hoe het aantal studenten en vacatures binnen Nederland beweegt over de tijd. 
+Deze applicatie bevat diverse grafieken die informatie geven over bijvoorbeeld het aantal eerstejaars, ingeschreven en afgestudeerde studenten per studiesector binnen Nederland. Daarnaast zijn er ook grafieken te vinden omtrent het aantal vacatures per bedrijfssector en in welke mate er per studierichting banen vervuld worden door afgestudeerde studenten.
+         <br /><br />
+         De data die gebruikt is om deze grafieken mee te maken, is ook gebruikt om een aantal interessante voorspellingen te doen. 
+         <br /><br />
+         Veel succes!
+         "
     )
   })
 }

@@ -3,8 +3,11 @@ StudentenGediplomeerdenUI <- function(PageName){
     
     tabItem(tabName = PageName, 
         # Page title
-        titlePanel("Gediplomeerde studenten"),
         fluidRow(
+          box(width = 12, collapsible = T, title = "Gediplomeerde studenten", 
+              p("Op deze pagina vindt u het aantal gediplomeerde studenten per studiesector over de periode 1995 tot en met 2013. U kunt zelf kiezen welke studiesectoren u wilt weergeven. Daarnaast kunt u ook zelf een keuze maken tussen HBO en WO. Verder kan u ook een totaallijn weergeven van alle studies of een totaallijn van de studies die u geselecteerd hebt."),
+              p("De grafiek biedt inzicht hoeveel studenten elk jaar afstuderen binnen een bepaalde studiesector. Er kan vervolgens uit opgemaakt worden of er een tekort of een teveel zal zijn aan studenten binnen een bepaalde studiesector voor in het bedrijfsleven.")
+              ),
           box(width=4, height = 170,
               selectInput("StudentenGediplomeerden_SelectStudyImp",
                           "Selecteer een of meerdere studiesectoren om weer te geven:",
