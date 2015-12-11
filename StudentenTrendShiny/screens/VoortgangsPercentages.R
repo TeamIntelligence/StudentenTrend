@@ -97,14 +97,14 @@ VoortgangsPercentagesServer <- function(input, output, session) {
     
     if(!is.null(input$VoortgangsPercentages_yearRangeSlider) && !is.null(input$VoortgangsPercentages_check)){
       columnNames <- if(input$VoortgangsPercentages_voortgangType == "uitschrijf"){
-                        c("iscedCode", 
+                        c("iscedCode.iscedNaam", 
                           paste("uitgeschreven", input$VoortgangsPercentages_yearRangeSlider, "Jaar", sep = ""))
                       } else {
-                        c("iscedCode", 
+                        c("iscedCode.iscedNaam", 
                           paste("hboGediplomeerd", input$VoortgangsPercentages_yearRangeSlider, "Jaar", sep = ""), 
                           paste("woGediplomeerd", input$VoortgangsPercentages_yearRangeSlider, "Jaar", sep = ""))
                       }
-      
+      LogVar(columnNames)
       if(input$VoortgangsPercentages_check == "morphSet"){
         svSet <- morphedSet
         
@@ -119,8 +119,8 @@ VoortgangsPercentagesServer <- function(input, output, session) {
       }
 
       svSub <- switch (input$VoortgangsPercentages_voortgangType,
-                       "uitschrijf" = aggregate (svSet[, columnNames][,2], list(svSet$iscedCode$iscedNaam), customMean),
-                       "afgestudeerd" = aggregate (svSet[, columnNames][,2] + svSet[, columnNames][,3], list(svSet$iscedCode$iscedNaam), customMean)
+                       "uitschrijf" = aggregate (svSet[, columnNames][,2], list(svSet$iscedCode.iscedNaam), customMean),
+                       "afgestudeerd" = aggregate (svSet[, columnNames][,2] + svSet[, columnNames][,3], list(svSet$iscedCode.iscedNaam), customMean)
       )
       
       
