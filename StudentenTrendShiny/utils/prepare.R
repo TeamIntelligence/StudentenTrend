@@ -62,3 +62,6 @@ LoadFromServer("studenten_gediplomeerden", "http://188.166.3.196:8080/studenten/
 LoadFromServer("vacatures", "http://188.166.3.196:8080/vacatures",flatten=TRUE)
 LoadFromServer("vacatures_jaartallen", "http://188.166.3.196:8080/vacatures/jaartallen",flatten=TRUE)
 LoadFromServer("studenten_ingeschrevenen", "http://188.166.3.196:8080/studenten/ingeschrevenen",flatten=TRUE)
+LoadFromServer("gediplomeerden_vacatures", "http://188.166.3.196:8080/studenten/vacatures",flatten=TRUE)
+LoadFromServer("sbicodes93", "http://188.166.3.196:8080/sbicodes93",flatten=FALSE)
+LoadFromServer("soicodes", "http://188.166.3.196:8080/soicodes",flatten=FALSE)

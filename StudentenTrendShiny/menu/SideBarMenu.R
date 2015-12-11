@@ -8,6 +8,10 @@ GetPages <- function() {
       ,list("Gediplomeerde studenten", tabName="StudentenGediplomeerden", icon=icon("bar-chart"))
       ,list("Aantal vacatures", tabName = "AantalVacatures", icon=icon("bar-chart"))
       ,list("Ingeschreven studenten",tabName = "StudentenIngeschreven",icon=icon("bar-chart"))
+      ,list("Vervulde banen",icon=icon("bar-chart")
+            ,menuSubItem("Per banen- per studiesector",tabName = "VacaturesGediplomeerden",icon=icon("bar-chart"))
+            ,menuSubItem("Per studie- per banensector",tabName = "GediplomeerdenVacatures",icon=icon("bar-chart"))
+            ,menuSubItem("Per studiesector per jaar",tabName = "BanenStudieSectorJaar",icon=icon("bar-chart"))) 
     )
   )
 }
