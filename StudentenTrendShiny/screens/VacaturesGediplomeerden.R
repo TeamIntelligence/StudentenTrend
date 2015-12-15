@@ -14,11 +14,9 @@ VacaturesGediplomeerdenUI <- function(PageName){
                               selectize = TRUE,
                               selected=1 
                   )
-                  
               ),
               box(width=7, height=150, 
                   sliderInput("VacaturesGediplomeerden_yearRangeSlider","Peilmoment", min = 0, max = 3, value = 0)
-            
               )
               ,box(width=5, height = 470, plotOutput("VacaGedipPlot", height = 450))
               ,box(width=7, height = 470, plotOutput("VacaGedipBarPlot", height=450))
@@ -56,7 +54,7 @@ VacaturesGediplomeerdenServer <- function(input, output, session){
                                         color = "black") + 
       geom_point(data=plotCalcs$totaalaantal, aes(y=aantal), 
                                          color = "black") + 
-      labs(color = "Studierichting") + 
+      scale_color_manual(values=CUSTOMCOLORARRAY[1:length(plotCalcs$vgSub$soiCode.soiNaam)]) +
       theme(legend.position="none") +
       xlim(2000,plotCalcs$toYear)
     
@@ -77,9 +75,9 @@ VacaturesGediplomeerdenServer <- function(input, output, session){
                 color = "black")) + 
       geom_point(data=plotCalcs$totaalaantal, aes(y=aantal, 
                  color = "black")) + 
+      scale_fill_manual(values=CUSTOMCOLORARRAY[1:length(plotCalcs$vgSub$soiCode.soiNaam)],name="Studiesector") +
       scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaal aantal vervulde banen"))+
       labs(color = "Totaallijn")+
-      labs(fill = "Studierichting") +
       xlim(1999,plotCalcs$toYear+1)
   })
 }
