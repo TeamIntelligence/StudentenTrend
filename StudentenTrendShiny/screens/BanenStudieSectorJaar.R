@@ -40,7 +40,6 @@ BanenStudieSectorJaarServer <- function(input, output, session){
     aantalgediplomeerden <- aggregate(aantalgediplomeerden$aantal, by=list(jaartal=aantalgediplomeerden$jaartal), FUN=sum)
     colnames(aantalgediplomeerden) <- c("jaartal","aantal")
     
-    
     ggplot(bsjSub,   
            aes(x=jaartal)) + 
       xlab("Jaar") +  
@@ -58,12 +57,7 @@ BanenStudieSectorJaarServer <- function(input, output, session){
       geom_point(data=aantalgediplomeerden,aes(y=aantal,color="Black")) +
       scale_color_manual(values = c("Red","Green","Blue","Purple","Black"), 
                          labels=c("Direct","Binnen een jaar","Binnen twee jaar","Binnen drie jaar", "Aantal gediplomeerden"), 
-                         breaks = c("Red","Green","Blue","Purple","Black")) +
-      xlim(2000,2008)+
-      labs(color = "Peilmoment")  
-
-    
+                         breaks = c("Red","Green","Blue","Purple","Black"), name = "Peilmoment") +
+      xlim(2000,2008)
   })
-  
-  
 }
