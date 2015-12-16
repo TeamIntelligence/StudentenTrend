@@ -2,9 +2,11 @@ BanenStudieSectorJaarUI <- function(PageName){
   return(
     #vervulde banen per banensector
     tabItem(tabName = PageName,
-            # Page title
-            titlePanel("Vervulde banen per studiesector per jaar"),
             fluidRow(
+              box(width=12, collapsible = T, title = "Vervulde banen per studiesector per jaar", 
+                  p("Op deze pagina vindt u het aantal vervulde banen per studiesector over de periode 2000 tot en met uiterst 2008. De jaartallen doelen op het afstudeermoment van de studenten. Wanneer bijvoorbeeld het peilmoment drie jaar is, is dit voor afstudeerjaar 2005 gemeten in 2008. U kunt zelf kiezen welke studiesector u wilt weergeven. Ook is er een totaallijn van het totaal aantal gediplomeerden studenten te zien. Deze komt uit een andere dataset, hierdoor kunnen er kleine verschillen in de data zitten."),
+                  p("De plots die op deze pagina worden getoond geven inzicht voor een student hoe snel hij of zij aan een baan komt. Dit kan je dan makkelijk zien ten opzichte van het totaal aantal gediplomeerden binnen deze studiesector. Het valt ons op dat er een groot aantal studenten direct aan een baan komt. Het verschil tussen direct en binnen één jaar na afstuderen aan een baan komen is relatief hoog. We zien dat er haast geen verschil is tussen aantal banen dat binnen één, twee en drie jaar na afstuderen worden vervuld. Hieruit is te concluderen dat wanneer je binnen één jaar na afstuderen geen baan hebt, je waarschijnlijk binnen drie jaar na afstuderen nog steeds geen baan zal vervullen.")
+              ),
               box(width=12, height = 150, 
                   selectInput("BanenStudieSectorJaar_SelectImp",
                               "Selecteer een studiesector om weer te geven:",
@@ -42,7 +44,7 @@ BanenStudieSectorJaarServer <- function(input, output, session){
     
     ggplot(bsjSub,   
            aes(x=jaartal)) + 
-      xlab("Jaar") +  
+      xlab("Afstudeerjaar") +  
       ylab("Aantal vervulde banen") + 
       ggtitle("Vervulde banen per studiesector per peilmoment") +
       geom_line(data=bsjSub, aes(y=direct,color="Red")) + 
