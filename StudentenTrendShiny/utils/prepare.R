@@ -40,7 +40,7 @@ LoadFromServer <- function(vName, ...) {
   }
 }
 
-CUSTOMCOLORARRAY <- sample(c("tan4", "tomato3",
+CUSTOMCOLORARRAY <- c("tan4", "tomato3",
                       "violetred", "turquoise4", 
                       "wheat3", "steelblue3", 
                       "salmon", "orchid", 
@@ -54,7 +54,7 @@ CUSTOMCOLORARRAY <- sample(c("tan4", "tomato3",
                       "orchid4", "purple",
                       "gold", "palegreen4",
                       "seagreen1", "peru",
-                      "red", "yellow4"))
+                      "red", "yellow4")
 
 
 LoadFromServer("studievoortgang", "http://188.166.3.196:8080/studenten/studievoortgang",flatten=TRUE)
