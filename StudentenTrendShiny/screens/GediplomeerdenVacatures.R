@@ -46,7 +46,7 @@ GediplomeerdenVacaturesServer <- function(input, output, session){
                 color = "black") + 
       geom_point(data=plotCalcs$totaalaantal, aes(y=aantal), 
                  color = "black") + 
-      scale_color_manual(values=CUSTOMCOLORARRAY[1:length(plotCalcs$gvSub$sbiCode93.sbiNaam93)]) +
+      scale_color_manual(values=GetColors(plotCalcs$gvSub$sbiCode93.sbiNaam93)) +
       theme(legend.position="none") +
       xlim(2000,plotCalcs$toYear)
   })
@@ -65,7 +65,7 @@ GediplomeerdenVacaturesServer <- function(input, output, session){
                                                  color = "black")) + 
       geom_point(data=plotCalcs$totaalaantal, aes(y=aantal, 
                                                   color = "black")) + 
-      scale_fill_manual(values=CUSTOMCOLORARRAY[1:length(plotCalcs$gvSub$sbiCode93.sbiNaam93)],name="Bedrijfssector") +
+      scale_fill_manual(values=GetColors(plotCalcs$gvSub$sbiCode93.sbiNaam93),name="Bedrijfssector") +
       scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaal aantal vervulde banen"))+
       labs(color = "Totaallijn")+
       xlim(1999,plotCalcs$toYear+1)

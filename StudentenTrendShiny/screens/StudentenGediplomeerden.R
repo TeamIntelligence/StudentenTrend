@@ -173,6 +173,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           geom_point(data=StudentenGediplomeerden_StudieSub,aes(y=aantal, 
                                     group=iscedCode.iscedNaam,
                                     color=iscedCode.iscedNaam)) +
+          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) +
           geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
                                            group=ondCode,
                                            color=ondCode), color = "black") + 

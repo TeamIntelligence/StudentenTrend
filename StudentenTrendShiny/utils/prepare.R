@@ -40,7 +40,9 @@ LoadFromServer <- function(vName, ...) {
   }
 }
 
-CUSTOMCOLORARRAY <- c("tan4", "tomato3",
+GetColors <- function(values){
+  len <- length(unique(values))
+  customColorArray <- c("tan4", "tomato3",
                       "violetred", "turquoise4", 
                       "wheat3", "steelblue3", 
                       "salmon", "orchid", 
@@ -55,6 +57,13 @@ CUSTOMCOLORARRAY <- c("tan4", "tomato3",
                       "gold", "palegreen4",
                       "seagreen1", "peru",
                       "red", "yellow4")
+  
+  if (len<=length(customColorArray)){
+    return(customColorArray[1:len])
+  }
+  
+}
+
 
 
 LoadFromServer("studievoortgang", "http://188.166.3.196:8080/studenten/studievoortgang",flatten=TRUE)
