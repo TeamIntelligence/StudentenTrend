@@ -44,8 +44,6 @@ StudentenIngeschrevenUI <- function(PageName){
   )
 }
 
-
-
 StudentenIngeschrevenServer <- function(input, output, session){
   
   output$aantalIngeschrevenPlot <- renderPlot({
@@ -69,12 +67,15 @@ StudentenIngeschrevenServer <- function(input, output, session){
     if (input$StudentenIngeschreven_Totaal == TRUE & input$StudentenIngeschreven_Totaalselect == TRUE ){ 
       ##allebei de lijnen
       ##select lijn
-      totaalaantalselect <- TotaalAantalSelectSI(input)
-      
+      totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
+                                               selectInput = input$StudentenIngeschreven_SelectStudyImp, 
+                                               studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
+                                               filterParams= c("ondCode",'jaartal'))
       #totaallijn
-      totaalaantal <- TotaalAantalSI(input)
+      totaalaantal <- TotaalAantal(data = studenten_ingeschrevenen,
+                                   studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
+                                   filterParams= c("ondCode",'jaartal'))
       
-      #plotten
       ggplot(totaalaantal,   
              aes(x=jaartal)) + 
         xlab("Jaar") +  
@@ -101,11 +102,13 @@ StudentenIngeschrevenServer <- function(input, output, session){
         labs(color = "Studierichting")+ 
         theme(legend.position="none")
       
-      
     }
     else if (input$StudentenIngeschreven_Totaalselect == TRUE ){
       ##select lijn
-      totaalaantalselect <- TotaalAantalSelectSI(input)
+      totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
+                                               selectInput = input$StudentenIngeschreven_SelectStudyImp, 
+                                               studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
+                                               filterParams= c("ondCode",'jaartal'))
       
       ggplot(totaalaantalselect,   
              aes(x=jaartal)) + 
@@ -130,7 +133,9 @@ StudentenIngeschrevenServer <- function(input, output, session){
     else if (input$StudentenIngeschreven_Totaal == TRUE ){
       #alleen totaal
       #totaallijn
-      totaalaantal <- TotaalAantalSI(input)
+      totaalaantal <- TotaalAantal(data = studenten_ingeschrevenen,
+                                   studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
+                                   filterParams= c("ondCode",'jaartal'))
       
       ggplot(totaalaantal,   
              aes(x=jaartal)) + 
@@ -168,11 +173,9 @@ StudentenIngeschrevenServer <- function(input, output, session){
         labs(color = "Studierichting")+ 
         theme(legend.position="none")
     }
-    
   })
   
   output$aantalIngeschrevenBarPlot <- renderPlot({
-    
     #data aanpassen nav keuzes gebruiker: studieniveau
     siBarSub <- switch (input$StudentenIngeschreven_StudieNiveau,
                         "HBO" = studenten_ingeschrevenen[studenten_ingeschrevenen$ondCode == "HBO",],
@@ -191,18 +194,17 @@ StudentenIngeschrevenServer <- function(input, output, session){
     plotTitle <- paste("Aantal ingeschreven bachelor studenten \nper jaar verdeeld per studie")
     
     if (input$StudentenIngeschreven_Totaal == TRUE & input$StudentenIngeschreven_Totaalselect == TRUE ){ 
-      
       ##allebei de lijnen
-      
-      
       ##select lijn
-      totaalaantalselect <- TotaalAantalSelectSI(input)
-      
+      totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
+                                               selectInput = input$StudentenIngeschreven_SelectStudyImp, 
+                                               studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
+                                               filterParams= c("ondCode",'jaartal'))
       #totaallijn
-      totaalaantal <- TotaalAantalSI(input)
+      totaalaantal <- TotaalAantal(data = studenten_ingeschrevenen,
+                                   studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
+                                   filterParams= c("ondCode",'jaartal'))
       
-      
-      #plotten
       ggplot(siBarSub, 
              aes(x=jaartal)) + 
         xlab("Jaar") +  
@@ -222,7 +224,6 @@ StudentenIngeschrevenServer <- function(input, output, session){
         geom_point(data=totaalaantal, aes(y=aantal, 
                                                 group=ondCode,
                                                 color="black")) +
-        
         scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
         labs(color = "Totaallijn")+
         labs(fill = "Studierichting")
@@ -230,8 +231,11 @@ StudentenIngeschrevenServer <- function(input, output, session){
     }
     else if (input$StudentenIngeschreven_Totaalselect == TRUE ){
       #alleen select
-      totaalaantalselect <- TotaalAantalSelectSI(input)
-      
+      totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
+                                               selectInput = input$StudentenIngeschreven_SelectStudyImp, 
+                                               studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
+                                               filterParams= c("ondCode",'jaartal'))
+
       ggplot(siBarSub, 
              aes(x=jaartal)) + 
         xlab("Jaar") +  
@@ -248,12 +252,12 @@ StudentenIngeschrevenServer <- function(input, output, session){
         scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
         labs(color = "Totaallijn")+
         labs(fill = "Studierichting") 
-      
     } 
     else if (input$StudentenIngeschreven_Totaal == TRUE ){
-
       #totaallijn
-      totaalaantal <- TotaalAantalSI(input)
+      totaalaantal <- TotaalAantal(data = studenten_ingeschrevenen,
+                                   studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
+                                   filterParams= c("ondCode",'jaartal'))
 
       ggplot(siBarSub, 
              aes(x=jaartal)) + 
@@ -271,10 +275,8 @@ StudentenIngeschrevenServer <- function(input, output, session){
         scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
         labs(color = "Totaallijn")+
         labs(fill = "Studierichting") 
-        
     }  
     else{
-    
     #normale enkele barplot
     ggplot(siBarSub, 
            aes(x=jaartal)) + 
@@ -300,59 +302,4 @@ StudentenIngeschrevenServer <- function(input, output, session){
       )
     }
   })
-}
-
-TotaalAantalSelectSI <- function(input){
-
-  ##keuze maken welke studies
-  totaalaantalselect <- studenten_ingeschrevenen[studenten_ingeschrevenen$iscedCode.iscedNaam %in% input$StudentenIngeschreven_SelectStudyImp,]
-  
-  #Totaal berekenen
-  totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=list(ondCode=totaalaantalselect$ondCode,jaartal=totaalaantalselect$jaartal), FUN=sum)
-  colnames(totaalaantalselect)<-c("ondCode","jaartal", "aantal")
-  
-  #keuze maken welk studie niveau
-  totaalaantalselect <- switch (input$StudentenIngeschreven_StudieNiveau,
-                                "HBO" = totaalaantalselect[totaalaantalselect$ondCode == "HBO",],
-                                "WO" = totaalaantalselect[totaalaantalselect$ondCode == "WO",],
-                                "HBOWO" = aggregate(totaalaantalselect$aantal, by=list(jaartal=totaalaantalselect$jaartal), FUN=sum)
-  )        
-  if (input$StudentenIngeschreven_StudieNiveau == "HBOWO"){
-    colnames(totaalaantalselect)<-c("jaartal","aantal")
-    totaalaantalselect$ondCode = "Totaal geselecteerde HBO en WO studies"
-  }
-  if (input$StudentenIngeschreven_StudieNiveau == "HBO"){
-    totaalaantalselect$ondCode = "Totaal geselecteerde HBO studies"
-  }
-  if (input$StudentenIngeschreven_StudieNiveau == "WO"){
-    totaalaantalselect$ondCode = "Totaal geselecteerde WO studies"
-  }
-  return(totaalaantalselect)
-}
-
-TotaalAantalSI <- function(input){
-  #Totaal berekenen
-  totaalaantal <- aggregate(studenten_ingeschrevenen$aantal, by=list(ondCode=studenten_ingeschrevenen$ondCode,jaartal=studenten_ingeschrevenen$jaartal), FUN=sum)
-  colnames(totaalaantal)<-c("ondCode","jaartal","aantal")
-  
-  
-  #keuze maken welk studie niveau
-  totaalaantal <- switch (input$StudentenIngeschreven_StudieNiveau,
-                          "HBO" = totaalaantal[totaalaantal$ondCode == "HBO",],
-                          "WO" = totaalaantal[totaalaantal$ondCode == "WO",],
-                          "HBOWO" = aggregate(totaalaantal$aantal, by=list(jaartal=totaalaantal$jaartal), FUN=sum)
-  )        
-  
-  if (input$StudentenIngeschreven_StudieNiveau == "HBOWO"){
-    colnames(totaalaantal)<-c("jaartal","aantal")
-    totaalaantal$ondCode = "Totaal HBO en WO"
-  }
-  if (input$StudentenIngeschreven_StudieNiveau == "HBO"){
-    totaalaantal$ondCode = "Totaal HBO"
-  }
-  if (input$StudentenIngeschreven_StudieNiveau == "WO"){
-    totaalaantal$ondCode = "Totaal WO"
-  }
-  
-  return(totaalaantal)
 }

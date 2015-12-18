@@ -8,20 +8,16 @@ StudentenPerSectorUI <- function(PageName) {
             p("De grafiek biedt inzicht hoeveel studenten elk jaar starten binnen een bepaalde studie sector. Er kan vervolgens uit opgemaakt worden of studies binnen een bepaalde studiesector groeien of afnemen."),
             collapsible = T
             ),
-                             
         box(width=6, height = 170,
             selectInput("StudentenPerSector_selectStudyImp",
                         "Selecteer een of meerdere studiesectoren om weer te geven:",
                         choices = studievoortgang$iscedCode.iscedNaam,
                         multiple = TRUE,
                         selectize = TRUE),
-
-            
             checkboxInput("StudentenPerSector_AlleStudies",
                           "Geef alle studies weer"
             )
         ),
-        
         box(width = 6, height = 170,
             checkboxInput("StudentenEerstejaars_Totaalselect",
                           "Totaal lijn weergeven van de geselecteerde studies"
@@ -29,9 +25,7 @@ StudentenPerSectorUI <- function(PageName) {
             checkboxInput("StudentenEerstejaars_Totaal",
                           "Totaal lijn weergeven"
             )
-            
         )
-        
         # Show a plot of the generated distribution
         ,
         tabBox( width=12, height=550,
@@ -51,12 +45,10 @@ StudentenPerSectorServer <- function(input, output, session) {
   
   output$StudentenPerSector_aantalStudentenPlot <- renderPlot({
     
-    
     svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
     
     PlotTitle <- "Aantal eerstejaarsstudenten \nper jaar verdeeld per studie"
     
-#     
 #         ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal), environment=environment()) +
 #           xlab("Jaar") +
 #           ylab("Aantal Studenten") +
@@ -69,25 +61,17 @@ StudentenPerSectorServer <- function(input, output, session) {
 #           geom_bar(stat = "identity")+
 #           ggtitle(plotTitle) +
 #           scale_fill_manual(values=rainbow(length(input$StudentenPerSector_selectStudyImp)),name="Opleidings Sector")
-#       
 
         if (input$StudentenEerstejaars_Totaal == TRUE & input$StudentenEerstejaars_Totaalselect == TRUE ){ 
-          
           ##allebei de lijnen
-          
           ##select lijn
-
-          totaalaantalselect <- svSub[svSub$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,] #wordt imp
-        
-          
-          #Totaal berekenen geselecteerde
-          totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=list(jaartal=totaalaantalselect$jaartal), FUN=sum)
-          colnames(totaalaantalselect)<-c("jaartal", "aantal")
-#           
-          #totaallijn
+          totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
+                                                   selectInput = input$StudentenPerSector_selectStudyImp, 
+                                                   filterParams= c("jaartal"))
+ 
           #Totaal berekenen
-          totaalaantal <- aggregate(studievoortgang$aantal, by=list(jaartal=studievoortgang$jaartal), FUN=sum)
-          colnames(totaalaantal)<-c("jaartal", "aantal")
+          totaalaantal <- TotaalAantal(data =studievoortgang, 
+                                       filterParams= c("jaartal"))
           
           #plotten
           ggplot(svSub, aes(x=jaartal)) + 
@@ -110,22 +94,15 @@ StudentenPerSectorServer <- function(input, output, session) {
               , color = "gray48") +
             labs(color = "Studierichting")+ 
             theme(legend.position="none")
-          
-          
         }
-        
-        
-        ######
+
         else if (input$StudentenEerstejaars_Totaalselect == TRUE ){
           #alleen select
           ##select lijn
-          totaalaantalselect <- svSub[svSub$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,] #wordt imp
+          totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
+                                                   selectInput = input$StudentenPerSector_selectStudyImp, 
+                                                   filterParams= c("jaartal"))
 
-          #Totaal berekenen geselecteerde
-          totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=list(jaartal=totaalaantalselect$jaartal), FUN=sum)
-          colnames(totaalaantalselect)<-c("jaartal", "aantal")
-
-          #plotten
           ggplot(svSub, aes(x=jaartal)) + 
             xlab("Jaar") +  
             ylab("Aantal studenten") + 
@@ -146,17 +123,9 @@ StudentenPerSectorServer <- function(input, output, session) {
           
         }
         else if (input$StudentenEerstejaars_Totaal == TRUE ){
-          #totaallijn
           #Totaal berekenen
-          totaalaantal <- aggregate(studievoortgang$aantal, by=list(jaartal=studievoortgang$jaartal), FUN=sum)
-          colnames(totaalaantal)<-c("jaartal", "aantal")
-
-          #totaallijn
-          #Totaal berekenen
-          totaalaantal <- aggregate(studievoortgang$aantal, by=list(jaartal=studievoortgang$jaartal), FUN=sum)
-          colnames(totaalaantal)<-c("jaartal", "aantal")
-          
-          #plotten
+          totaalaantal <- TotaalAantal(data =studievoortgang, 
+                                       filterParams= c("jaartal"))
           ggplot(svSub, aes(x=jaartal)) + 
             xlab("Jaar") +  
             ylab("Aantal studenten") + 
@@ -220,24 +189,16 @@ StudentenPerSectorServer <- function(input, output, session) {
     #       
     
     if (input$StudentenEerstejaars_Totaal == TRUE & input$StudentenEerstejaars_Totaalselect == TRUE ){ 
-      
       ##allebei de lijnen
-      
       ##select lijn
+      totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
+                                               selectInput = input$StudentenPerSector_selectStudyImp, 
+                                               filterParams= c("jaartal"))
       
-      totaalaantalselect <- svBarSub[svBarSub$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,] #wordt imp
-      
-      
-      #Totaal berekenen geselecteerde
-      totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=list(jaartal=totaalaantalselect$jaartal), FUN=sum)
-      colnames(totaalaantalselect)<-c("jaartal", "aantal")
-      #           
-      #totaallijn
       #Totaal berekenen
-      totaalaantal <- aggregate(studievoortgang$aantal, by=list(jaartal=studievoortgang$jaartal), FUN=sum)
-      colnames(totaalaantal)<-c("jaartal", "aantal")
+      totaalaantal <- TotaalAantal(data =studievoortgang, 
+                                   filterParams= c("jaartal"))
       
-      #plotten
       ggplot(svBarSub, aes(x=jaartal)) + 
         xlab("Jaar") +  
         ylab("Aantal studenten") + 
@@ -255,22 +216,15 @@ StudentenPerSectorServer <- function(input, output, session) {
         scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
         labs(color = "Totaallijn")+
         labs(fill = "Studierichting")
-      
-      
     }
     
-    
-    ######
+
     else if (input$StudentenEerstejaars_Totaalselect == TRUE ){
-      #alleen select
       ##select lijn
-      totaalaantalselect <- svBarSub[svBarSub$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,] #wordt imp
-      
-      #Totaal berekenen geselecteerde
-      totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=list(jaartal=totaalaantalselect$jaartal), FUN=sum)
-      colnames(totaalaantalselect)<-c("jaartal", "aantal")
-      
-      #plotten
+      totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
+                                               selectInput = input$StudentenPerSector_selectStudyImp, 
+                                               filterParams= c("jaartal"))
+
       ggplot(svBarSub, aes(x=jaartal)) + 
         xlab("Jaar") +  
         ylab("Aantal studenten") + 
@@ -288,17 +242,9 @@ StudentenPerSectorServer <- function(input, output, session) {
       
     }
     else if (input$StudentenEerstejaars_Totaal == TRUE ){
-      #totaallijn
       #Totaal berekenen
-      totaalaantal <- aggregate(studievoortgang$aantal, by=list(jaartal=studievoortgang$jaartal), FUN=sum)
-      colnames(totaalaantal)<-c("jaartal", "aantal")
-      
-      #totaallijn
-      #Totaal berekenen
-      totaalaantal <- aggregate(studievoortgang$aantal, by=list(jaartal=studievoortgang$jaartal), FUN=sum)
-      colnames(totaalaantal)<-c("jaartal", "aantal")
-      
-      #plotten
+      totaalaantal <- TotaalAantal(data =studievoortgang, 
+                                   filterParams= c("jaartal"))
       ggplot(svBarSub, aes(x=jaartal)) + 
         xlab("Jaar") +  
         ylab("Aantal studenten") + 
@@ -325,14 +271,8 @@ StudentenPerSectorServer <- function(input, output, session) {
                  aes(y=aantal,fill=iscedCode.iscedNaam)) +
         labs(fill = "Studierichting")
     }
-    
-    
-    
-    
   })      
-        
-        
-        
+ 
   observe({
     trueFalse = length(input$StudentenPerSector_selectStudyImp) == length(unique(studievoortgang$iscedCode.iscedNaam))
 
