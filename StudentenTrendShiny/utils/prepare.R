@@ -34,6 +34,13 @@ if(!require(data.table)) {
 }
 library(data.table)
 
+if(!require(forecast)){
+  install.packages("forecast")
+}
+library(forecast)
+
+
+
 LoadFromServer <- function(vName, ...) {
   if(!exists(vName, envir=.GlobalEnv)) {
     assign(vName, do.call(fromJSON, list(...)), envir=.GlobalEnv)
