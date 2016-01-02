@@ -7,7 +7,7 @@ createForecastSub <- function(INPUTSET, GROUPBY, START, END, EXCLUDE){
     forecastData <- subset(forecastData, is.na(forecastData$observed))
   } else {
     timeSeries <- tapply(INPUTSET$aantal, INPUTSET[GROUPBY], ts, start=START, end=END, frequency=1)
-    fits         <- lapply(timeSeries, Arima, order=c(2,0,0)) 
+    fits         <- lapply(timeSeries, Arima, order=c(2,0,0),method="CSS")
     forecastData <- list()
     for(name in names(timeSeries)){
       forecastData[[name]] <- funggcast(timeSeries[[name]], forecast(fits[[name]]))
