@@ -32,13 +32,13 @@ VoortgangsPercentagesServer <- function(input, output, session) {
   output$VoortgangsPercentages_percentageRadio <- renderUI({
     if(input$VoortgangsPercentages_voortgangType == "uitschrijf"){
       radioButtons("VoortgangsPercentages_check", "Percentage berekening",
-                   choices = list("Percentage uitschrijvers tov. alle gestarte studenten" = "normalSet",
-                                  "Percentage uitschrijvers tov. alle uitgeschreven studenten" = "morphSet")
+                   choices = list("Percentage uitschrijvers t.o.v. alle gestarte studenten" = "normalSet",
+                                  "Percentage uitschrijvers t.o.v. alle uitgeschreven studenten" = "morphSet")
       ) 
     } else {
       radioButtons("VoortgangsPercentages_check", "Percentage berekening",
-                   choices = list("Percentage geslaagden tov. alle gestarte studenten" = "normalSet",
-                                  "Percentage geslaagden tov. alle geslaagde studenten" = "morphSet")
+                   choices = list("Percentage geslaagden t.o.v. alle gestarte studenten" = "normalSet",
+                                  "Percentage geslaagden t.o.v. alle geslaagde studenten" = "morphSet")
       )
     }
   })
@@ -142,7 +142,7 @@ VoortgangsPercentagesServer <- function(input, output, session) {
         xlab("Sector") +
         ylab("Percentage") +
         geom_bar(stat="identity") +
-        scale_fill_manual(values=CUSTOMCOLORARRAY[1:length(svSub$sector)],name="Opleidings Sector") +
+        scale_fill_manual(values=GetColors(svSub$sector),name="Opleidings Sector") +
         coord_cartesian(ylim=c(0,yLim)) + 
         theme(axis.text.x=element_blank()) +
         ggtitle(plotTitle)
