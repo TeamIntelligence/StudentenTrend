@@ -43,9 +43,6 @@ CallServerFunction <- function(Page, ...) {
       message(paste("Could not find the Server function of: ", Page["tabName"]))
     }
   }
-<<<<<<< HEAD
-}
-=======
 }
 
 
@@ -153,5 +150,3 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
   
   return(totaalaantal)
 }
-
->>>>>>> master
