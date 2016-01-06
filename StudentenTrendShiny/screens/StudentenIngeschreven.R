@@ -105,7 +105,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
         geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                 group=ondCode,
                                                 color=ondCode), color = "gray48") + 
-        labs(color = "Studierichting")+ 
+        scale_color_manual(values=GetColors(siSub$iscedCode.iscedNaam))+
         theme(legend.position="none")
       
     }
@@ -133,7 +133,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
         geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                 group=ondCode,
                                                 color=ondCode), color = "gray48") +
-        labs(color = "Studierichting")+ 
+        scale_color_manual(values=GetColors(siSub$iscedCode.iscedNaam))+
         theme(legend.position="none")
     }
     else if (input$StudentenIngeschreven_Totaal == TRUE ){
@@ -160,7 +160,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
         geom_point(data=totaalaantal, aes(y=aantal, 
                                           group=ondCode,
                                           color=ondCode), color = "black") +
-        labs(color = "Studierichting")+ 
+        scale_color_manual(values=GetColors(siSub$iscedCode.iscedNaam))+
         theme(legend.position="none")
     }
     else{
@@ -176,7 +176,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
         geom_point(aes(y=aantal, 
                        group=iscedCode.iscedNaam,
                        color=iscedCode.iscedNaam)) +
-        labs(color = "Studierichting")+ 
+        scale_color_manual(values=GetColors(siSub$iscedCode.iscedNaam))+
         theme(legend.position="none")
     }
   })
@@ -232,7 +232,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
                                                 color="black")) +
         scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
         labs(color = "Totaallijn")+
-        labs(fill = "Studierichting")
+        scale_fill_manual(values=GetColors(siBarSub$iscedCode.iscedNaam),name="Studierichting")
       
     }
     else if (input$StudentenIngeschreven_Totaalselect == TRUE ){
@@ -257,7 +257,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
                                           color="gray48")) +
         scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
         labs(color = "Totaallijn")+
-        labs(fill = "Studierichting") 
+        scale_fill_manual(values=GetColors(siBarSub$iscedCode.iscedNaam),name="Studierichting") 
     } 
     else if (input$StudentenIngeschreven_Totaal == TRUE ){
       #totaallijn
@@ -280,7 +280,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
                                           color="black")) +
         scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
         labs(color = "Totaallijn")+
-        labs(fill = "Studierichting") 
+        scale_fill_manual(values=GetColors(siBarSub$iscedCode.iscedNaam),name="Studierichting")
     }  
     else{
     #normale enkele barplot
@@ -290,7 +290,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
       ylab("Aantal studenten") + 
       ggtitle(plotTitle) +
       geom_bar(stat = "identity",aes(y=aantal, fill=iscedCode.iscedNaam))+
-      labs(fill = "Studierichting") 
+      scale_fill_manual(values=GetColors(siBarSub$iscedCode.iscedNaam),name="Studierichting")
     }
   })
 
@@ -309,7 +309,6 @@ StudentenIngeschrevenServer <- function(input, output, session){
                      "HBOWO" = aggregate(studenten_ingeschrevenen$aantal, by=list(iscedNaam=studenten_ingeschrevenen$iscedCode.iscedNaam,jaartal=studenten_ingeschrevenen$jaartal), FUN=sum)
     )
     
-    
     #namen kolomtitels van de nieuwe gevormde data aanpassen
     if(input$StudentenIngeschreven_StudieNiveau == "HBOWO"){
       colnames(siSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
@@ -320,32 +319,30 @@ StudentenIngeschrevenServer <- function(input, output, session){
     StudentenIngeschreven_forecastSub <- createForecastSub(siSub, "iscedCode.iscedNaam", 1990, 2014,"")
     
     #totaallijn
-    totaalaantal <- TotaalAantal(data = studenten_ingeschrevenen,
+    totaalaantal <<- TotaalAantal(data = studenten_ingeschrevenen,
                                  studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
                                  filterParams= c("ondCode",'jaartal'))
     forecastTotaal         <- createForecastSub(totaalaantal, "totaal", 1990, 2014, "")
     forecastTotaal$soort   = "Totaal ingeschrevenen" 
-    
-    
+
     StudentenIngeschreven_forecast_baseplot <- ggplot(StudentenIngeschreven_forecastSub, aes(x=jaartal)) +
       xlab("Jaar") + 
       ylab("Aantal ingeschreven studenten") +
       ggtitle("Aantal ingeschreven studenten per studiesector") +
-      geom_line(linetype="dashed", size=1,
-                aes(y=fitted,
-                    group=iscedCode.iscedNaam,
-                    color=iscedCode.iscedNaam))+
+       geom_line(linetype="dashed", size=1,
+                 aes(y=fitted,
+                     group=iscedCode.iscedNaam,
+                     color=iscedCode.iscedNaam))+
       geom_line(aes(y=aantal, 
                     group=iscedCode.iscedNaam,
                     color=iscedCode.iscedNaam))+
       geom_point(aes(y=aantal, 
                      group=iscedCode.iscedNaam,
                      color=iscedCode.iscedNaam))+
-      labs(color = "Studiesector")
-    
-    if (input$StudentenIngeschreven_Totaal == TRUE & input$StudentenIngeschreven_TotaalSelect == TRUE ){ 
-      ##allebei de lijnen
-      #selectlijn
+      scale_color_manual(values=GetColors(siSub$iscedCode.iscedNaam),name="Studierichting")
+    if (input$StudentenIngeschreven_Totaal == TRUE & input$StudentenIngeschreven_Totaalselect == TRUE ){ 
+        ##allebei de lijnen
+        #selectlijn
       totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
                                                selectInput = input$StudentenIngeschreven_SelectStudyImp, 
                                                studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
@@ -380,7 +377,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
         geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
       
     }
-    else if (input$StudentenIngeschreven_TotaalSelect == TRUE ){
+    else if (input$StudentenIngeschreven_Totaalselect == TRUE ){
       #alleen select
       totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
                                                selectInput = input$StudentenIngeschreven_SelectStudyImp, 

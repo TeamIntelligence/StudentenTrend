@@ -115,7 +115,6 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                   group=ondCode,
                                                   color=ondCode), color = "gray48") +
-          labs(color = "Studierichting")+ 
           theme(legend.position="none")
         
       }
@@ -143,7 +142,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                   group=ondCode,
                                                   color=ondCode), color = "gray48") +
-          labs(color = "Studierichting")+ 
+          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) +
           theme(legend.position="none")
         
       }
@@ -171,7 +170,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           geom_point(data=totaalaantal, aes(y=aantal, 
                                             group=ondCode,
                                             color=ondCode), color = "black") +
-          labs(color = "Studierichting")+ 
+          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) + 
           theme(legend.position="none")
       }
       else{
@@ -187,7 +186,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           geom_point(aes(y=aantal, 
                          group=iscedCode.iscedNaam,
                          color=iscedCode.iscedNaam)) +
-          labs(color = "Studierichting")+ 
+          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) +
           theme(legend.position="none")
       }
   })
@@ -248,7 +247,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           
           scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
           labs(color = "Totaallijn")+
-          labs(fill = "Studierichting")
+          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting")
         
       }
       else if (input$StudentenGediplomeerden_TotaalSelect == TRUE ){
@@ -271,7 +270,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                                   color="gray48")) +
           scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
           labs(color = "Totaallijn")+
-          labs(fill = "Studierichting") 
+          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting") 
       }
       else if (input$StudentenGediplomeerden_Totaal == TRUE ){
         #totaallijn
@@ -292,7 +291,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                             color="black")) +
           scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
           labs(color = "Totaallijn")+
-          labs(fill = "Studierichting") 
+          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting") 
       }
       else{
         #normale enkele plot
@@ -301,7 +300,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           ylab("Aantal studenten") + 
           ggtitle("Aantal gediplomeerde studenten") +
           geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) +
-          labs(fill = "Studierichting") 
+          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting") 
       }  
   })
   
@@ -378,7 +377,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       geom_point(aes(y=aantal, 
                      group=iscedCode.iscedNaam,
                      color=iscedCode.iscedNaam))+
-      labs(color = "Studiesector")
+      scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam), name = "Studiesector")
     
     if (input$StudentenGediplomeerden_Totaal == TRUE & input$StudentenGediplomeerden_TotaalSelect == TRUE ){ 
       ##allebei de lijnen

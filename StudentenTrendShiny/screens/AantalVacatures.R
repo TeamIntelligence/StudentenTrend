@@ -98,7 +98,7 @@ AantalVacaturesServer <- function(input,output, session){
          geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                  group=soort,
                                                  color=soort), color = "gray48") +
-         labs(color = "Bedrijfssector")+
+         scale_color_manual(values=GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam)) +
          theme(legend.position="none")
      }
      else if (input$AantalVacatures_TotaalSelect == TRUE ){
@@ -127,7 +127,7 @@ AantalVacaturesServer <- function(input,output, session){
          geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                  group=soort,
                                                  color=soort), color = "gray48") +
-         labs(color = "Bedrijfssector")+
+         scale_color_manual(values=GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam)) +
          theme(legend.position="none")
        
        ##############
@@ -156,7 +156,7 @@ AantalVacaturesServer <- function(input,output, session){
          geom_point(data=totaalaantal, aes(y=aantal, 
                                            group=soort,
                                            color=soort), color = "black") +
-         labs(color = "Bedrijfssector")+
+         scale_color_manual(values=GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam)) +
          theme(legend.position="none")
      }
      else{
@@ -170,7 +170,7 @@ AantalVacaturesServer <- function(input,output, session){
                        color=sbiCode.sbiNaam))+
          geom_point(aes(y=aantal, 
                         color=sbiCode.sbiNaam))+ 
-         labs(color = "Bedrijfssector")+
+         scale_color_manual(values=GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam)) +
          theme(legend.position="none")
      }
     
@@ -223,7 +223,7 @@ AantalVacaturesServer <- function(input,output, session){
                                             color="black")) +
           scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
           labs(color = "Totaallijn")+
-          labs(fill = "Bedrijfssector")
+          scale_fill_manual(values=GetColors(AantalVacatures_vacBarSub$sbiCode.sbiNaam), name = "Bedrijfssector")
       }
       else if (input$AantalVacatures_TotaalSelect == TRUE ){
         # alleen select
@@ -246,7 +246,7 @@ AantalVacaturesServer <- function(input,output, session){
                                                   color= "gray48")) +
           scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
           labs(color = "Totaallijn")+
-          labs(fill = "Bedrijfssector")
+          scale_fill_manual(values=GetColors(AantalVacatures_vacBarSub$sbiCode.sbiNaam), name = "Bedrijfssector")
         
         ##############
       }
@@ -271,7 +271,7 @@ AantalVacaturesServer <- function(input,output, session){
                                             color="black")) +
           scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
           labs(color = "Totaallijn")+
-          labs(fill = "Bedrijfssector")
+          scale_fill_manual(values=GetColors(AantalVacatures_vacBarSub$sbiCode.sbiNaam), name = "Bedrijfssector")
       }
       else{
         #normale enkele plot
@@ -281,7 +281,7 @@ AantalVacaturesServer <- function(input,output, session){
           ylab("Aantal vacatures") +
           ggtitle("Aantal vacatures per sector") +
           geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
-          labs(fill = "Bedrijfssector") 
+          scale_fill_manual(values=GetColors(AantalVacatures_vacBarSub$sbiCode.sbiNaam), name = "Bedrijfssector")
       }
       
       
@@ -318,7 +318,7 @@ AantalVacaturesServer <- function(input,output, session){
       geom_point(aes(y=aantal, 
                      group=sbiCode.sbiNaam,
                      color=sbiCode.sbiNaam))+
-      labs(color = "Bedrijfssector")
+      scale_color_manual(values=GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam), name = "Bedrijfssector")
 
     if (input$AantalVacatures_Totaal == TRUE && input$AantalVacatures_TotaalSelect == TRUE ){ 
       

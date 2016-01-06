@@ -94,7 +94,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                , color = "gray48") + 
             geom_point(data=totaalaantalselect, aes(y=aantal) 
               , color = "gray48") +
-            labs(color = "Studierichting")+ 
+            scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam)) + 
             theme(legend.position="none")
         }
 
@@ -119,7 +119,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                       , color = "gray48") + 
             geom_point(data=totaalaantalselect, aes(y=aantal) 
                        , color = "gray48") +
-            labs(color = "Studierichting")+ 
+            scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam)) + 
             theme(legend.position="none")
           
           
@@ -142,7 +142,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                       , color = "black") + 
             geom_point(data=totaalaantal, aes(y=aantal) 
                        , color = "black") +
-            labs(color = "Studierichting")+ 
+            scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam)) + 
             theme(legend.position="none")
           
           
@@ -159,7 +159,7 @@ StudentenPerSectorServer <- function(input, output, session) {
             geom_point(data=svSub,aes(y=aantal, 
                                       group=iscedCode.iscedNaam,
                                       color=iscedCode.iscedNaam)) +
-            labs(color = "Studierichting")+ 
+            scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam)) + 
             theme(legend.position="none")
         }
         
@@ -217,7 +217,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                    , color = "black")) +
         scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
         labs(color = "Totaallijn")+
-        labs(fill = "Studierichting")
+        scale_fill_manual(values=GetColors(svBarSub$iscedCode.iscedNaam),name="Studierichting")
     }
     
 
@@ -239,7 +239,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                    , color = "gray48")) +
         scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
         labs(color = "Totaallijn")+
-        labs(fill = "Studierichting")
+        scale_fill_manual(values=GetColors(svBarSub$iscedCode.iscedNaam),name="Studierichting")
       
       
     }
@@ -259,7 +259,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                    , color = "black")) +
         scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
         labs(color = "Totaallijn")+
-        labs(fill = "Studierichting")
+        scale_fill_manual(values=GetColors(svBarSub$iscedCode.iscedNaam),name="Studierichting")
       
       
     }
@@ -271,7 +271,7 @@ StudentenPerSectorServer <- function(input, output, session) {
         ggtitle(PlotTitle) +
         geom_bar(data=svBarSub, stat = "identity",
                  aes(y=aantal,fill=iscedCode.iscedNaam)) +
-        labs(fill = "Studierichting")
+        scale_fill_manual(values=GetColors(svBarSub$iscedCode.iscedNaam),name="Studierichting")
     }
   })      
  
@@ -305,9 +305,10 @@ StudentenPerSectorServer <- function(input, output, session) {
       geom_point(aes(y=aantal, 
                      group=iscedCode.iscedNaam,
                      color=iscedCode.iscedNaam))+
-      labs(color = "Studiesector")
+      scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam), name = "Studiesector")
     
-    if (input$StudentenEerstejaars_Totaal == TRUE & input$StudentenEerstejaars_TotaalSelect == TRUE ){ 
+    if (input$StudentenEerstejaars_Totaal == TRUE & input$StudentenEerstejaars_Totaalselect == TRUE ){ 
+      
       ##allebei de lijnen
       #selectlijn
       totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
@@ -343,7 +344,7 @@ StudentenPerSectorServer <- function(input, output, session) {
         geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
       
     }
-    else if (input$StudentenEerstejaars_TotaalSelect == TRUE ){
+    else if (input$StudentenEerstejaars_Totaalselect == TRUE ){
       #alleen select
       totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
                                                selectInput = input$StudentenPerSector_selectStudyImp, 
