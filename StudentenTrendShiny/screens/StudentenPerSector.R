@@ -33,7 +33,9 @@ StudentenPerSectorUI <- function(PageName) {
                    box(width=5, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450)), 
                    box(width=7, plotOutput("StudentenPerSector_aantalStudentenBarPlot", height=450))
                    ),
-          tabPanel("Voorspelling", textOutput("HOI"))
+          tabPanel("Voorspelling",
+                   box(width=12,plotOutput("StudentenPerSector_aantalStudentenVoorspellingPlot", height = 450))
+          )
         )
       )
     )
@@ -92,7 +94,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                , color = "gray48") + 
             geom_point(data=totaalaantalselect, aes(y=aantal) 
               , color = "gray48") +
-            labs(color = "Studierichting")+ 
+            scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam)) + 
             theme(legend.position="none")
         }
 
@@ -117,7 +119,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                       , color = "gray48") + 
             geom_point(data=totaalaantalselect, aes(y=aantal) 
                        , color = "gray48") +
-            labs(color = "Studierichting")+ 
+            scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam)) + 
             theme(legend.position="none")
           
           
@@ -140,7 +142,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                       , color = "black") + 
             geom_point(data=totaalaantal, aes(y=aantal) 
                        , color = "black") +
-            labs(color = "Studierichting")+ 
+            scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam)) + 
             theme(legend.position="none")
           
           
@@ -157,7 +159,7 @@ StudentenPerSectorServer <- function(input, output, session) {
             geom_point(data=svSub,aes(y=aantal, 
                                       group=iscedCode.iscedNaam,
                                       color=iscedCode.iscedNaam)) +
-            labs(color = "Studierichting")+ 
+            scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam)) + 
             theme(legend.position="none")
         }
         
@@ -215,7 +217,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                    , color = "black")) +
         scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
         labs(color = "Totaallijn")+
-        labs(fill = "Studierichting")
+        scale_fill_manual(values=GetColors(svBarSub$iscedCode.iscedNaam),name="Studierichting")
     }
     
 
@@ -237,7 +239,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                    , color = "gray48")) +
         scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
         labs(color = "Totaallijn")+
-        labs(fill = "Studierichting")
+        scale_fill_manual(values=GetColors(svBarSub$iscedCode.iscedNaam),name="Studierichting")
       
       
     }
@@ -257,7 +259,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                    , color = "black")) +
         scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
         labs(color = "Totaallijn")+
-        labs(fill = "Studierichting")
+        scale_fill_manual(values=GetColors(svBarSub$iscedCode.iscedNaam),name="Studierichting")
       
       
     }
@@ -269,10 +271,128 @@ StudentenPerSectorServer <- function(input, output, session) {
         ggtitle(PlotTitle) +
         geom_bar(data=svBarSub, stat = "identity",
                  aes(y=aantal,fill=iscedCode.iscedNaam)) +
-        labs(fill = "Studierichting")
+        scale_fill_manual(values=GetColors(svBarSub$iscedCode.iscedNaam),name="Studierichting")
     }
   })      
  
+  #########################
+  ## VOORSPELLINGEN PLOT ##
+  #########################
+  
+  output$StudentenPerSector_aantalStudentenVoorspellingPlot <- renderPlot({
+    
+    svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
+    StudentenEerstejaars_forecastSub <- createForecastSub(svSub, "iscedCode.iscedNaam", 1995, 2012,"")
+    
+    #totaallijn
+    totaalaantal <- TotaalAantal(data =studievoortgang, 
+                                 filterParams= c("jaartal"))
+    forecastTotaal         <- createForecastSub(totaalaantal, "totaal", 1995, 2012, "")
+    forecastTotaal$soort   = "Totaal gediplomeerden" 
+    
+    
+    StudentenEerstejaars_forecast_baseplot <- ggplot(StudentenEerstejaars_forecastSub, aes(x=jaartal)) +
+      xlab("Jaar") + 
+      ylab("Aantal eerstejaars studenten") +
+      ggtitle("Aantal eerstejaars studenten per studiesector") +
+      geom_line(linetype="dashed", size=1,
+                aes(y=fitted,
+                    group=iscedCode.iscedNaam,
+                    color=iscedCode.iscedNaam))+
+      geom_line(aes(y=aantal, 
+                    group=iscedCode.iscedNaam,
+                    color=iscedCode.iscedNaam))+
+      geom_point(aes(y=aantal, 
+                     group=iscedCode.iscedNaam,
+                     color=iscedCode.iscedNaam))+
+      scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam), name = "Studiesector")
+    
+    if (input$StudentenEerstejaars_Totaal == TRUE & input$StudentenEerstejaars_Totaalselect == TRUE ){ 
+      
+      ##allebei de lijnen
+      #selectlijn
+      totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
+                                               selectInput = input$StudentenPerSector_selectStudyImp, 
+                                               filterParams= c("jaartal"))
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1995, 2012, "")
+      forecastTotaalselect$soort   = "Totaal eerstejaars studenten"
+      
+      StudentenEerstejaars_forecast_baseplot +
+        #TOTAAL GESELECTEERD
+        geom_line(data=forecastTotaalselect, aes(y=aantal, 
+                                                 group=soort,
+                                                 color=soort), color = "gray48") + 
+        geom_point(data=forecastTotaalselect, aes(y=aantal, 
+                                                  group=soort,
+                                                  color=soort), color = "gray48") +
+        geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
+                  aes(y=fitted, group=soort, color=soort), color = "gray48") +
+        
+        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
+        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25) +
+        #TOTAAL
+        geom_line(data=forecastTotaal, aes(y=aantal, 
+                                           group=soort,
+                                           color=soort), color = "black") + 
+        geom_point(data=forecastTotaal, aes(y=aantal, 
+                                            group=soort,
+                                            color=soort), color = "black") +
+        geom_line(data=forecastTotaal, linetype="dashed", size=1,
+                  aes(y=fitted, group=soort, color=soort), color = "black") + 
+        
+        geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
+        geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
+      
+    }
+    else if (input$StudentenEerstejaars_Totaalselect == TRUE ){
+      #alleen select
+      totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
+                                               selectInput = input$StudentenPerSector_selectStudyImp, 
+                                               filterParams= c("jaartal"))
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1995, 2012, "")
+      forecastTotaalselect$soort   = "Totaal eerstejaars studenten"
+      
+      StudentenEerstejaars_forecast_baseplot +
+        #TOTAAL GESELECTEERD
+        geom_line(data=forecastTotaalselect, aes(y=aantal, 
+                                                 group=soort,
+                                                 color=soort), color = "gray48") + 
+        geom_point(data=forecastTotaalselect, aes(y=aantal, 
+                                                  group=soort,
+                                                  color=soort), color = "gray48") +
+        geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
+                  aes(y=fitted, group=soort, color=soort), color = "gray48") +
+        
+        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
+        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
+      
+    }
+    else if (input$StudentenEerstejaars_Totaal == TRUE ){
+      #alleen totaal
+      
+      StudentenEerstejaars_forecast_baseplot +
+        #TOTAAL
+        geom_line(data=forecastTotaal, aes(y=aantal, 
+                                           group=soort,
+                                           color=soort), color = "black") + 
+        geom_point(data=forecastTotaal, aes(y=aantal, 
+                                            group=soort,
+                                            color=soort), color = "black") +
+        geom_line(data=forecastTotaal, linetype="dashed", size=1,
+                  aes(y=fitted, group=soort, color=soort), color = "black") + 
+        
+        geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
+        geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
+      
+    }
+    else{
+      StudentenEerstejaars_forecast_baseplot
+    }
+    
+  })
+  
+  
+  
   observe({
     trueFalse = length(input$StudentenPerSector_selectStudyImp) == length(unique(studievoortgang$iscedCode.iscedNaam))
 

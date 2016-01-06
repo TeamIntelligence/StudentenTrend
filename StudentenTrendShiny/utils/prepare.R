@@ -49,6 +49,9 @@ LoadFromServer <- function(vName, ...) {
 
 GetColors <- function(values){
   len <- length(unique(values))
+  if(len==0|len==1){
+    len <- 2
+  }
   customColorArray <- c("tan4", "tomato3",
                       "violetred", "turquoise4", 
                       "wheat3", "steelblue3", 

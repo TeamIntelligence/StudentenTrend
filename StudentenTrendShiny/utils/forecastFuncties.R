@@ -2,12 +2,46 @@ createForecastSub <- function(INPUTSET, GROUPBY, START, END, EXCLUDE){
   
   if(GROUPBY == "totaal"){
     timeSeries   <- ts(INPUTSET$aantal, start=START, end=END, frequency=1)
-    fits         <- Arima(timeSeries, order = c(2,0,0))
+    
+    tryCatch({
+      fits         <- Arima(timeSeries, order = c(2,0,0),method="CSS")
+    }
+    ,error = function(cond) {
+      tryCatch({
+        fits         <<- Arima(timeSeries, order = c(2,0,0),method="ML")
+      }
+      ,error = function(cond) {
+          fits         <<- auto.arima(timeSeries)
+      })
+    })
+    
+    if(is.null(fits)) {
+      fits <- get("fits", envir = .GlobalEnv)
+      remove("fits", envir = .GlobalEnv)
+    }
+    
     forecastData <- funggcast(timeSeries, forecast(fits))
     forecastData <- subset(forecastData, is.na(forecastData$observed))
   } else {
     timeSeries <- tapply(INPUTSET$aantal, INPUTSET[GROUPBY], ts, start=START, end=END, frequency=1)
-    fits         <- lapply(timeSeries, Arima, order=c(2,0,0)) 
+    
+    tryCatch({
+      fits         <- lapply(timeSeries, Arima, order=c(2,0,0),method="CSS")
+    }
+    ,error = function(cond) {
+      tryCatch({
+        fits         <<- lapply(timeSeries, Arima, order=c(2,0,0),method="ML")
+      }
+      ,error = function(cond) {
+          fits         <<- lapply(timeSeries, auto.arima)
+      })
+    })
+    
+    if(is.null(fits)) {
+      fits <- get("fits", envir = .GlobalEnv)
+      remove("fits", envir = .GlobalEnv)
+    }
+  
     forecastData <- list()
     for(name in names(timeSeries)){
       forecastData[[name]] <- funggcast(timeSeries[[name]], forecast(fits[[name]]))

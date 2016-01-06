@@ -37,11 +37,17 @@ StudentenGediplomeerdenUI <- function(PageName){
               checkboxInput("StudentenGediplomeerden_Totaal",
                             "Totaal lijn weergeven"
               )
-          )
+          ),
               
-        
-        ,box(width=5, height = 470, plotOutput("DiploPlot", height=450))
-        ,box(width=7, height = 470, plotOutput("DiploBarPlot", height=450))
+          tabBox(width=12, height=550, 
+                 tabPanel("Huidige data",
+                          box(width=5, plotOutput("DiploPlot", height=450)),
+                          box(width=7, plotOutput("DiploBarPlot", height=450))
+                 ),
+                 tabPanel("Voorspelling",
+                          box(width=12,plotOutput("DiploVoorspellingPlot", height = 450))
+                 )
+          )
         )
       )
     )
@@ -109,7 +115,6 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                   group=ondCode,
                                                   color=ondCode), color = "gray48") +
-          labs(color = "Studierichting")+ 
           theme(legend.position="none")
         
       }
@@ -137,7 +142,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           geom_point(data=totaalaantalselect, aes(y=aantal, 
                                                   group=ondCode,
                                                   color=ondCode), color = "gray48") +
-          labs(color = "Studierichting")+ 
+          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) +
           theme(legend.position="none")
         
       }
@@ -165,7 +170,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           geom_point(data=totaalaantal, aes(y=aantal, 
                                             group=ondCode,
                                             color=ondCode), color = "black") +
-          labs(color = "Studierichting")+ 
+          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) + 
           theme(legend.position="none")
       }
       else{
@@ -181,7 +186,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           geom_point(aes(y=aantal, 
                          group=iscedCode.iscedNaam,
                          color=iscedCode.iscedNaam)) +
-          labs(color = "Studierichting")+ 
+          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) +
           theme(legend.position="none")
       }
   })
@@ -242,7 +247,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           
           scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
           labs(color = "Totaallijn")+
-          labs(fill = "Studierichting")
+          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting")
         
       }
       else if (input$StudentenGediplomeerden_TotaalSelect == TRUE ){
@@ -265,7 +270,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                                   color="gray48")) +
           scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
           labs(color = "Totaallijn")+
-          labs(fill = "Studierichting") 
+          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting") 
       }
       else if (input$StudentenGediplomeerden_Totaal == TRUE ){
         #totaallijn
@@ -286,7 +291,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                             color="black")) +
           scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
           labs(color = "Totaallijn")+
-          labs(fill = "Studierichting") 
+          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting") 
       }
       else{
         #normale enkele plot
@@ -295,7 +300,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           ylab("Aantal studenten") + 
           ggtitle("Aantal gediplomeerde studenten") +
           geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) +
-          labs(fill = "Studierichting") 
+          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting") 
       }  
   })
   
@@ -312,6 +317,151 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                         selected = studenten_gediplomeerden$iscedCode.iscedNaam
       )
     }
+  })
+  
+  #########################
+  ## VOORSPELLINGEN PLOT ##
+  #########################
+  
+  output$DiploVoorspellingPlot <- renderPlot({
+    #HBO BACH en WO MAST
+    HWSet <- studenten_gediplomeerden[(studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor") | (studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master"),] 
+    
+    
+    #data aanpassen nav keuzes gebruiker
+    StudentenGediplomeerden_StudieSub <- switch (input$StudentenGediplomeerden_StudieNiveau,
+                                                 "HBO" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor",] ,
+                                                 "WOB" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Bachelor",],
+                                                 "WOM"= studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master",],
+                                                 "HBOWO" = aggregate(HWSet$aantal, by=list(iscedNaam=HWSet$iscedCode.iscedNaam, jaartal=HWSet$jaartal), FUN=sum)
+    )
+    
+    
+    #namen kolomtitels van de nieuwe gevormde data aanpassen
+    if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
+      colnames(StudentenGediplomeerden_StudieSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
+    }
+    
+    #data aanpassen nav keuze gebruiker: studie(s)
+    StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,]
+    StudentenGediplomeerden_forecastSub <- createForecastSub(StudentenGediplomeerden_StudieSub, "iscedCode.iscedNaam", 1995, 2013,"")
+    
+    
+    PlotTitle <- "Aantal gediplomeerde studenten \nper jaar verdeeld per studie"
+    
+    if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
+      data <- HWSet
+    } else {
+      data <- studenten_gediplomeerden
+    }
+    
+    #totaallijn
+    totaalaantal <- TotaalAantal(data = data,
+                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                 filterParams= c("ondCode",'jaartal',"diploma"))
+    forecastTotaal         <- createForecastSub(totaalaantal, "totaal", 1995, 2013, "")
+    forecastTotaal$soort   = "Totaal gediplomeerden" 
+    
+    
+    StudentenGediplomeerden_forecast_baseplot <- ggplot(StudentenGediplomeerden_forecastSub, aes(x=jaartal)) +
+      xlab("Jaar") + 
+      ylab("Aantal gediplomeerden") +
+      ggtitle("Aantal gediplomeerden per studiesector") +
+      geom_line(linetype="dashed", size=1,
+                aes(y=fitted,
+                    group=iscedCode.iscedNaam,
+                    color=iscedCode.iscedNaam))+
+      geom_line(aes(y=aantal, 
+                    group=iscedCode.iscedNaam,
+                    color=iscedCode.iscedNaam))+
+      geom_point(aes(y=aantal, 
+                     group=iscedCode.iscedNaam,
+                     color=iscedCode.iscedNaam))+
+      scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam), name = "Studiesector")
+    
+    if (input$StudentenGediplomeerden_Totaal == TRUE & input$StudentenGediplomeerden_TotaalSelect == TRUE ){ 
+      ##allebei de lijnen
+      #selectlijn
+      totaalaantalselect <- TotaalAantalSelect(data = data,
+                                               selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
+                                               studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                               filterParams= c("ondCode",'jaartal',"diploma"))
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1995, 2013, "")
+      forecastTotaalselect$soort   = "Totaal geselecteerde gediplomeerden"
+      
+      StudentenGediplomeerden_forecast_baseplot +
+        #TOTAAL GESELECTEERD
+        geom_line(data=forecastTotaalselect, aes(y=aantal, 
+                                                 group=soort,
+                                                 color=soort), color = "gray48") + 
+        geom_point(data=forecastTotaalselect, aes(y=aantal, 
+                                                  group=soort,
+                                                  color=soort), color = "gray48") +
+        geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
+                  aes(y=fitted, group=soort, color=soort), color = "gray48") +
+        
+        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
+        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25) +
+        #TOTAAL
+        geom_line(data=forecastTotaal, aes(y=aantal, 
+                                           group=soort,
+                                           color=soort), color = "black") + 
+        geom_point(data=forecastTotaal, aes(y=aantal, 
+                                            group=soort,
+                                            color=soort), color = "black") +
+        geom_line(data=forecastTotaal, linetype="dashed", size=1,
+                  aes(y=fitted, group=soort, color=soort), color = "black") + 
+        
+        geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
+        geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
+      
+    }
+    else if (input$StudentenGediplomeerden_TotaalSelect == TRUE ){
+      #alleen select
+      totaalaantalselect <- TotaalAantalSelect(data = data,
+                                               selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
+                                               studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                               filterParams= c("ondCode",'jaartal',"diploma"))
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1995, 2013, "")
+      forecastTotaalselect$soort   = "Totaal geselecteerde gediplomeerden"
+      
+      StudentenGediplomeerden_forecast_baseplot +
+        #TOTAAL GESELECTEERD
+        geom_line(data=forecastTotaalselect, aes(y=aantal, 
+                                                 group=soort,
+                                                 color=soort), color = "gray48") + 
+        geom_point(data=forecastTotaalselect, aes(y=aantal, 
+                                                  group=soort,
+                                                  color=soort), color = "gray48") +
+        geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
+                  aes(y=fitted, group=soort, color=soort), color = "gray48") +
+        
+        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
+        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
+      
+    }
+    else if (input$StudentenGediplomeerden_Totaal == TRUE ){
+      #alleen totaal
+      
+      StudentenGediplomeerden_forecast_baseplot +
+      #TOTAAL
+        geom_line(data=forecastTotaal, aes(y=aantal, 
+                                         group=soort,
+                                         color=soort), color = "black") + 
+        geom_point(data=forecastTotaal, aes(y=aantal, 
+                                            group=soort,
+                                            color=soort), color = "black") +
+        geom_line(data=forecastTotaal, linetype="dashed", size=1,
+                  aes(y=fitted, group=soort, color=soort), color = "black") + 
+        
+        geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
+        geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
+      
+    }
+    else{
+      StudentenGediplomeerden_forecast_baseplot
+    }
+    
   })
   
 }  
