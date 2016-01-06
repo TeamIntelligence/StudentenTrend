@@ -45,6 +45,4 @@ CallServerFunction <- function(Page, ...) {
       message(paste("Could not find the Server function of: ", Page["tabName"]))
     }
   }
-  
-  Test <<- Page
 }
