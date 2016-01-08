@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 import studententrend.model.GediplomeerdenVacatures;
 import studententrend.model.dao.GediplomeerdenVacaturesRepository;
 
+/**
+ * Called with the 
+ * 
+ */
 @RestController
 @RequestMapping("/studenten/vacatures")
 public class GediplomeerdenVacaturesController {

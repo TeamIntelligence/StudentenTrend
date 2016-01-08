@@ -14,6 +14,11 @@ import studententrend.model.OnderwijsSoort;
 import studententrend.model.dao.GediplomeerdenRepository;
 import studententrend.model.dao.OnderwijsSoortRepository;
 
+/**
+ * Used to return all the data we have for the graduated students.
+ * All the functions within this class are called when we use the base url including /studenten/(RequestMapping$value).
+ * 
+ */
 @RestController
 @RequestMapping("/studenten")
 public class GediplomeerdenController {
@@ -23,11 +28,16 @@ public class GediplomeerdenController {
 	@Autowired
 	OnderwijsSoortRepository onderwijsSoortRepository;
 	
+
+	/**
+	 * Gets all the graduated students from the database
+	 * @return All the graduated students
+	 */	
 	@RequestMapping(
-			value = "/gediplomeerden", 
-			method = RequestMethod.GET,
-			headers = "Accept=application/json", 
-			produces = {"application/json"})
+		value = "/gediplomeerden", 
+		method = RequestMethod.GET,
+		headers = "Accept=application/json", 
+		produces = {"application/json"})
 	@ResponseBody
 	public List<Gediplomeerden> gediplomeerdenAll() {
 		List<Gediplomeerden> hoGediplomeerden = (List<Gediplomeerden>) gediplomeerdenRepository.findAll();
@@ -39,11 +49,16 @@ public class GediplomeerdenController {
 		return hoGediplomeerden;
 	}
 
+	/**
+	 * Gets all the graduated students based on the ondCode send as parameter inside the url
+	 * @param ondCode (String) - The ondCode used to filter all the graduated students
+	 * @return The filtered graduated students
+	 */
 	@RequestMapping(
-			value = "/gediplomeerden/{ondCode}", 
-			method = RequestMethod.GET,
-			headers = "Accept=application/json", 
-			produces = {"application/json"})
+		value = "/gediplomeerden/{ondCode}", 
+		method = RequestMethod.GET,
+		headers = "Accept=application/json", 
+		produces = {"application/json"})
 	@ResponseBody
 	public List<Gediplomeerden> hoGediplomeerdenOndCode(@PathVariable("ondCode") String ondCode) {
 		List<OnderwijsSoort> onderwijs = (List<OnderwijsSoort>) onderwijsSoortRepository.findByOndCode(ondCode);
