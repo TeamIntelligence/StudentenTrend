@@ -16,7 +16,14 @@ BanenStudieSectorJaarUI <- function(PageName){
                               selected=1 
                   )
               ),
-              box(width=12, height = 470, plotOutput("BanenStudieSectorJaarPlot", height = 450))
+              tabBox(width=12, height=550, 
+                     tabPanel("Huidige data",
+                              box(width=12, height = 470, plotOutput("BanenStudieSectorJaarPlot", height = 450))
+                     ),
+                     tabPanel("Voorspelling",
+                              box(width=12, plotOutput("BanenStudieSectorJaarVoorspellingPlot", height = 450))
+                     )
+              )
             )   
     )
   )
@@ -25,22 +32,24 @@ BanenStudieSectorJaarUI <- function(PageName){
 BanenStudieSectorJaarServer <- function(input, output, session){
   
   output$BanenStudieSectorJaarPlot <- renderPlot({
-    
-    #data aanpassen nav keuze gebruiker: SOI Studielijntjes
-    bsjSub <- gediplomeerden_vacatures[gediplomeerden_vacatures$soiCode.soiNaam %in% input$BanenStudieSectorJaar_SelectImp,]
-    #data aanpassen: HBO en WO optellen 
-    bsjSub <- aggregate(cbind(bsjSub$direct,bsjSub$binnenEenJaar,bsjSub$binnenTweeJaar,bsjSub$binnenDrieJaar), by=list(jaartal =bsjSub$jaartal), FUN=sum)
-    colnames(bsjSub)<-c("jaartal","direct","binnenEenJaar","binnenTweeJaar","binnenDrieJaar")
-    
-    # gekozen soi omzetten naar isced
-    gekozenisced <- soicodes[soicodes$soiNaam %in% input$BanenStudieSectorJaar_SelectImp,]$iscedCodes[[1]]
-    #gekozenisced <- soicodes[soicodes$soiNaam %in% "Leraren",]$iscedCodes[[1]]
-    
-    # aantal gediplomeerden omzetten naar gekozen soi
-    aantalgediplomeerden <- studenten_gediplomeerden[studenten_gediplomeerden$iscedCode.iscedCode %in% gekozenisced$iscedCode, ]
-    aantalgediplomeerden <- aantalgediplomeerden[(aantalgediplomeerden$ondCode == "HBO" & aantalgediplomeerden$diploma == "Bachelor") | (aantalgediplomeerden$ondCode == "WO" & aantalgediplomeerden$diploma == "Wo-master"),] 
-    aantalgediplomeerden <- aggregate(aantalgediplomeerden$aantal, by=list(jaartal=aantalgediplomeerden$jaartal), FUN=sum)
-    colnames(aantalgediplomeerden) <- c("jaartal","aantal")
+    plotCalcs <- BanenStudieSectorJaarPlotCalcs(input)
+    bsjSub <<- plotCalcs$bsjSub
+    aantalgediplomeerden <<- plotCalcs$aantalgediplomeerden
+#     #data aanpassen nav keuze gebruiker: SOI Studielijntjes
+#     bsjSub <- gediplomeerden_vacatures[gediplomeerden_vacatures$soiCode.soiNaam %in% input$BanenStudieSectorJaar_SelectImp,]
+#     #data aanpassen: HBO en WO optellen 
+#     bsjSub <- aggregate(cbind(bsjSub$direct,bsjSub$binnenEenJaar,bsjSub$binnenTweeJaar,bsjSub$binnenDrieJaar), by=list(jaartal =bsjSub$jaartal), FUN=sum)
+#     colnames(bsjSub)<-c("jaartal","direct","binnenEenJaar","binnenTweeJaar","binnenDrieJaar")
+#     
+#     # gekozen soi omzetten naar isced
+#     gekozenisced <- soicodes[soicodes$soiNaam %in% input$BanenStudieSectorJaar_SelectImp,]$iscedCodes[[1]]
+#     #gekozenisced <- soicodes[soicodes$soiNaam %in% "Leraren",]$iscedCodes[[1]]
+#     
+#     # aantal gediplomeerden omzetten naar gekozen soi
+#     aantalgediplomeerden <- studenten_gediplomeerden[studenten_gediplomeerden$iscedCode.iscedCode %in% gekozenisced$iscedCode, ]
+#     aantalgediplomeerden <- aantalgediplomeerden[(aantalgediplomeerden$ondCode == "HBO" & aantalgediplomeerden$diploma == "Bachelor") | (aantalgediplomeerden$ondCode == "WO" & aantalgediplomeerden$diploma == "Wo-master"),] 
+#     aantalgediplomeerden <- aggregate(aantalgediplomeerden$aantal, by=list(jaartal=aantalgediplomeerden$jaartal), FUN=sum)
+#     colnames(aantalgediplomeerden) <- c("jaartal","aantal")
     
     ggplot(bsjSub,   
            aes(x=jaartal)) + 
@@ -62,4 +71,82 @@ BanenStudieSectorJaarServer <- function(input, output, session){
                          breaks = c("Red","Green","Blue","Purple","Black"), name = "Peilmoment") +
       xlim(2000,2008)
   })
+  
+  output$BanenStudieSectorJaarVoorspellingPlot <- renderPlot({
+    plotCalcs               <- BanenStudieSectorJaarPlotCalcs(input)
+    bsjSub                  <<- plotCalcs$bsjSub
+    aantalgediplomeerden    <- plotCalcs$aantalgediplomeerden
+    
+    minYear                 <- bsjSub$jaartal[which.min(bsjSub$jaartal)]
+    maxYear                 <- bsjSub$jaartal[which.max(bsjSub$jaartal)]
+    
+    bSJForeCastSubDirect                <<- createForecastSub(bsjSub[,c("jaartal", "direct")], "direct", "singleColumn", minYear, maxYear, "")
+    bSJForeCastSubDirect$group          = "Direct"
+    bSJForeCastSubBinnenEenJaar         <<- createForecastSub(bsjSub[,c("jaartal", "binnenEenJaar")], "binnenEenJaar", "singleColumn", minYear, maxYear-1, "")
+    bSJForeCastSubBinnenEenJaar$group   = "Binnen 1 jaar"
+    bSJForeCastSubBinnenTweeJaar        <<- createForecastSub(bsjSub[,c("jaartal", "binnenTweeJaar")], "binnenTweeJaar", "singleColumn", minYear, maxYear-2, "")
+    bSJForeCastSubBinnenTweeJaar$group  = "Binnen 2 jaar"
+    bSJForeCastSubbinnenDrieJaar        <<- createForecastSub(bsjSub[,c("jaartal", "binnenDrieJaar")], "binnenDrieJaar", "singleColumn", minYear, maxYear-3, "")
+    bSJForeCastSubbinnenDrieJaar$group  = "Binnen 3 jaar"
+    bSJForeCastTotaal                   <<- createForecastSub(aantalgediplomeerden[which(aantalgediplomeerden$jaartal %in% c(minYear:maxYear)),], "aantal", "singleColumn", minYear, maxYear, "")
+    bSJForeCastTotaal$group             = "Aantal gediplomeerden" 
+    
+    ggplot(bSJForeCastTotaal,   
+           aes(x=jaartal)) + 
+      xlab("Afstudeerjaar") +  
+      ylab("Aantal vervulde banen") + 
+      ggtitle("Vervulde banen per studiesector per peilmoment") +
+      geom_line(data=bSJForeCastSubDirect, aes(y=direct,color="Red", group=group)) + 
+      geom_point(data=bSJForeCastSubDirect, aes(y=direct,color="Red", group=group)) + 
+      geom_line(data=bSJForeCastSubDirect, linetype="dashed", size=1, aes(y=fitted, color="Red", group=group)) +
+      
+      geom_line(data=bSJForeCastSubBinnenEenJaar, aes(y=binnenEenJaar,color="Green", group=group)) + 
+      geom_point(data=bSJForeCastSubBinnenEenJaar,aes(y=binnenEenJaar,color="Green", group=group)) +
+      geom_line(data=bSJForeCastSubBinnenEenJaar, linetype="dashed", size=1, aes(y=fitted, color="Green", group=group)) +
+      
+      geom_line(data=bSJForeCastSubBinnenTweeJaar, aes(y=binnenTweeJaar,color="Blue", group=group)) + 
+      geom_point(data=bSJForeCastSubBinnenTweeJaar,aes(y=binnenTweeJaar,color="Blue", group=group)) +
+      geom_line(data=bSJForeCastSubBinnenTweeJaar, linetype="dashed", size=1, aes(y=fitted, color="Blue", group=group)) +
+      
+      geom_line(data=bSJForeCastSubbinnenDrieJaar, aes(y=binnenDrieJaar,color="Purple", group=group)) + 
+      geom_point(data=bSJForeCastSubbinnenDrieJaar, aes(y=binnenDrieJaar,color="Purple", group=group)) +
+      geom_line(data=bSJForeCastSubbinnenDrieJaar, linetype="dashed", size=1, aes(y=fitted, color="Purple", group=group)) +
+      
+      geom_line(data=bSJForeCastTotaal, aes(y=aantal,color="Black", group=group)) + 
+      geom_point(data=bSJForeCastTotaal,aes(y=aantal,color="Black", group=group)) +
+      geom_line(data=bSJForeCastTotaal, linetype="dashed", size=1, aes(y=fitted, color="Black", group=group)) +
+      
+      scale_color_manual(values = c("Red","Green","Blue","Purple","Black"), 
+                         labels=c("Direct","Binnen een jaar","Binnen twee jaar","Binnen drie jaar", "Aantal gediplomeerden"), 
+                         breaks = c("Red","Green","Blue","Purple","Black"), name = "Peilmoment")
+#       xlim(2000,2008)
+    
+    
+  })
+  
+  BanenStudieSectorJaarPlotCalcs <- function(input) {
+    
+    #data aanpassen nav keuze gebruiker: SOI Studielijntjes
+    bsjSub <- gediplomeerden_vacatures[gediplomeerden_vacatures$soiCode.soiNaam %in% input$BanenStudieSectorJaar_SelectImp,]
+    #data aanpassen: HBO en WO optellen 
+    bsjSub <- aggregate(cbind(bsjSub$direct,bsjSub$binnenEenJaar,bsjSub$binnenTweeJaar,bsjSub$binnenDrieJaar), by=list(jaartal =bsjSub$jaartal), FUN=sum)
+    colnames(bsjSub)<-c("jaartal","direct","binnenEenJaar","binnenTweeJaar","binnenDrieJaar")
+    
+    # gekozen soi omzetten naar isced
+    gekozenisced <- soicodes[soicodes$soiNaam %in% input$BanenStudieSectorJaar_SelectImp,]$iscedCodes[[1]]
+    #gekozenisced <- soicodes[soicodes$soiNaam %in% "Leraren",]$iscedCodes[[1]]
+    
+    # aantal gediplomeerden omzetten naar gekozen soi
+    aantalgediplomeerden <- studenten_gediplomeerden[studenten_gediplomeerden$iscedCode.iscedCode %in% gekozenisced$iscedCode, ]
+    aantalgediplomeerden <- aantalgediplomeerden[(aantalgediplomeerden$ondCode == "HBO" & aantalgediplomeerden$diploma == "Bachelor") | (aantalgediplomeerden$ondCode == "WO" & aantalgediplomeerden$diploma == "Wo-master"),] 
+    aantalgediplomeerden <- aggregate(aantalgediplomeerden$aantal, by=list(jaartal=aantalgediplomeerden$jaartal), FUN=sum)
+    colnames(aantalgediplomeerden) <- c("jaartal","aantal")
+    
+    
+    return(
+      list(bsjSub = bsjSub, aantalgediplomeerden=aantalgediplomeerden)
+    )
+  }
+  
+  
 }

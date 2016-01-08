@@ -19,9 +19,16 @@ VacaturesGediplomeerdenUI <- function(PageName){
               ),
               box(width=7, height=150, 
                   sliderInput("VacaturesGediplomeerden_yearRangeSlider","Peilmoment", min = 0, max = 3, value = 0)
+              ),
+              tabBox(width=12, height=550, 
+                     tabPanel("Huidige data",
+                              box(width=5, height = 470, plotOutput("VacaGedipPlot", height = 450)),
+                              box(width=7, height = 470, plotOutput("VacaGedipBarPlot", height=450))
+                     ),
+                     tabPanel("Voorspelling",
+                              box(width=12, plotOutput("VacaGedipVoorspellingPlot", height = 450))
+                     )
               )
-              ,box(width=5, height = 470, plotOutput("VacaGedipPlot", height = 450))
-              ,box(width=7, height = 470, plotOutput("VacaGedipBarPlot", height=450))
             )   
     )
   )
@@ -81,6 +88,62 @@ VacaturesGediplomeerdenServer <- function(input, output, session){
       scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaal aantal vervulde banen"))+
       labs(color = "Totaallijn")+
       xlim(1999,plotCalcs$toYear+1)
+  })
+  
+  output$VacaGedipVoorspellingPlot <- renderPlot({
+    plotCalcs <- VacaturesGediplomeerdenPlotCalc(input)
+    minYear   <- plotCalcs$vgSub$jaartal[which.min(plotCalcs$vgSub$jaartal)]
+    maxYear   <- plotCalcs$toYear
+  
+    for(val in unique(plotCalcs$vgSub$soiCode.soiNaam)){
+      removal_candidates <- plotCalcs$vgSub[plotCalcs$vgSub$soiCode.soiNaam == val,]
+      allZero = T
+      for(row in removal_candidates$aantal){
+        if(!is.na(row)){
+          if(row != 0){
+            allZero = F
+            }
+          }
+      }
+      if(allZero){
+        plotCalcs$vgSub <- plotCalcs$vgSub[setdiff(rownames(plotCalcs$vgSub),rownames(removal_candidates)),]
+      }
+    } 
+
+    VGVForeCastSub          <- createForecastSub(plotCalcs$vgSub, "aantal", "soiCode.soiNaam", minYear, maxYear, "")
+    VGVForeCastTotaal       <- createForecastSub(plotCalcs$totaalaantal, "aantal", "singleColumn", minYear, maxYear, "")
+    VGVForeCastTotaal$soort = "Totaal" 
+    
+    ggplot(VGVForeCastSub,   
+           aes(x=jaartal)) + 
+      xlab("Afstudeerjaar") +  
+      ylab("Aantal vervulde banen") + 
+      ggtitle("Vervulde banen per bedrijfs- per studiesector") +
+      geom_line(data=VGVForeCastSub, aes(y=aantal,     #lijnen studies
+                                          group=soiCode.soiNaam,
+                                          color=soiCode.soiNaam)) + 
+      geom_point(data=VGVForeCastSub,aes(y=aantal, 
+                                          group=soiCode.soiNaam,
+                                          color=soiCode.soiNaam)) +
+      geom_line(data=VGVForeCastSub, linetype="dashed", size=1, aes(y=fitted,
+                                         group=soiCode.soiNaam,
+                                         color=soiCode.soiNaam)) +
+      geom_line(data=VGVForeCastTotaal, 
+                aes(y=aantal, 
+                    group=soort), 
+                color = "black") +  #totaal lijn
+      geom_point(data=VGVForeCastTotaal, aes(y=aantal), 
+                 color = "black") +
+      geom_line(data=VGVForeCastTotaal, linetype="dashed", size=1, 
+                aes(y=fitted, 
+                    group=soort),  #totaal lijn
+                color = "black") +
+      geom_ribbon(data=VGVForeCastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
+      geom_ribbon(data=VGVForeCastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25) 
+      #xlim(2000,plotCalcs$toYear)
+      #scale_color_manual(values=GetColors(VGVForeCastSub$soiCode.soiNaam)) +
+      #theme(legend.position="none") +
+      
   })
 }
 
