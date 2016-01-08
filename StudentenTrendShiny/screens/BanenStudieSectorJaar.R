@@ -115,6 +115,8 @@ BanenStudieSectorJaarServer <- function(input, output, session){
       geom_line(data=bSJForeCastTotaal, aes(y=aantal,color="Black", group=group)) + 
       geom_point(data=bSJForeCastTotaal,aes(y=aantal,color="Black", group=group)) +
       geom_line(data=bSJForeCastTotaal, linetype="dashed", size=1, aes(y=fitted, color="Black", group=group)) +
+      geom_ribbon(data=bSJForeCastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=group), fill="red", alpha=.25) +
+      geom_ribbon(data=bSJForeCastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=group), fill="darkred", alpha=.25) +
       
       scale_color_manual(values = c("Red","Green","Blue","Purple","Black"), 
                          labels=c("Direct","Binnen een jaar","Binnen twee jaar","Binnen drie jaar", "Aantal gediplomeerden"), 
