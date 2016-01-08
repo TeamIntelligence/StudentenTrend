@@ -344,7 +344,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     
     #data aanpassen nav keuze gebruiker: studie(s)
     StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,]
-    StudentenGediplomeerden_forecastSub <- createForecastSub(StudentenGediplomeerden_StudieSub, "iscedCode.iscedNaam", 1995, 2013,"")
+    StudentenGediplomeerden_forecastSub <- createForecastSub(StudentenGediplomeerden_StudieSub, "aantal", "iscedCode.iscedNaam", 1995, 2013,"")
     
     
     PlotTitle <- "Aantal gediplomeerde studenten \nper jaar verdeeld per studie"
@@ -359,7 +359,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     totaalaantal <- TotaalAantal(data = data,
                                  studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
                                  filterParams= c("ondCode",'jaartal',"diploma"))
-    forecastTotaal         <- createForecastSub(totaalaantal, "totaal", 1995, 2013, "")
+    forecastTotaal         <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1995, 2013, "")
     forecastTotaal$soort   = "Totaal gediplomeerden" 
     
     
@@ -386,7 +386,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                                selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
                                                studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
                                                filterParams= c("ondCode",'jaartal',"diploma"))
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1995, 2013, "")
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2013, "")
       forecastTotaalselect$soort   = "Totaal geselecteerde gediplomeerden"
       
       StudentenGediplomeerden_forecast_baseplot +
@@ -422,7 +422,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                                selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
                                                studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
                                                filterParams= c("ondCode",'jaartal',"diploma"))
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1995, 2013, "")
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2013, "")
       forecastTotaalselect$soort   = "Totaal geselecteerde gediplomeerden"
       
       StudentenGediplomeerden_forecast_baseplot +

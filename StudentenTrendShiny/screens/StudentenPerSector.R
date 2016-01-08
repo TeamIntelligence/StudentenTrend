@@ -282,12 +282,12 @@ StudentenPerSectorServer <- function(input, output, session) {
   output$StudentenPerSector_aantalStudentenVoorspellingPlot <- renderPlot({
     
     svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
-    StudentenEerstejaars_forecastSub <- createForecastSub(svSub, "iscedCode.iscedNaam", 1995, 2012,"")
+    StudentenEerstejaars_forecastSub <- createForecastSub(svSub, "aantal", "iscedCode.iscedNaam", 1995, 2012,"")
     
     #totaallijn
     totaalaantal <- TotaalAantal(data =studievoortgang, 
                                  filterParams= c("jaartal"))
-    forecastTotaal         <- createForecastSub(totaalaantal, "totaal", 1995, 2012, "")
+    forecastTotaal         <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1995, 2012, "")
     forecastTotaal$soort   = "Totaal gediplomeerden" 
     
     
@@ -314,7 +314,7 @@ StudentenPerSectorServer <- function(input, output, session) {
       totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
                                                selectInput = input$StudentenPerSector_selectStudyImp, 
                                                filterParams= c("jaartal"))
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1995, 2012, "")
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2012, "")
       forecastTotaalselect$soort   = "Totaal eerstejaars studenten"
       
       StudentenEerstejaars_forecast_baseplot +
@@ -349,7 +349,7 @@ StudentenPerSectorServer <- function(input, output, session) {
       totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
                                                selectInput = input$StudentenPerSector_selectStudyImp, 
                                                filterParams= c("jaartal"))
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1995, 2012, "")
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2012, "")
       forecastTotaalselect$soort   = "Totaal eerstejaars studenten"
       
       StudentenEerstejaars_forecast_baseplot +

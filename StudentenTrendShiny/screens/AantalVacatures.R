@@ -295,13 +295,13 @@ AantalVacaturesServer <- function(input,output, session){
     
     #data aanpassen nav keuze bedrijfssector
     AantalVacatures_vacSub      <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% input$AantalVacatures_SelectImp,]
-    aantalVacatures_forecastSub <- createForecastSub(AantalVacatures_vacSub, "sbiCode.sbiNaam", 1997, 2014, 2015)
+    aantalVacatures_forecastSub <- createForecastSub(AantalVacatures_vacSub, "aantal", "sbiCode.sbiNaam", 1997, 2014, 2015)
     
     #totaallijn
     #Totaal berekenen
     totaalaantal           <- aggregate(vacatures_jaartallen$aantal, by=list(jaartal=vacatures_jaartallen$jaartal), FUN=sum)
     colnames(totaalaantal) <- c("jaartal","aantal") 
-    forecastTotaal         <- createForecastSub(totaalaantal, "totaal", 1997, 2014, 2015)
+    forecastTotaal         <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1997, 2014, 2015)
     forecastTotaal$soort   = "Totale vacatures" 
     
     aantalVacatures_forecast_baseplot <- ggplot(aantalVacatures_forecastSub, aes(x=jaartal)) +
@@ -326,7 +326,7 @@ AantalVacaturesServer <- function(input,output, session){
       # select lijn
       totaalaantalselect           <- aggregate(aantalVacatures_forecastSub$aantal, by=list(jaartal=aantalVacatures_forecastSub$jaartal), FUN=sum)
       colnames(totaalaantalselect) <- c("jaartal", "aantal")
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1997, 2014, 2015)
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1997, 2014, 2015)
       forecastTotaalselect$soort   = "Totale geselecteerde vacatures"
      
       aantalVacatures_forecast_baseplot +
@@ -362,7 +362,7 @@ AantalVacaturesServer <- function(input,output, session){
       colnames(totaalaantalselect)<-c("jaartal", "aantal")
       totaalaantalselect <- totaalaantalselect[totaalaantalselect$jaartal != 2015,]
 
-      forecastTotaalselect   <- createForecastSub(totaalaantalselect, "totaal", 1997, 2014, 2015)
+      forecastTotaalselect   <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1997, 2014, 2015)
       forecastTotaalselect$soort = "Totale geselecteerde vacatures"
       
       aantalVacatures_forecast_baseplot +

@@ -316,13 +316,13 @@ StudentenIngeschrevenServer <- function(input, output, session){
     
     #data aanpassen nav keuze gebruiker: studie(s)
     siSub <- siSub[siSub$iscedCode.iscedNaam %in% input$StudentenIngeschreven_SelectStudyImp,]
-    StudentenIngeschreven_forecastSub <- createForecastSub(siSub, "iscedCode.iscedNaam", 1990, 2014,"")
+    StudentenIngeschreven_forecastSub <- createForecastSub(siSub, "aantal", "iscedCode.iscedNaam", 1990, 2014,"")
     
     #totaallijn
     totaalaantal <<- TotaalAantal(data = studenten_ingeschrevenen,
                                  studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
                                  filterParams= c("ondCode",'jaartal'))
-    forecastTotaal         <- createForecastSub(totaalaantal, "totaal", 1990, 2014, "")
+    forecastTotaal         <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1990, 2014, "")
     forecastTotaal$soort   = "Totaal ingeschrevenen" 
 
     StudentenIngeschreven_forecast_baseplot <- ggplot(StudentenIngeschreven_forecastSub, aes(x=jaartal)) +
@@ -347,7 +347,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
                                                selectInput = input$StudentenIngeschreven_SelectStudyImp, 
                                                studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
                                                filterParams= c("ondCode",'jaartal'))
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1990, 2014, "")
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1990, 2014, "")
       forecastTotaalselect$soort   = "Totaal geselecteerde ingeschreven studenten"
       
       StudentenIngeschreven_forecast_baseplot +
@@ -384,7 +384,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
                                                studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
                                                filterParams= c("ondCode",'jaartal'))
       
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "totaal", 1990, 2014, "")
+      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1990, 2014, "")
       forecastTotaalselect$soort   = "Totaal geselecteerde ingeschreven studenten"
       
       StudentenIngeschreven_forecast_baseplot +
