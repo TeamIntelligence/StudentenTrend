@@ -1,7 +1,6 @@
-createForecastSub <- function(INPUTSET, GROUPBY, START, END, EXCLUDE){
-  
-  if(GROUPBY == "totaal"){
-    timeSeries   <- ts(INPUTSET$aantal, start=START, end=END, frequency=1)
+createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE){
+  if(GROUPBY == "singleColumn"){
+    timeSeries   <- ts(INPUTSET[[COUNTCOL]], start=START, end=END, frequency=1)
     
     tryCatch({
       fits         <- Arima(timeSeries, order = c(2,0,0),method="CSS")
@@ -20,31 +19,42 @@ createForecastSub <- function(INPUTSET, GROUPBY, START, END, EXCLUDE){
       remove("fits", envir = .GlobalEnv)
     }
     
-    forecastData <- funggcast(timeSeries, forecast(fits))
+    forecastData <- funggcast(timeSeries, forecast(fits,h=5),END+1, 5)
     forecastData <- subset(forecastData, is.na(forecastData$observed))
   } else {
-    timeSeries <- tapply(INPUTSET$aantal, INPUTSET[GROUPBY], ts, start=START, end=END, frequency=1)
+    timeSeries <- tapply(INPUTSET[[COUNTCOL]], INPUTSET[GROUPBY], ts, start=START, end=END, frequency=1)
     
-    tryCatch({
-      fits         <- lapply(timeSeries, Arima, order=c(2,0,0),method="CSS")
-    }
-    ,error = function(cond) {
+    fits <<- vector("list", length(timeSeries))
+    names(fits) <<- names(timeSeries)
+    
+    i <- 1
+    for(serie in timeSeries){
       tryCatch({
-        fits         <<- lapply(timeSeries, Arima, order=c(2,0,0),method="ML")
+        fits[[i]] <<- Arima(serie, order=c(2,0,0),method="CSS")
+        # print("CHOSE CSS")
       }
       ,error = function(cond) {
-          fits         <<- lapply(timeSeries, auto.arima)
+        tryCatch({
+          fits[[i]] <<- Arima(serie, order=c(2,0,0), method="ML")
+          # print("CHOSE ML")
+        }
+        ,error = function(cond) {
+          fits[[i]] <<- auto.arima(serie)
+          # print("CHOSE AUTO")
+        })
       })
-    })
+      i <- i + 1
+    }
+    # print("Completed arima's")
     
     if(is.null(fits)) {
       fits <- get("fits", envir = .GlobalEnv)
       remove("fits", envir = .GlobalEnv)
     }
-  
+    
     forecastData <- list()
     for(name in names(timeSeries)){
-      forecastData[[name]] <- funggcast(timeSeries[[name]], forecast(fits[[name]]))
+      forecastData[[name]] <- funggcast(timeSeries[[name]], forecast(fits[[name]], h=5), END+1, 5)
       forecastData[[name]] <- subset(forecastData[[name]],is.na(forecastData[[name]]$observed))
     }
     
@@ -53,25 +63,36 @@ createForecastSub <- function(INPUTSET, GROUPBY, START, END, EXCLUDE){
   mergedSub <- mergeForecastframe(INPUTSET, forecastData, GROUPBY, EXCLUDE)
 }
 
-funggcast <- function(dn,fcast){ 
+funggcast <- function(dn,fcast,fitStart,fitDuration){ 
   require(zoo) #needed for the 'as.yearmon()' function
   en<-max(time(fcast$mean)) #extract the max date used in the forecast
-  
   #Extract Source and Training Data
-  ds<-as.data.frame(window(dn,end=en))
-  names(ds)<-'observed'
-  ds$date<-as.Date(time(window(dn,end=en)))
+  ds<-as.data.frame(window(dn))
   
+  names(ds)<-'observed'
+  ds$date<-as.Date(time(window(dn)))
+
   #Extract the Fitted Values (need to figure out how to grab confidence intervals)
   dfit<-as.data.frame(fcast$fitted)
   dfit$date<-as.Date(time(fcast$fitted))
   names(dfit)[1]<-'fitted'
   
   ds<-merge(ds,dfit,all.x=T) #Merge fitted values with source and training data
-  
+
   #Exract the Forecast values and confidence intervals
   dfcastn<-as.data.frame(fcast)
+  
+  if(row.names(dfcastn)[1] != fitStart){
+    nameArr <- c()
+    for(newName in fitStart:(fitStart+fitDuration-1)){
+      nameArr <- c(nameArr, newName)
+    }
+    print(nameArr)
+    row.names(dfcastn) <- nameArr
+  }
+  
   dfcastn$date<-as.Date(as.yearmon(paste(row.names(dfcastn), "-01-01", sep = "")))
+
   names(dfcastn)<-c('fitted','lo80','hi80','lo95','hi95','date')
   
   pd<-merge(ds,dfcastn, all.x=T, all.y = T) #final data.frame for use in ggplot
@@ -79,7 +100,7 @@ funggcast <- function(dn,fcast){
 }
 
 mergeForecastframe <- function(normalSet, forecastSet, sbiOrIsced, excludeYear){
-  if(sbiOrIsced == "totaal"){
+  if(sbiOrIsced == "singleColumn"){
     newDf <- data.frame(jaartal=NA, fitted=NA, lo80=NA, hi80=NA, lo95=NA, hi95=NA)
     
     tempDf <- forecastSet
