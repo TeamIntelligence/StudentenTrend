@@ -157,106 +157,59 @@ StudentenPerSectorServer <- function(input, output, session) {
                                  filterParams= c("jaartal"))
     forecastTotaal         <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1995, 2012, "")
     forecastTotaal$soort   = "Totaal gediplomeerden" 
-    
-    
-    StudentenEerstejaars_forecast_baseplot <- ggplot(StudentenEerstejaars_forecastSub, aes(x=jaartal)) +
+
+    SEForecastBaseplot <- ggplot(StudentenEerstejaars_forecastSub, aes(x=jaartal)) +
       xlab("Jaar") + 
       ylab("Aantal eerstejaars studenten") +
       ggtitle("Aantal eerstejaars studenten per studiesector") +
       geom_line(linetype="dashed", size=1,
-                aes(y=fitted,
-                    group=iscedCode.iscedNaam,
-                    color=iscedCode.iscedNaam))+
-      geom_line(aes(y=aantal, 
-                    group=iscedCode.iscedNaam,
-                    color=iscedCode.iscedNaam))+
-      geom_point(aes(y=aantal, 
-                     group=iscedCode.iscedNaam,
-                     color=iscedCode.iscedNaam))+
+                aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
+      geom_line(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
+      geom_point(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
       scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam), name = "Studiesector")
     
-    if (input$StudentenEerstejaars_Totaal == TRUE & input$StudentenEerstejaars_Totaalselect == TRUE ){ 
+    if (input$StudentenEerstejaars_Totaal == TRUE ){
       
-      ##allebei de lijnen
-      #selectlijn
-      totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
-                                               selectInput = input$StudentenPerSector_selectStudyImp, 
-                                               filterParams= c("jaartal"))
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2012, "")
-      forecastTotaalselect$soort   = "Totaal eerstejaars studenten"
-      
-      StudentenEerstejaars_forecast_baseplot +
-        #TOTAAL GESELECTEERD
-        geom_line(data=forecastTotaalselect, aes(y=aantal, 
-                                                 group=soort,
-                                                 color=soort), color = "gray48") + 
-        geom_point(data=forecastTotaalselect, aes(y=aantal, 
-                                                  group=soort,
-                                                  color=soort), color = "gray48") +
-        geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), color = "gray48") +
-        
-        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
-        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25) +
+      SEForecastBaseplot <- SEForecastBaseplot +
         #TOTAAL
-        geom_line(data=forecastTotaal, aes(y=aantal, 
-                                           group=soort,
-                                           color=soort), color = "black") + 
-        geom_point(data=forecastTotaal, aes(y=aantal, 
-                                            group=soort,
-                                            color=soort), color = "black") +
+        geom_line(data=forecastTotaal, 
+                  aes(y=aantal, group=soort, color=soort),
+                  color = "black") + 
+        geom_point(data=forecastTotaal, 
+                   aes(y=aantal, group=soort, color=soort), 
+                   color = "black") +
         geom_line(data=forecastTotaal, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), color = "black") + 
-        
+                  aes(y=fitted, group=soort, color=soort), 
+                  color = "black") + 
         geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
         geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
-      
     }
-    else if (input$StudentenEerstejaars_Totaalselect == TRUE ){
+    if (input$StudentenEerstejaars_Totaalselect == TRUE ){
       #alleen select
       totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
                                                selectInput = input$StudentenPerSector_selectStudyImp, 
                                                filterParams= c("jaartal"))
+      
       forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2012, "")
       forecastTotaalselect$soort   = "Totaal eerstejaars studenten"
       
-      StudentenEerstejaars_forecast_baseplot +
+      SEForecastBaseplot <- SEForecastBaseplot +
         #TOTAAL GESELECTEERD
-        geom_line(data=forecastTotaalselect, aes(y=aantal, 
-                                                 group=soort,
-                                                 color=soort), color = "gray48") + 
-        geom_point(data=forecastTotaalselect, aes(y=aantal, 
-                                                  group=soort,
-                                                  color=soort), color = "gray48") +
+        geom_line(data=forecastTotaalselect, 
+                  aes(y=aantal, group=soort, color=soort),
+                  color = "gray48") + 
+        geom_point(data=forecastTotaalselect, 
+                   aes(y=aantal, group=soort, color=soort), 
+                   color = "gray48") +
         geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), color = "gray48") +
-        
+                  aes(y=fitted, group=soort, color=soort), 
+                  color = "gray48") +
         geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
         geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
-      
-    }
-    else if (input$StudentenEerstejaars_Totaal == TRUE ){
-      #alleen totaal
-      
-      StudentenEerstejaars_forecast_baseplot +
-        #TOTAAL
-        geom_line(data=forecastTotaal, aes(y=aantal, 
-                                           group=soort,
-                                           color=soort), color = "black") + 
-        geom_point(data=forecastTotaal, aes(y=aantal, 
-                                            group=soort,
-                                            color=soort), color = "black") +
-        geom_line(data=forecastTotaal, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), color = "black") + 
-        
-        geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
-        geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
-      
-    }
-    else{
-      StudentenEerstejaars_forecast_baseplot
     }
     
+    #Render plot
+    SEForecastBaseplot
   })
   
   observe({
