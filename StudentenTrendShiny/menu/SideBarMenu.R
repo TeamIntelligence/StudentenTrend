@@ -13,6 +13,10 @@ GetPages <- function() {
             ,menuSubItem("Per bedrijfs- per studiesector",tabName = "VacaturesGediplomeerden",icon=icon("briefcase"))
             ,menuSubItem("Per studie- per bedrijfssector",tabName = "GediplomeerdenVacatures",icon=icon("university"))
             ,menuSubItem("Per studiesector per jaar",tabName = "BanenStudieSectorJaar",icon=icon("line-chart"))) 
+      ,list("Statistische analyse", icon=icon("line-chart")
+            ,menuSubItem("Ingeschreven studenten", tabName  = "StatIngeschreven", icon=icon("university"))
+            ,menuSubItem("Gediplomeerde studenten", tabName  = "StatGediplomeerden", icon=icon("graduation-cap"))
+            ,menuSubItem("Vervulde banen", tabName  = "StatVervuldeBanen", icon=icon("briefcase")))
     )
   )
 }
