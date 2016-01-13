@@ -55,6 +55,9 @@ StudentenGediplomeerdenUI <- function(PageName){
 
 StudentenGediplomeerdenServer <- function(input, output, session){
   
+  #######################
+  ## NORMALE LINE PLOT ##
+  #######################
   output$DiploPlot <- renderPlot({
     #HBO BACH en WO MAST
     HWSet <- studenten_gediplomeerden[(studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor") | (studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master"),] 
@@ -66,6 +69,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                      "WOM"= studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master",],
                      "HBOWO" = aggregate(HWSet$aantal, by=list(iscedNaam=HWSet$iscedCode.iscedNaam, jaartal=HWSet$jaartal), FUN=sum)
     )
+    
     #namen kolomtitels van de nieuwe gevormde data aanpassen
     if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       colnames(StudentenGediplomeerden_StudieSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
@@ -79,119 +83,59 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     } else {
       data <- studenten_gediplomeerden
     }
-      
-      if (input$StudentenGediplomeerden_Totaal == TRUE & input$StudentenGediplomeerden_TotaalSelect == TRUE ){ 
-        ##allebei de lijnen
-        #selectlijn
-        totaalaantalselect <- TotaalAantalSelect(data = data,
-                                                 selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
-                                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                                 filterParams= c("ondCode",'jaartal',"diploma"))
-        #totaallijn
-        totaalaantal <- TotaalAantal(data = data,
-                                     studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                     filterParams= c("ondCode",'jaartal',"diploma"))
-        
-        ggplot(StudentenGediplomeerden_StudieSub, aes(x=jaartal)) + 
-          xlab("Jaar") +  
-          ylab("Aantal studenten") + 
-          ggtitle(PlotTitle) +
-          geom_line(data=StudentenGediplomeerden_StudieSub, aes(y=aantal,   #lijn studies
-                                    group=iscedCode.iscedNaam,
-                                    color=iscedCode.iscedNaam)) + 
-          geom_point(data=StudentenGediplomeerden_StudieSub,aes(y=aantal, 
-                                    group=iscedCode.iscedNaam,
-                                    color=iscedCode.iscedNaam)) +
-          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) +
-          geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
-                                           group=ondCode,
-                                           color=ondCode), color = "black") + 
-          geom_point(data=totaalaantal, aes(y=aantal, 
-                                            group=ondCode,
-                                            color=ondCode), color = "black") +
-          geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal select lijn
-                                                 group=ondCode,
-                                                 color=ondCode), color = "gray48") + 
-          geom_point(data=totaalaantalselect, aes(y=aantal, 
-                                                  group=ondCode,
-                                                  color=ondCode), color = "gray48") +
-          theme(legend.position="none")
-        
-      }
-      else if (input$StudentenGediplomeerden_TotaalSelect == TRUE ){
-        #alleen select
-        totaalaantalselect <- TotaalAantalSelect(data = data,
-                                                 selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
-                                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                                 filterParams= c("ondCode",'jaartal',"diploma"))
-        
-        ggplot(StudentenGediplomeerden_StudieSub,   
-               aes(x=jaartal)) + 
-          xlab("Jaar") +  
-          ylab("Aantal studenten") + 
-          ggtitle(PlotTitle) +
-          geom_line(data=StudentenGediplomeerden_StudieSub, aes(y=aantal,     #lijn studies
-                                    group=iscedCode.iscedNaam,
-                                    color=iscedCode.iscedNaam)) + 
-          geom_point(data=StudentenGediplomeerden_StudieSub,aes(y=aantal, 
-                                    group=iscedCode.iscedNaam,
-                                    color=iscedCode.iscedNaam)) +
-          geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal geslecteerde lijn
-                                                 group=ondCode,
-                                                 color=ondCode), color = "gray48") + 
-          geom_point(data=totaalaantalselect, aes(y=aantal, 
-                                                  group=ondCode,
-                                                  color=ondCode), color = "gray48") +
-          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) +
-          theme(legend.position="none")
-        
-      }
-      else if (input$StudentenGediplomeerden_Totaal == TRUE ){
-        #alleen totaal
-        #totaallijn
-        totaalaantal <- TotaalAantal(data = data,
-                                     studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                     filterParams= c("ondCode",'jaartal',"diploma"))
-        
-        ggplot(StudentenGediplomeerden_StudieSub,   
-               aes(x=jaartal)) + 
-          xlab("Jaar") +  
-          ylab("Aantal studenten") + 
-          ggtitle(PlotTitle) +
-          geom_line(data=StudentenGediplomeerden_StudieSub, aes(y=aantal,     #lijn studies
-                                    group=iscedCode.iscedNaam,
-                                    color=iscedCode.iscedNaam)) + 
-          geom_point(data=StudentenGediplomeerden_StudieSub,aes(y=aantal, 
-                                    group=iscedCode.iscedNaam,
-                                    color=iscedCode.iscedNaam)) +
-          geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
-                                           group=ondCode,
-                                           color=ondCode), color = "black") + 
-          geom_point(data=totaalaantal, aes(y=aantal, 
-                                            group=ondCode,
-                                            color=ondCode), color = "black") +
-          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) + 
-          theme(legend.position="none")
-      }
-      else{
-        #normale enkele plot
-        ggplot(StudentenGediplomeerden_StudieSub, 
-               aes(x=jaartal)) + 
-          xlab("Jaar") +  
-          ylab("Aantal studenten") + 
-          ggtitle(PlotTitle) +
-          geom_line(aes(y=aantal, 
-                        group=iscedCode.iscedNaam,
-                        color=iscedCode.iscedNaam)) + 
-          geom_point(aes(y=aantal, 
-                         group=iscedCode.iscedNaam,
-                         color=iscedCode.iscedNaam)) +
-          scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) +
-          theme(legend.position="none")
-      }
+    
+    #totaallijn
+    totaalaantal <- TotaalAantal(data = data,
+                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                 filterParams= c("ondCode",'jaartal',"diploma"))
+    
+    SGLineBaseplot <- ggplot(StudentenGediplomeerden_StudieSub, aes(x=jaartal)) + 
+      xlab("Jaar") +  
+      ylab("Aantal studenten") + 
+      ggtitle(PlotTitle) +
+      geom_line(data=StudentenGediplomeerden_StudieSub, 
+                aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) + 
+      geom_point(data=StudentenGediplomeerden_StudieSub,
+                 aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
+      scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam)) +
+      theme(legend.position="none")
+    
+    #Totaal lijn toevoegen
+    if (input$StudentenGediplomeerden_Totaal == TRUE ){
+      SGLineBaseplot <- SGLineBaseplot +
+        geom_line(data=totaalaantal, 
+                  aes(y=aantal, group=ondCode, color=ondCode), 
+                  color = "black") + 
+        geom_point(data=totaalaantal, 
+                   aes(y=aantal, group=ondCode, color=ondCode),
+                   color = "black")
+    }
+    
+    #alleen select
+    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
+      totaalaantalselect <- TotaalAantalSelect(data = data,
+                                               selectInput = input$StudentenGediplomeerden_SelectStudyImp,
+                                               studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
+                                               filterParams= c("ondCode",'jaartal',"diploma"))
+
+      SGLineBaseplot <- SGLineBaseplot +
+        geom_line(data=totaalaantalselect, 
+                  aes(y=aantal, group=ondCode, color=ondCode),
+                  color = "gray48") + 
+        geom_point(data=totaalaantalselect,
+                   aes(y=aantal, group=ondCode, color=ondCode),
+                   color = "gray48")
+    }
+    
+    #Render de plot
+    SGLineBaseplot 
   })
   
+  ######################
+  ## NORMALE BAR PLOT ##
+  ######################
   output$DiploBarPlot <- renderPlot({
+    
     HWBarSet <<- studenten_gediplomeerden[(studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor") | (studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master") ,] 
     
     #data aanpassen nav keuzes gebruiker
@@ -214,120 +158,67 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       data <- studenten_gediplomeerden
     }
     
-      if (input$StudentenGediplomeerden_Totaal == TRUE & input$StudentenGediplomeerden_TotaalSelect == TRUE ){ 
-        ##allebei de lijnen
-        ##Selectlijn
-        totaalaantalselect <- TotaalAantalSelect(data = data,
-                                                 selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
-                                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                                 filterParams= c("ondCode",'jaartal',"diploma"))
-        
-        #totaallijn
-        totaalaantal <- TotaalAantal(data = data, 
-                                     studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                     filterParams= c("ondCode",'jaartal',"diploma"))
-        
-        ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
-          xlab("Jaar") +  
-          ylab("Aantal studenten") + 
-          ggtitle("Aantal gediplomeerde studenten") +
-          geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
-          geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal lijn
-                                                 group=ondCode,
-                                                 color="gray48")) +
-          geom_point(data=totaalaantalselect, aes(y=aantal, 
-                                                  group=ondCode,
-                                                  color="gray48")) +
-          geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
-                                           group=ondCode,
-                                           color= "black")) + 
-          geom_point(data=totaalaantal, aes(y=aantal, 
-                                            group=ondCode,
-                                            color="black")) +
-          
-          scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
-          labs(color = "Totaallijn")+
-          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting")
-        
-      }
-      else if (input$StudentenGediplomeerden_TotaalSelect == TRUE ){
-        #alleen select
-        totaalaantalselect <- TotaalAantalSelect(data = data,
-                                                 selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
-                                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                                 filterParams= c("ondCode",'jaartal',"diploma"))
-        
-        ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
-          xlab("Jaar") +  
-          ylab("Aantal studenten") + 
-          ggtitle("Aantal gediplomeerde studenten") +
-          geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
-          geom_line(data=totaalaantalselect, aes(y=aantal,  #totaal lijn
-                                                 group=ondCode,
-                                                 color= "gray48")) + 
-          geom_point(data=totaalaantalselect, aes(y=aantal, 
-                                                  group=ondCode,
-                                                  color="gray48")) +
-          scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
-          labs(color = "Totaallijn")+
-          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting") 
-      }
-      else if (input$StudentenGediplomeerden_Totaal == TRUE ){
-        #totaallijn
-        totaalaantal <- TotaalAantal(data = data,
-                                     studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                     filterParams= c("ondCode",'jaartal',"diploma"))
-        
-        ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
-          xlab("Jaar") +  
-          ylab("Aantal studenten") + 
-          ggtitle("Aantal gediplomeerde studenten") +
-          geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
-          geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
-                                           group=ondCode,
-                                           color= "black")) + 
-          geom_point(data=totaalaantal, aes(y=aantal, 
-                                            group=ondCode,
-                                            color="black")) +
-          scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
-          labs(color = "Totaallijn")+
-          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting") 
-      }
-      else{
-        #normale enkele plot
-        ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
-          xlab("Jaar") +  
-          ylab("Aantal studenten") + 
-          ggtitle("Aantal gediplomeerde studenten") +
-          geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) +
-          scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting") 
-      }  
-  })
-  
-  observe({
-    trueFalse = length(input$StudentenGediplomeerden_SelectStudyImp) == length(unique(studenten_gediplomeerden$iscedCode.iscedNaam))
-
-    updateCheckboxInput(session, "StudentenGediplomeerden_AlleStudies", value = trueFalse)
-  })
-  
-  observeEvent(input$StudentenGediplomeerden_AlleStudies, {
-    trueFalse = length(input$StudentenGediplomeerden_SelectStudyImp) == length(unique(studenten_gediplomeerden$iscedCode.iscedNaam))
-    if(input$StudentenGediplomeerden_AlleStudies == T && !trueFalse){
-      updateSelectInput(session, "StudentenGediplomeerden_SelectStudyImp",
-                        selected = studenten_gediplomeerden$iscedCode.iscedNaam
-      )
+    totaalaantal <- TotaalAantal(data = data, 
+                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                 filterParams= c("ondCode",'jaartal',"diploma"))
+    
+    
+    SGBarBaseplot <-  ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
+      xlab("Jaar") +  
+      ylab("Aantal studenten") + 
+      ggtitle("Aantal gediplomeerde studenten") +
+      geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
+      scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting")
+    
+    #scale_color_manual options
+    scmOptionsList.names <- c("values", "breaks", "labels")
+    scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names)
+    
+    if (input$StudentenGediplomeerden_Totaal == TRUE ){
+      
+      SGBarBaseplot <- SGBarBaseplot +
+        geom_line(data=totaalaantal, 
+                  aes(y=aantal, group=ondCode, color= "black")) + 
+        geom_point(data=totaalaantal, 
+                   aes(y=aantal, group=ondCode, color="black")) +
+        labs(color = "Totaallijn")
+      
+      scmOptionsList$values <- c(scmOptionsList$values, "black")
+      scmOptionsList$breaks <- c(scmOptionsList$breaks, "black")
+      scmOptionsList$labels <- c(scmOptionsList$labels, "Totaallijn")
     }
+    
+    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
+      
+      totaalaantalselect <- TotaalAantalSelect(data = data,
+                                               selectInput = input$StudentenGediplomeerden_SelectStudyImp,
+                                               studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
+                                               filterParams= c("ondCode",'jaartal',"diploma"))
+      
+      SGBarBaseplot <- SGBarBaseplot +
+        geom_line(data=totaalaantalselect, 
+                  aes(y=aantal, group=ondCode, color= "gray48")) + 
+        geom_point(data=totaalaantalselect,
+                   aes(y=aantal, group=ondCode, color="gray48")) +
+        labs(color = "Totaallijn")
+      
+      scmOptionsList$values <- c(scmOptionsList$values, "gray48")
+      scmOptionsList$breaks <- c(scmOptionsList$breaks, "gray48")
+      scmOptionsList$labels <- c(scmOptionsList$labels, "Totaallijn geselecteerde")
+    }
+    
+    #Render de plot
+    SGBarBaseplot +
+      scale_color_manual(values=scmOptionsList$values, breaks=scmOptionsList$breaks, labels=scmOptionsList$labels)
   })
   
   #########################
   ## VOORSPELLINGEN PLOT ##
   #########################
-  
   output$DiploVoorspellingPlot <- renderPlot({
     #HBO BACH en WO MAST
     HWSet <- studenten_gediplomeerden[(studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor") | (studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master"),] 
-    
-    
+
     #data aanpassen nav keuzes gebruiker
     StudentenGediplomeerden_StudieSub <- switch (input$StudentenGediplomeerden_StudieNiveau,
                                                  "HBO" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor",] ,
@@ -335,8 +226,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                                  "WOM"= studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master",],
                                                  "HBOWO" = aggregate(HWSet$aantal, by=list(iscedNaam=HWSet$iscedCode.iscedNaam, jaartal=HWSet$jaartal), FUN=sum)
     )
-    
-    
+
     #namen kolomtitels van de nieuwe gevormde data aanpassen
     if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       colnames(StudentenGediplomeerden_StudieSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
@@ -345,8 +235,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     #data aanpassen nav keuze gebruiker: studie(s)
     StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,]
     StudentenGediplomeerden_forecastSub <- createForecastSub(StudentenGediplomeerden_StudieSub, "aantal", "iscedCode.iscedNaam", 1995, 2013,"")
-    
-    
+
     PlotTitle <- "Aantal gediplomeerde studenten \nper jaar verdeeld per studie"
     
     if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
@@ -361,47 +250,20 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                  filterParams= c("ondCode",'jaartal',"diploma"))
     forecastTotaal         <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1995, 2013, "")
     forecastTotaal$soort   = "Totaal gediplomeerden" 
-    
-    
-    StudentenGediplomeerden_forecast_baseplot <- ggplot(StudentenGediplomeerden_forecastSub, aes(x=jaartal)) +
+
+    SGForecastBaseplot <- ggplot(StudentenGediplomeerden_forecastSub, aes(x=jaartal)) +
       xlab("Jaar") + 
       ylab("Aantal gediplomeerden") +
       ggtitle("Aantal gediplomeerden per studiesector") +
       geom_line(linetype="dashed", size=1,
-                aes(y=fitted,
-                    group=iscedCode.iscedNaam,
-                    color=iscedCode.iscedNaam))+
-      geom_line(aes(y=aantal, 
-                    group=iscedCode.iscedNaam,
-                    color=iscedCode.iscedNaam))+
-      geom_point(aes(y=aantal, 
-                     group=iscedCode.iscedNaam,
-                     color=iscedCode.iscedNaam))+
+                aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
+      geom_line(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
+      geom_point(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
       scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam), name = "Studiesector")
     
-    if (input$StudentenGediplomeerden_Totaal == TRUE & input$StudentenGediplomeerden_TotaalSelect == TRUE ){ 
-      ##allebei de lijnen
-      #selectlijn
-      totaalaantalselect <- TotaalAantalSelect(data = data,
-                                               selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
-                                               studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                               filterParams= c("ondCode",'jaartal',"diploma"))
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2013, "")
-      forecastTotaalselect$soort   = "Totaal geselecteerde gediplomeerden"
-      
-      StudentenGediplomeerden_forecast_baseplot +
-        #TOTAAL GESELECTEERD
-        geom_line(data=forecastTotaalselect, aes(y=aantal, 
-                                                 group=soort,
-                                                 color=soort), color = "gray48") + 
-        geom_point(data=forecastTotaalselect, aes(y=aantal, 
-                                                  group=soort,
-                                                  color=soort), color = "gray48") +
-        geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), color = "gray48") +
-        
-        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
-        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25) +
+    if (input$StudentenGediplomeerden_Totaal == TRUE ){
+
+      SGForecastBaseplot +
         #TOTAAL
         geom_line(data=forecastTotaal, aes(y=aantal, 
                                            group=soort,
@@ -411,57 +273,47 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                             color=soort), color = "black") +
         geom_line(data=forecastTotaal, linetype="dashed", size=1,
                   aes(y=fitted, group=soort, color=soort), color = "black") + 
-        
         geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
         geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
-      
     }
-    else if (input$StudentenGediplomeerden_TotaalSelect == TRUE ){
+    
+    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
       #alleen select
       totaalaantalselect <- TotaalAantalSelect(data = data,
                                                selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
                                                studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
                                                filterParams= c("ondCode",'jaartal',"diploma"))
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2013, "")
-      forecastTotaalselect$soort   = "Totaal geselecteerde gediplomeerden"
+      forecastTotaalselect       <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2013, "")
+      forecastTotaalselect$soort = "Totaal geselecteerde gediplomeerden"
       
-      StudentenGediplomeerden_forecast_baseplot +
-        #TOTAAL GESELECTEERD
-        geom_line(data=forecastTotaalselect, aes(y=aantal, 
-                                                 group=soort,
-                                                 color=soort), color = "gray48") + 
-        geom_point(data=forecastTotaalselect, aes(y=aantal, 
-                                                  group=soort,
-                                                  color=soort), color = "gray48") +
+      SGForecastBaseplot +
+        geom_line(data=forecastTotaalselect, aes(y=aantal, group=soort, color=soort), 
+                  color = "gray48") + 
+        geom_point(data=forecastTotaalselect, aes(y=aantal, group=soort, color=soort),
+                  color = "gray48") +
         geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), color = "gray48") +
-        
+                  aes(y=fitted, group=soort, color=soort), 
+                  color = "gray48") +
         geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
         geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
-      
-    }
-    else if (input$StudentenGediplomeerden_Totaal == TRUE ){
-      #alleen totaal
-      
-      StudentenGediplomeerden_forecast_baseplot +
-      #TOTAAL
-        geom_line(data=forecastTotaal, aes(y=aantal, 
-                                         group=soort,
-                                         color=soort), color = "black") + 
-        geom_point(data=forecastTotaal, aes(y=aantal, 
-                                            group=soort,
-                                            color=soort), color = "black") +
-        geom_line(data=forecastTotaal, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), color = "black") + 
-        
-        geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
-        geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
-      
-    }
-    else{
-      StudentenGediplomeerden_forecast_baseplot
     }
     
+    #Render de plot
+    SGForecastBaseplot
   })
   
+  observe({
+    trueFalse = length(input$StudentenGediplomeerden_SelectStudyImp) == length(unique(studenten_gediplomeerden$iscedCode.iscedNaam))
+    
+    updateCheckboxInput(session, "StudentenGediplomeerden_AlleStudies", value = trueFalse)
+  })
+  
+  observeEvent(input$StudentenGediplomeerden_AlleStudies, {
+    trueFalse = length(input$StudentenGediplomeerden_SelectStudyImp) == length(unique(studenten_gediplomeerden$iscedCode.iscedNaam))
+    if(input$StudentenGediplomeerden_AlleStudies == T && !trueFalse){
+      updateSelectInput(session, "StudentenGediplomeerden_SelectStudyImp",
+                        selected = studenten_gediplomeerden$iscedCode.iscedNaam
+      )
+    }
+  })
 }  

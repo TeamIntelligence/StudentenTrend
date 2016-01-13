@@ -35,6 +35,9 @@ GediplomeerdenVacaturesUI <- function(PageName){
 
 GediplomeerdenVacaturesServer <- function(input, output, session){
   
+  #######################
+  ## NORMALE LINE PLOT ##
+  #######################
   output$GedipVacaPlot <- renderPlot({
     plotCalcs <- GediplomeerdenVacaturesPlotCalc(input)
 
@@ -58,6 +61,9 @@ GediplomeerdenVacaturesServer <- function(input, output, session){
       xlim(2000,plotCalcs$toYear)
   })
   
+  ######################
+  ## NORMALE BAR PLOT ##
+  ######################
   output$GedipVacaBarPlot <- renderPlot({
     plotCalcs <- GediplomeerdenVacaturesPlotCalc(input)
     
@@ -78,6 +84,9 @@ GediplomeerdenVacaturesServer <- function(input, output, session){
       xlim(1999,plotCalcs$toYear+1)
   })
   
+  #########################
+  ## VOORSPELLINGEN PLOT ##
+  #########################
   output$GedipVacaVoorspellingPlot <- renderPlot({
     plotCalcs <- GediplomeerdenVacaturesPlotCalc(input)
     minYear   <- plotCalcs$gvSub$jaartal[which.min(plotCalcs$gvSub$jaartal)]
@@ -128,7 +137,6 @@ GediplomeerdenVacaturesServer <- function(input, output, session){
                 color = "black") +
       geom_ribbon(data=GVVForeCastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
       geom_ribbon(data=GVVForeCastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25) 
-    
     
   })
   

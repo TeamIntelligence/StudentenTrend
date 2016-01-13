@@ -35,22 +35,7 @@ BanenStudieSectorJaarServer <- function(input, output, session){
     plotCalcs <- BanenStudieSectorJaarPlotCalcs(input)
     bsjSub <<- plotCalcs$bsjSub
     aantalgediplomeerden <<- plotCalcs$aantalgediplomeerden
-#     #data aanpassen nav keuze gebruiker: SOI Studielijntjes
-#     bsjSub <- gediplomeerden_vacatures[gediplomeerden_vacatures$soiCode.soiNaam %in% input$BanenStudieSectorJaar_SelectImp,]
-#     #data aanpassen: HBO en WO optellen 
-#     bsjSub <- aggregate(cbind(bsjSub$direct,bsjSub$binnenEenJaar,bsjSub$binnenTweeJaar,bsjSub$binnenDrieJaar), by=list(jaartal =bsjSub$jaartal), FUN=sum)
-#     colnames(bsjSub)<-c("jaartal","direct","binnenEenJaar","binnenTweeJaar","binnenDrieJaar")
-#     
-#     # gekozen soi omzetten naar isced
-#     gekozenisced <- soicodes[soicodes$soiNaam %in% input$BanenStudieSectorJaar_SelectImp,]$iscedCodes[[1]]
-#     #gekozenisced <- soicodes[soicodes$soiNaam %in% "Leraren",]$iscedCodes[[1]]
-#     
-#     # aantal gediplomeerden omzetten naar gekozen soi
-#     aantalgediplomeerden <- studenten_gediplomeerden[studenten_gediplomeerden$iscedCode.iscedCode %in% gekozenisced$iscedCode, ]
-#     aantalgediplomeerden <- aantalgediplomeerden[(aantalgediplomeerden$ondCode == "HBO" & aantalgediplomeerden$diploma == "Bachelor") | (aantalgediplomeerden$ondCode == "WO" & aantalgediplomeerden$diploma == "Wo-master"),] 
-#     aantalgediplomeerden <- aggregate(aantalgediplomeerden$aantal, by=list(jaartal=aantalgediplomeerden$jaartal), FUN=sum)
-#     colnames(aantalgediplomeerden) <- c("jaartal","aantal")
-    
+
     ggplot(bsjSub,   
            aes(x=jaartal)) + 
       xlab("Afstudeerjaar") +  
