@@ -46,7 +46,7 @@ CallServerFunction <- function(Page, ...) {
 }
 
 
-TotaalAantalSelect <- function(data, selectInput, studieNiveauInput = NULL, filterParams){
+TotaalAantalSelect <- function(data, selectInput, studieNiveauInput = NULL, filterParams) {
   ##keuze maken welke studies
   totaalaantalselect <- data[data$iscedCode.iscedNaam %in% selectInput,]
   
@@ -80,19 +80,15 @@ TotaalAantalSelect <- function(data, selectInput, studieNiveauInput = NULL, filt
       } else{
         totaalaantalselect$ondCode = "Totaal geselecteerde HBO en WO studies"
       }
-    }
-    if (studieNiveauInput == "HBO"){
+    } else if (studieNiveauInput == "HBO"){
       totaalaantalselect$ondCode = "Totaal geselecteerde HBO studies"
-    }
-    if (studieNiveauInput == "WOB"){
+    } else if (studieNiveauInput == "WOB"){
       totaalaantalselect$ondCode = "Totaal geselecteerde WO Bachelor studies"
-    }
-    if (studieNiveauInput == "WOM"){
+    } else if (studieNiveauInput == "WOM"){
       totaalaantalselect$ondCode = "Totaal geselecteerde WO Master studies"
-    }
-    if (studieNiveauInput == "WO"){
+    } else if (studieNiveauInput == "WO"){
       totaalaantalselect$ondCode = "Totaal geselecteerde WO studies"
-    }
+    } 
   }
   
   return(totaalaantalselect)
@@ -112,41 +108,48 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
   colnames(totaalaantal)<-append(filterParams, "aantal")
   
   if (!is.null(studieNiveauInput)){
-  
-  isGedpl <- FALSE
+    
+    isGedpl <- FALSE
     if(!is.null(data$diploma)){
       isGedpl <- TRUE
     }
     
     #keuze maken welk studie niveau
     totaalaantal <- switch (studieNiveauInput,
-                                  "HBO" = totaalaantal[totaalaantal$ondCode == "HBO",],
-                                  "WO" = totaalaantal[totaalaantal$ondCode == "WO",],
-                                  "WOB" = totaalaantal[totaalaantal$ondCode == "WO" & totaalaantal$diploma == "Bachelor",],
-                                  "WOM"= totaalaantal[totaalaantal$ondCode == "WO" & totaalaantal$diploma == "Wo-master",],
-                                  "HBOWO" = aggregate(totaalaantal$aantal, by=list(jaartal=totaalaantal$jaartal), FUN=sum)
+                            "HBO" = totaalaantal[totaalaantal$ondCode == "HBO",],
+                            "WO" = totaalaantal[totaalaantal$ondCode == "WO",],
+                            "WOB" = totaalaantal[totaalaantal$ondCode == "WO" & totaalaantal$diploma == "Bachelor",],
+                            "WOM"= totaalaantal[totaalaantal$ondCode == "WO" & totaalaantal$diploma == "Wo-master",],
+                            "HBOWO" = aggregate(totaalaantal$aantal, by=list(jaartal=totaalaantal$jaartal), FUN=sum)
     )        
     if (studieNiveauInput == "HBOWO"){
       colnames(totaalaantal)<-c("jaartal","aantal")
       if(isGedpl){
-        totaalaantal$ondCode = "Totaal geselecteerde HBO Bachelor en WO Master studies"
+        totaalaantal$ondCode = "Totaal aantal HBO Bachelor en WO Master studies"
       } else{
-        totaalaantal$ondCode = "Totaal geselecteerde HBO en WO studies"
+        totaalaantal$ondCode = "Totaal aantal HBO en WO studies"
       }
     }
     if (studieNiveauInput == "HBO"){
-      totaalaantal$ondCode = "Totaal geselecteerde HBO studies"
+      totaalaantal$ondCode = "Totaal aantal HBO studies"
     }
     if (studieNiveauInput == "WOB"){
-      totaalaantal$ondCode = "Totaal geselecteerde WO Bachelor studies"
+      totaalaantal$ondCode = "Totaal aantal WO Bachelor studies"
     }
     if (studieNiveauInput == "WOM"){
-      totaalaantal$ondCode = "Totaal geselecteerde WO Master studies"
+      totaalaantal$ondCode = "Totaal aantal WO Master studies"
     }
     if (studieNiveauInput == "WO"){
-      totaalaantal$ondCode = "Totaal geselecteerde WO studies"
+      totaalaantal$ondCode = "Totaal aantal WO studies"
     }
   }
   
   return(totaalaantal)
+}
+
+PrintGGPlotly <- function(plot, ...) {
+  params <- list(p=ggplotly(plot), hovermode = "closest", titlefont=GetDefaultTitleFont(), ...)
+  return(
+    do.call(layout, params)
+  )
 }

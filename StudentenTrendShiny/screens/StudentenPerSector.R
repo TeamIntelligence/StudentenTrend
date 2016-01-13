@@ -2,40 +2,40 @@
 StudentenPerSectorUI <- function(PageName) {
   return(
     tabItem(tabName = PageName,
-      fluidRow(
-        box(width = 12, title = "Eerstejaarsstudenten",
-            p("Op deze pagina vindt u het aantal eerstejaarsstudenten per studiesector over de periode 1995 tot en met 2012. HBO en WO is samengenomen. U kunt zelf kiezen welke studiesectoren u wilt weergeven. Daarnaast kunt u ook een totaallijn weergeven van alle studies of een totaallijn van de studies die u geselecteerd hebt."),
-            p("De grafiek biedt inzicht hoeveel studenten elk jaar starten binnen een bepaalde studie sector. Er kan vervolgens uit opgemaakt worden of studies binnen een bepaalde studiesector groeien of afnemen."),
-            collapsible = T
-            ),
-        box(width=6, height = 170,
-            selectInput("StudentenPerSector_selectStudyImp",
-                        "Selecteer een of meerdere studiesectoren om weer te geven:",
-                        choices = studievoortgang$iscedCode.iscedNaam,
-                        multiple = TRUE,
-                        selectize = TRUE),
-            checkboxInput("StudentenPerSector_AlleStudies",
-                          "Geef alle studies weer"
+            fluidRow(
+              box(width = 12, title = "Eerstejaarsstudenten",
+                  p("Op deze pagina vindt u het aantal eerstejaarsstudenten per studiesector over de periode 1995 tot en met 2012. HBO en WO is samengenomen. U kunt zelf kiezen welke studiesectoren u wilt weergeven. Daarnaast kunt u ook een totaallijn weergeven van alle studies of een totaallijn van de studies die u geselecteerd hebt."),
+                  p("De grafiek biedt inzicht hoeveel studenten elk jaar starten binnen een bepaalde studie sector. Er kan vervolgens uit opgemaakt worden of studies binnen een bepaalde studiesector groeien of afnemen."),
+                  collapsible = T
+              ),
+              box(width=6, height = 170,
+                  selectInput("StudentenPerSector_selectStudyImp",
+                              "Selecteer een of meerdere studiesectoren om weer te geven:",
+                              choices = studievoortgang$iscedCode.iscedNaam,
+                              multiple = TRUE,
+                              selectize = TRUE),
+                  checkboxInput("StudentenPerSector_AlleStudies",
+                                "Geef alle studies weer"
+                  )
+              ),
+              box(width = 6, height = 170,
+                  checkboxInput("StudentenEerstejaars_Totaalselect",
+                                "Totaal lijn weergeven van de geselecteerde studies"
+                  ),
+                  checkboxInput("StudentenEerstejaars_Totaal",
+                                "Totaal lijn weergeven"
+                  )
+              )
+              # Show a plot of the generated distribution
+              ,
+              tabBox( width=12, height=550,
+                      tabPanel("Huidig", 
+                               box(width=5, plotlyOutput("StudentenPerSector_aantalStudentenPlot", height=450)), 
+                               box(width=7, plotOutput("StudentenPerSector_aantalStudentenBarPlot", height=450))
+                      ),
+                      tabPanel("Voorspelling", textOutput("HOI"))
+              )
             )
-        ),
-        box(width = 6, height = 170,
-            checkboxInput("StudentenEerstejaars_Totaalselect",
-                          "Totaal lijn weergeven van de geselecteerde studies"
-            ),
-            checkboxInput("StudentenEerstejaars_Totaal",
-                          "Totaal lijn weergeven"
-            )
-        )
-        # Show a plot of the generated distribution
-        ,
-        tabBox( width=12, height=550,
-          tabPanel("Huidig", 
-                   box(width=5, plotOutput("StudentenPerSector_aantalStudentenPlot", height=450)), 
-                   box(width=7, plotOutput("StudentenPerSector_aantalStudentenBarPlot", height=450))
-                   ),
-          tabPanel("Voorspelling", textOutput("HOI"))
-        )
-      )
     )
   )
 }
@@ -43,239 +43,108 @@ StudentenPerSectorUI <- function(PageName) {
 #The Server function for the StudentenPerSector page
 StudentenPerSectorServer <- function(input, output, session) {
   
-  output$StudentenPerSector_aantalStudentenPlot <- renderPlot({
-    
+  output$StudentenPerSector_aantalStudentenPlot <- renderPlotly({
     svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
+    PlotTitle <- "Aantal eerstejaarsstudenten per jaar verdeeld per studie"
     
-    PlotTitle <- "Aantal eerstejaarsstudenten \nper jaar verdeeld per studie"
+    #plotten
+    plot <- ggplot(svSub, aes(x=jaartal)) + 
+      xlab("Jaar") +  
+      ylab("Aantal studenten") + 
+      ggtitle(PlotTitle) +
+      geom_line(data=svSub, size = -1, aes(y=aantal,     #lijn studies
+                                          group=iscedCode.iscedNaam,
+                                          color=iscedCode.iscedNaam)) + 
+      geom_point(data=svSub,aes(y=aantal, 
+                                group=iscedCode.iscedNaam,
+                                color=iscedCode.iscedNaam)) +
+      
+      scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam)) + 
+      theme(legend.position="none")
     
-#         ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal), environment=environment()) +
-#           xlab("Jaar") +
-#           ylab("Aantal Studenten") +
-#           geom_bar(stat = "identity", fill="red", alpha = 1/2)+
-#           ggtitle(plotTitle)
-#       
-#         ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal, fill=svSub$iscedCode$iscedNaam), environment=environment()) +
-#           xlab("Jaar") +
-#           ylab("Aantal Studenten") +
-#           geom_bar(stat = "identity")+
-#           ggtitle(plotTitle) +
-#           scale_fill_manual(values=rainbow(length(input$StudentenPerSector_selectStudyImp)),name="Opleidings Sector")
-
-        if (input$StudentenEerstejaars_Totaal == TRUE & input$StudentenEerstejaars_Totaalselect == TRUE ){ 
-          ##allebei de lijnen
-          ##select lijn
-          totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
-                                                   selectInput = input$StudentenPerSector_selectStudyImp, 
-                                                   filterParams= c("jaartal"))
- 
-          #Totaal berekenen
-          totaalaantal <- TotaalAantal(data =studievoortgang, 
-                                       filterParams= c("jaartal"))
-          
-          #plotten
-          ggplot(svSub, aes(x=jaartal)) + 
-            xlab("Jaar") +  
-            ylab("Aantal studenten") + 
-            ggtitle(PlotTitle) +
-            geom_line(data=svSub, aes(y=aantal,     #lijn studies
-              group=iscedCode.iscedNaam,
-              color=iscedCode.iscedNaam)) + 
-            geom_point(data=svSub,aes(y=aantal, 
-              group=iscedCode.iscedNaam,
-              color=iscedCode.iscedNaam)) +
-            geom_line(data=totaalaantal, aes(y=aantal)  #totaal lijn
-               , color = "black") + 
-            geom_point(data=totaalaantal, aes(y=aantal) 
-                , color = "black") +
-            geom_line(data=totaalaantalselect, aes(y=aantal)  #totaal select lijn
-               , color = "gray48") + 
-            geom_point(data=totaalaantalselect, aes(y=aantal) 
-              , color = "gray48") +
-            labs(color = "Studierichting")+ 
-            theme(legend.position="none")
-        }
-
-        else if (input$StudentenEerstejaars_Totaalselect == TRUE ){
-          #alleen select
-          ##select lijn
-          totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
-                                                   selectInput = input$StudentenPerSector_selectStudyImp, 
-                                                   filterParams= c("jaartal"))
-
-          ggplot(svSub, aes(x=jaartal)) + 
-            xlab("Jaar") +  
-            ylab("Aantal studenten") + 
-            ggtitle(PlotTitle) +
-            geom_line(data=svSub, aes(y=aantal,     #lijn studies
-                                      group=iscedCode.iscedNaam,
-                                      color=iscedCode.iscedNaam)) + 
-            geom_point(data=svSub,aes(y=aantal, 
-                                      group=iscedCode.iscedNaam,
-                                      color=iscedCode.iscedNaam)) +
-            geom_line(data=totaalaantalselect, aes(y=aantal)  #totaal select lijn
-                      , color = "gray48") + 
-            geom_point(data=totaalaantalselect, aes(y=aantal) 
-                       , color = "gray48") +
-            labs(color = "Studierichting")+ 
-            theme(legend.position="none")
-          
-          
-        }
-        else if (input$StudentenEerstejaars_Totaal == TRUE ){
-          #Totaal berekenen
-          totaalaantal <- TotaalAantal(data =studievoortgang, 
-                                       filterParams= c("jaartal"))
-          ggplot(svSub, aes(x=jaartal)) + 
-            xlab("Jaar") +  
-            ylab("Aantal studenten") + 
-            ggtitle(PlotTitle) +
-            geom_line(data=svSub, aes(y=aantal,     #lijn studies
-                                      group=iscedCode.iscedNaam,
-                                      color=iscedCode.iscedNaam)) + 
-            geom_point(data=svSub,aes(y=aantal, 
-                                      group=iscedCode.iscedNaam,
-                                      color=iscedCode.iscedNaam)) +
-            geom_line(data=totaalaantal, aes(y=aantal)  #totaal lijn
-                      , color = "black") + 
-            geom_point(data=totaalaantal, aes(y=aantal) 
-                       , color = "black") +
-            labs(color = "Studierichting")+ 
-            theme(legend.position="none")
-          
-          
-        }
-        else{
-          #plotten
-          ggplot(svSub, aes(x=jaartal)) + 
-            xlab("Jaar") +  
-            ylab("Aantal studenten") + 
-            ggtitle(PlotTitle) +
-            geom_line(data=svSub, aes(y=aantal,     #lijn studies
-                                      group=iscedCode.iscedNaam,
-                                      color=iscedCode.iscedNaam)) + 
-            geom_point(data=svSub,aes(y=aantal, 
-                                      group=iscedCode.iscedNaam,
-                                      color=iscedCode.iscedNaam)) +
-            labs(color = "Studierichting")+ 
-            theme(legend.position="none")
-        }
-        
-        
-        
-        
+    
+    #Totaal selectlijn
+    if (input$StudentenEerstejaars_Totaalselect == TRUE){ 
+      totaalaantalselect <- TotaalAantalSelect(data         = studievoortgang
+                                               ,selectInput = input$StudentenPerSector_selectStudyImp
+                                               ,filterParams= c("jaartal"))
+      
+      plot <- plot + geom_line(data=totaalaantalselect, aes(y=aantal), color = "gray48", size = -1) + 
+        geom_point(data=totaalaantalselect, aes(y=aantal), color = "gray48")
+    }
+    
+    #Totaal berekenen
+    if(input$StudentenEerstejaars_Totaal == TRUE) {
+      totaalaantal <- TotaalAantal(data         = studievoortgang
+                                  ,filterParams = c("jaartal"))
+      
+      plot <- plot + geom_line(data=totaalaantal, aes(y=aantal)  
+                               ,color = "black", size = -1) + 
+        geom_point(data=totaalaantal, aes(y=aantal) 
+                   ,color = "black")
+    }
+    
+    PrintGGPlotly(plot)
   })
   
   output$StudentenPerSector_aantalStudentenBarPlot <- renderPlot({
-    
-    
     svBarSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
+    PlotTitle <- "Aantal eerstejaarsstudenten per jaar verdeeld per studie"
     
-    PlotTitle <- "Aantal eerstejaarsstudenten \nper jaar verdeeld per studie"
+    plot <- ggplot(svBarSub, aes(x=jaartal)) + 
+      xlab("Jaar") +  
+      ylab("Aantal studenten") + 
+      ggtitle(PlotTitle) +
+      geom_bar(data=svBarSub, stat = "identity",
+               aes(y=aantal,fill=iscedCode.iscedNaam)) +
+      scale_fill_manual(values=GetColors(svBarSub$iscedCode.iscedNaam), name="Studierichting") +
+      theme(plot.title = do.call(element_text, GetDefaultTitleFont()))
     
-    #     
-    #         ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal), environment=environment()) +
-    #           xlab("Jaar") +
-    #           ylab("Aantal Studenten") +
-    #           geom_bar(stat = "identity", fill="red", alpha = 1/2)+
-    #           ggtitle(plotTitle)
-    #       
-    #         ggplot(svSub, aes(x=svSub$jaartal, y=svSub$aantal, fill=svSub$iscedCode$iscedNaam), environment=environment()) +
-    #           xlab("Jaar") +
-    #           ylab("Aantal Studenten") +
-    #           geom_bar(stat = "identity")+
-    #           ggtitle(plotTitle) +
-    #           scale_fill_manual(values=rainbow(length(input$StudentenPerSector_selectStudyImp)),name="Opleidings Sector")
-    #       
+    scale_color_manual_params <- list(values = c(), breaks = c(), labels = c())     
     
-    if (input$StudentenEerstejaars_Totaal == TRUE & input$StudentenEerstejaars_Totaalselect == TRUE ){ 
-      ##allebei de lijnen
-      ##select lijn
-      totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
-                                               selectInput = input$StudentenPerSector_selectStudyImp, 
-                                               filterParams= c("jaartal"))
-      
-      #Totaal berekenen
+    #Totaal berekenen
+    if (input$StudentenEerstejaars_Totaal == TRUE){ 
       totaalaantal <- TotaalAantal(data =studievoortgang, 
                                    filterParams= c("jaartal"))
       
-      ggplot(svBarSub, aes(x=jaartal)) + 
-        xlab("Jaar") +  
-        ylab("Aantal studenten") + 
-        ggtitle(PlotTitle) +
-        geom_bar(data=svBarSub, stat = "identity",
-                                  aes(y=aantal,fill=iscedCode.iscedNaam)) +
-        geom_line(data=totaalaantalselect, aes(y=aantal  #totaal select lijn
-                  , color = "gray48")) + 
-        geom_point(data=totaalaantalselect, aes(y=aantal 
-                   , color = "gray48")) +
-        geom_line(data=totaalaantal, aes(y=aantal  #totaal lijn
-                  , color = "black")) + 
+      plot <- plot + geom_line(data=totaalaantal, aes(y=aantal  #totaal lijn
+                                                      ,color = "black")) + 
         geom_point(data=totaalaantal, aes(y=aantal 
-                   , color = "black")) +
-        scale_color_manual(values=c("black","gray48"),breaks=c("black","gray48"), labels=c("Totaallijn","Totaallijn geselecteerde"))+
-        labs(color = "Totaallijn")+
-        labs(fill = "Studierichting")
+                                          ,color = "black")) +
+        labs(color = "Totaallijn")
+      
+      scale_color_manual_params[["values"]] <- c(scale_color_manual_params[["values"]], "black")
+      scale_color_manual_params[["breaks"]] <- c(scale_color_manual_params[["breaks"]], "black")
+      scale_color_manual_params[["labels"]] <- c(scale_color_manual_params[["labels"]], "Totaallijn")
     }
     
-
-    else if (input$StudentenEerstejaars_Totaalselect == TRUE ){
-      ##select lijn
-      totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
-                                               selectInput = input$StudentenPerSector_selectStudyImp, 
-                                               filterParams= c("jaartal"))
-
-      ggplot(svBarSub, aes(x=jaartal)) + 
-        xlab("Jaar") +  
-        ylab("Aantal studenten") + 
-        ggtitle(PlotTitle) +
-        geom_bar(data=svBarSub, stat = "identity",
-                 aes(y=aantal,fill=iscedCode.iscedNaam)) +
-        geom_line(data=totaalaantalselect, aes(y=aantal  #totaal select lijn
-                  , color = "gray48")) + 
+    #select lijn
+    if(input$StudentenEerstejaars_Totaalselect == TRUE) {
+      totaalaantalselect <- TotaalAantalSelect(data =studievoortgang 
+                                               ,selectInput = input$StudentenPerSector_selectStudyImp 
+                                               ,filterParams= c("jaartal"))
+      
+      plot <- plot + geom_line(data=totaalaantalselect, aes(y=aantal  #totaal select lijn
+                                                            ,color = "gray48")) + 
         geom_point(data=totaalaantalselect, aes(y=aantal 
-                   , color = "gray48")) +
-        scale_color_manual(values=c("gray48"),breaks=c("gray48"), labels=c("Totaallijn geselecteerde"))+
-        labs(color = "Totaallijn")+
-        labs(fill = "Studierichting")
+                                                ,color = "gray48")) +
+        labs(color = "Totaallijn")
       
-      
+      scale_color_manual_params[["values"]] <- c(scale_color_manual_params[["values"]], "gray48")
+      scale_color_manual_params[["breaks"]] <- c(scale_color_manual_params[["breaks"]], "gray48")
+      scale_color_manual_params[["labels"]] <- c(scale_color_manual_params[["labels"]], "Totaallijn geselecteerde")
     }
-    else if (input$StudentenEerstejaars_Totaal == TRUE ){
-      #Totaal berekenen
-      totaalaantal <- TotaalAantal(data =studievoortgang, 
-                                   filterParams= c("jaartal"))
-      ggplot(svBarSub, aes(x=jaartal)) + 
-        xlab("Jaar") +  
-        ylab("Aantal studenten") + 
-        ggtitle(PlotTitle) +
-        geom_bar(data=svBarSub, stat = "identity",
-                 aes(y=aantal,fill=iscedCode.iscedNaam)) +
-        geom_line(data=totaalaantal, aes(y=aantal  #totaal lijn
-                  , color = "black")) + 
-        geom_point(data=totaalaantal, aes(y=aantal 
-                   , color = "black")) +
-        scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaallijn"))+
-        labs(color = "Totaallijn")+
-        labs(fill = "Studierichting")
-      
-      
+    
+    if(input$StudentenEerstejaars_Totaal == TRUE || input$StudentenEerstejaars_Totaalselect == TRUE) {
+      plot <- plot + do.call(scale_color_manual, scale_color_manual_params)
     }
-    else{
-      #plotten
-      ggplot(svBarSub, aes(x=jaartal)) + 
-        xlab("Jaar") +  
-        ylab("Aantal studenten") + 
-        ggtitle(PlotTitle) +
-        geom_bar(data=svBarSub, stat = "identity",
-                 aes(y=aantal,fill=iscedCode.iscedNaam)) +
-        labs(fill = "Studierichting")
-    }
+    
+    plot
   })      
- 
+  
   observe({
     trueFalse = length(input$StudentenPerSector_selectStudyImp) == length(unique(studievoortgang$iscedCode.iscedNaam))
-
+    
     updateCheckboxInput(session, "StudentenPerSector_AlleStudies", value = trueFalse)
     
   })
