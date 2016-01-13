@@ -128,6 +128,7 @@ AantalVacaturesServer <- function(input,output, session){
     scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names )
     
     if (input$AantalVacatures_Totaal == TRUE ){
+      
       AVBarBaseplot <- AVBarBaseplot +
         geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
                                          group=soort,
