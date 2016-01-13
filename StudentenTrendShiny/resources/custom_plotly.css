@@ -1,0 +1,11 @@
+div.modebar.modebar--hover div.modebar-group:last-child {
+  display: none;
+}
+
+div.modebar.modebar--hover div.modebar-group:first-child a.modebar-btn:last-child {
+    display: none;
+}
+
+div.modebar.modebar--hover div.modebar-group:nth-child(3) a.modebar-btn:last-child {
+    display: none;
+}

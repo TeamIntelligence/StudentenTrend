@@ -9,6 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableAutoConfiguration
 public class Application {
 	
+	/**
+	 * Starts the Sprint boot application
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Configuration cfg = new Configuration();
 		cfg.addResource("hibernate.cfg.xml"); 
