@@ -87,13 +87,18 @@ funggcast <- function(dn,fcast,fitStart,fitDuration){
     for(newName in fitStart:(fitStart+fitDuration-1)){
       nameArr <- c(nameArr, newName)
     }
-    print(nameArr)
     row.names(dfcastn) <- nameArr
   }
   
   dfcastn$date<-as.Date(as.yearmon(paste(row.names(dfcastn), "-01-01", sep = "")))
 
   names(dfcastn)<-c('fitted','lo80','hi80','lo95','hi95','date')
+  
+  for(rowName in row.names(dfcastn)){
+    if(dfcastn[rowName, "fitted"] < 0){
+      dfcastn[rowName, "fitted"] <- 0
+    }
+  }
   
   pd<-merge(ds,dfcastn, all.x=T, all.y = T) #final data.frame for use in ggplot
   return(pd)
