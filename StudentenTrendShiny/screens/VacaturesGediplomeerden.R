@@ -110,8 +110,8 @@ VacaturesGediplomeerdenServer <- function(input, output, session){
       }
     } 
 
-    VGVForeCastSub          <- createForecastSub(plotCalcs$vgSub, "aantal", "soiCode.soiNaam", minYear, maxYear, "")
-    VGVForeCastTotaal       <- createForecastSub(plotCalcs$totaalaantal, "aantal", "singleColumn", minYear, maxYear, "")
+    VGVForeCastSub          <- createForecastSub(plotCalcs$vgSub, "aantal", "soiCode.soiNaam", minYear, maxYear, "",DF = 1)
+    VGVForeCastTotaal       <- createForecastSub(plotCalcs$totaalaantal, "aantal", "singleColumn", minYear, maxYear, "",DF = 1)
     VGVForeCastTotaal$soort = "Totaal" 
     
     ggplot(VGVForeCastSub,   

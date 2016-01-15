@@ -1,13 +1,13 @@
-createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE){
+createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE,DF=2){
   if(GROUPBY == "singleColumn"){
     timeSeries   <- ts(INPUTSET[[COUNTCOL]], start=START, end=END, frequency=1)
     
     tryCatch({
-      fits         <- Arima(timeSeries, order = c(2,0,0),method="CSS")
+      fits         <- Arima(timeSeries, order = c(DF,0,0),method="CSS")
     }
     ,error = function(cond) {
       tryCatch({
-        fits         <<- Arima(timeSeries, order = c(2,0,0),method="ML")
+        fits         <<- Arima(timeSeries, order = c(DF,0,0),method="ML")
       }
       ,error = function(cond) {
           fits         <<- auto.arima(timeSeries)
@@ -30,12 +30,12 @@ createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE){
     i <- 1
     for(serie in timeSeries){
       tryCatch({
-        fits[[i]] <<- Arima(serie, order=c(2,0,0),method="CSS")
+        fits[[i]] <<- Arima(serie, order=c(DF,0,0),method="CSS")
         # print("CHOSE CSS")
       }
       ,error = function(cond) {
         tryCatch({
-          fits[[i]] <<- Arima(serie, order=c(2,0,0), method="ML")
+          fits[[i]] <<- Arima(serie, order=c(DF,0,0), method="ML")
           # print("CHOSE ML")
         }
         ,error = function(cond) {

@@ -65,15 +65,15 @@ BanenStudieSectorJaarServer <- function(input, output, session){
     minYear                 <- bsjSub$jaartal[which.min(bsjSub$jaartal)]
     maxYear                 <- bsjSub$jaartal[which.max(bsjSub$jaartal)]
     
-    bSJForeCastSubDirect                <<- createForecastSub(bsjSub[,c("jaartal", "direct")], "direct", "singleColumn", minYear, maxYear, "")
+    bSJForeCastSubDirect                <<- createForecastSub(bsjSub[,c("jaartal", "direct")], "direct", "singleColumn", minYear, maxYear, "",DF = 1)
     bSJForeCastSubDirect$group          = "Direct"
-    bSJForeCastSubBinnenEenJaar         <<- createForecastSub(bsjSub[,c("jaartal", "binnenEenJaar")], "binnenEenJaar", "singleColumn", minYear, maxYear-1, "")
+    bSJForeCastSubBinnenEenJaar         <<- createForecastSub(bsjSub[,c("jaartal", "binnenEenJaar")], "binnenEenJaar", "singleColumn", minYear, maxYear-1, "",DF = 1)
     bSJForeCastSubBinnenEenJaar$group   = "Binnen 1 jaar"
-    bSJForeCastSubBinnenTweeJaar        <<- createForecastSub(bsjSub[,c("jaartal", "binnenTweeJaar")], "binnenTweeJaar", "singleColumn", minYear, maxYear-2, "")
+    bSJForeCastSubBinnenTweeJaar        <<- createForecastSub(bsjSub[,c("jaartal", "binnenTweeJaar")], "binnenTweeJaar", "singleColumn", minYear, maxYear-2, "",DF = 1)
     bSJForeCastSubBinnenTweeJaar$group  = "Binnen 2 jaar"
-    bSJForeCastSubbinnenDrieJaar        <<- createForecastSub(bsjSub[,c("jaartal", "binnenDrieJaar")], "binnenDrieJaar", "singleColumn", minYear, maxYear-3, "")
+    bSJForeCastSubbinnenDrieJaar        <<- createForecastSub(bsjSub[,c("jaartal", "binnenDrieJaar")], "binnenDrieJaar", "singleColumn", minYear, maxYear-3, "",DF = 1)
     bSJForeCastSubbinnenDrieJaar$group  = "Binnen 3 jaar"
-    bSJForeCastTotaal                   <<- createForecastSub(aantalgediplomeerden[which(aantalgediplomeerden$jaartal %in% c(minYear:maxYear)),], "aantal", "singleColumn", minYear, maxYear, "")
+    bSJForeCastTotaal                   <<- createForecastSub(aantalgediplomeerden[which(aantalgediplomeerden$jaartal %in% c(minYear:maxYear)),], "aantal", "singleColumn", minYear, maxYear, "",DF = 1)
     bSJForeCastTotaal$group             = "Aantal gediplomeerden" 
     
     ggplot(bSJForeCastTotaal,   

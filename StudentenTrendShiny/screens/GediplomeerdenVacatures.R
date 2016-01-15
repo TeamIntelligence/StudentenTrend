@@ -107,8 +107,8 @@ GediplomeerdenVacaturesServer <- function(input, output, session){
       }
     } 
 
-    GVVForeCastSub          <- createForecastSub(plotCalcs$gvSub, "aantal", "sbiCode93.sbiNaam93", minYear, maxYear, "")
-    GVVForeCastTotaal       <- createForecastSub(plotCalcs$totaalaantal, "aantal", "singleColumn", minYear, maxYear, "")
+    GVVForeCastSub          <- createForecastSub(plotCalcs$gvSub, "aantal", "sbiCode93.sbiNaam93", minYear, maxYear, "",DF = 1)
+    GVVForeCastTotaal       <- createForecastSub(plotCalcs$totaalaantal, "aantal", "singleColumn", minYear, maxYear, "",DF = 1)
     GVVForeCastTotaal$soort = "Totaal" 
     
     ggplot(plotCalcs$totaalaantal,   
