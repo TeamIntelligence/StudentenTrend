@@ -149,16 +149,8 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
 
 # Make a plotly from a ggplot. Apply our defaults to this plotly
 PrintGGPlotly <- function(plot, ...) {
-  params <- list(p=ggplotly(plot), hovermode = "closest", titlefont=GetDefaultTitleFont(), showlegend=FALSE, ...)
+  params <- list(p=ggplotly(plot), hovermode = "closest", titlefont=GetDefaultTitleFont(), ...)
   return(
     do.call(layout, params)
   )
 }
-
-#Only extract the legend from a ggplot
-gg_legend <- function(plot){ 
-  table <- ggplot_gtable(ggplot_build(plot)) 
-  leg <- which(sapply(table$grobs, function(x) x$name) == "guide-box") 
-  legend <- table$grobs[[leg]] 
-  return(legend)
-} 

@@ -48,7 +48,6 @@ LoadPackage("data.table")
 LoadPackage("forecast")
 LoadPackage("plotly")
 LoadPackage("gapminder")
-LoadPackage("gridExtra")
 
 # Load the data from the server
 LoadFromServer("studievoortgang", "http://188.166.3.196:8080/studenten/studievoortgang",flatten=TRUE)
