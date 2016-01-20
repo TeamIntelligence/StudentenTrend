@@ -245,48 +245,47 @@ StudentenIngeschrevenServer <- function(input, output, session){
       ylab("Aantal ingeschreven studenten") +
       ggtitle("Aantal ingeschreven studenten per studiesector") 
 
-       if (length(input$StudentenIngeschreven_SelectStudyImp) != 0) {
-       SIForecastBaseplot <- SIForecastBaseplot +
-         geom_line(linetype="dashed", size=1,
-                   aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
-         geom_line(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
-         geom_point(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))
+    if (length(input$StudentenIngeschreven_SelectStudyImp) != 0) {
        
-       scmOptionsList$values <- c(scmOptionsList$values, GetColors(StudentenIngeschreven_forecastSub$iscedCode.iscedNaam))
-       scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(StudentenIngeschreven_forecastSub$iscedCode.iscedNaam))
-       scmOptionsList$labels <- c(scmOptionsList$labels, unique(StudentenIngeschreven_forecastSub$iscedCode.iscedNaam))
+      SIForecastBaseplot <- SIForecastBaseplot +
+        geom_line(linetype="dashed", size=1,
+                 aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
+        geom_line(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
+        geom_point(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))
        
-       print(StudentenIngeschreven_forecastSub$iscedCode.iscedNaam)
+      scmOptionsList$values <- c(scmOptionsList$values, GetColors(StudentenIngeschreven_forecastSub$iscedCode.iscedNaam))
+      scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(StudentenIngeschreven_forecastSub$iscedCode.iscedNaam))
+      scmOptionsList$labels <- c(scmOptionsList$labels, unique(StudentenIngeschreven_forecastSub$iscedCode.iscedNaam))
        
-       if (input$StudentenIngeschreven_Totaalselect == TRUE){
+      if (input$StudentenIngeschreven_Totaalselect == TRUE){
+        
+        totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
+                                                selectInput = input$StudentenIngeschreven_SelectStudyImp, 
+                                                studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
+                                                filterParams= c("ondCode",'jaartal'))
+        
+        forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1990, 2014, "")
+        forecastTotaalselect$soort   = "Totaal geselecteerde ingeschreven studenten"
+        
+        SIForecastBaseplot <- SIForecastBaseplot +
+         geom_line(data=forecastTotaalselect, aes(y=aantal, 
+                                                  group=soort,
+                                                  color="gray48"),color="gray48") + 
+         geom_point(data=forecastTotaalselect, aes(y=aantal, 
+                                                   group=soort,
+                                                   color="gray48"),color="gray48") +
+         geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
+                   aes(y=fitted, group=soort, color="gray48")) +
          
-         totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
-                                                  selectInput = input$StudentenIngeschreven_SelectStudyImp, 
-                                                  studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
-                                                  filterParams= c("ondCode",'jaartal'))
-         
-         forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1990, 2014, "")
-         forecastTotaalselect$soort   = "Totaal geselecteerde ingeschreven studenten"
-         
-         SIForecastBaseplot <- SIForecastBaseplot +
-           geom_line(data=forecastTotaalselect, aes(y=aantal, 
-                                                    group=soort,
-                                                    color="gray48"),color="gray48") + 
-           geom_point(data=forecastTotaalselect, aes(y=aantal, 
-                                                     group=soort,
-                                                     color="gray48"),color="gray48") +
-           geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
-                     aes(y=fitted, group=soort, color="gray48")) +
-           
-           geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
-           geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)#+
-         #labs(color = "Totaallijn")
-         
-         scmOptionsList$values <- c("gray48",scmOptionsList$values)
-         scmOptionsList$breaks <- c("gray48", scmOptionsList$breaks)
-         scmOptionsList$labels <- c("Totaallijn geselecteerde",scmOptionsList$labels)
-       }
-     }
+         geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
+         geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)#+
+        #labs(color = "Totaallijn")
+        
+        scmOptionsList$values <- c("gray48",scmOptionsList$values)
+        scmOptionsList$breaks <- c("gray48", scmOptionsList$breaks)
+        scmOptionsList$labels <- c("Totaallijn geselecteerde",scmOptionsList$labels)
+      }
+    }
      
     #alleen totaal
     if (input$StudentenIngeschreven_Totaal == TRUE ){

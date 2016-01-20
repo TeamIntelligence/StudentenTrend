@@ -247,15 +247,59 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       data <- studenten_gediplomeerden
     }
     
+    #scale_color_manual options
+    scmOptionsList.names <- c("values", "breaks", "labels")
+    scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names)
+    
+    scmOptionsList$values <- NULL
+    scmOptionsList$breaks <- NULL
+    scmOptionsList$labels <- NULL
+    
     SGForecastBaseplot <- ggplot(StudentenGediplomeerden_forecastSub, aes(x=jaartal)) +
-      xlab("Jaar") + 
-      ylab("Aantal gediplomeerden") +
       ggtitle("Aantal gediplomeerden per studiesector") +
-      geom_line(linetype="dashed", size=1,
-                aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
-      geom_line(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
-      geom_point(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
-      scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam), name = "Studiesector")
+      xlab("Jaar") + 
+      ylab("Aantal gediplomeerden") 
+      # scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam), name = "Studiesector")
+    
+    if (length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
+      
+      SGForecastBaseplot <- SGForecastBaseplot+
+        geom_line(linetype="dashed", size=1,
+                  aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
+        geom_line(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
+        geom_point(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))
+      
+      scmOptionsList$values <- c(scmOptionsList$values, GetColors(StudentenGediplomeerden_forecastSub$iscedCode.iscedNaam))
+      scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(StudentenGediplomeerden_forecastSub$iscedCode.iscedNaam))
+      scmOptionsList$labels <- c(scmOptionsList$labels, unique(StudentenGediplomeerden_forecastSub$iscedCode.iscedNaam))
+      
+      if (input$StudentenGediplomeerden_TotaalSelect == TRUE){
+        
+        totaalaantalselect <- TotaalAantalSelect(data = data,
+                                                 selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
+                                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                                 filterParams= c("ondCode",'jaartal',"diploma"))
+        
+        forecastTotaalselect       <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2013, "")
+        forecastTotaalselect$soort = "Totaal geselecteerde gediplomeerden"
+        
+        SGForecastBaseplot <- SGForecastBaseplot +
+          geom_line(data=forecastTotaalselect, aes(y=aantal, group=soort, color=soort), 
+                    color = "gray48") + 
+          geom_point(data=forecastTotaalselect, aes(y=aantal, group=soort, color=soort),
+                     color = "gray48") +
+          geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
+                    aes(y=fitted, group=soort, color=soort), 
+                    color = "gray48") +
+          geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
+          geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
+        
+        scmOptionsList$values <- c("gray48", scmOptionsList$values)
+        scmOptionsList$breaks <- c("gray48", scmOptionsList$breaks)
+        scmOptionsList$labels <- c("Totaallijn geselecteerde", scmOptionsList$labels)
+        
+      }
+    }
     
     if (input$StudentenGediplomeerden_Totaal == TRUE ){
       #totaallijn
@@ -276,31 +320,17 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                   aes(y=fitted, group=soort, color=soort), color = "black") + 
         geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
         geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
+      
+      scmOptionsList$values <- c("black", scmOptionsList$values)
+      scmOptionsList$breaks <- c("black", scmOptionsList$breaks)
+      scmOptionsList$labels <- c("Totaallijn", scmOptionsList$labels)
     }
     
-    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
-      #alleen select
-      totaalaantalselect <- TotaalAantalSelect(data = data,
-                                               selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
-                                               studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                               filterParams= c("ondCode",'jaartal',"diploma"))
-      forecastTotaalselect       <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2013, "")
-      forecastTotaalselect$soort = "Totaal geselecteerde gediplomeerden"
-      
-      SGForecastBaseplot <- SGForecastBaseplot +
-        geom_line(data=forecastTotaalselect, aes(y=aantal, group=soort, color=soort), 
-                  color = "gray48") + 
-        geom_point(data=forecastTotaalselect, aes(y=aantal, group=soort, color=soort),
-                   color = "gray48") +
-        geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), 
-                  color = "gray48") +
-        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
-        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
-    }
+   
     
     #Render de plot
-    SGForecastBaseplot
+    SGForecastBaseplot +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Studierichting")
   })
   
   observe({
