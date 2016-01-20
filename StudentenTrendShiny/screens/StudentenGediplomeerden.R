@@ -2,55 +2,55 @@ StudentenGediplomeerdenUI <- function(PageName){
   return(
     
     tabItem(tabName = PageName, 
-        # Page title
-        fluidRow(
-          box(width = 12, collapsible = T, title = "Gediplomeerde studenten", 
-              p("Op deze pagina vindt u het aantal gediplomeerde studenten per studiesector over de periode 1995 tot en met 2013. U kunt zelf kiezen welke studiesectoren u wilt weergeven. Daarnaast kunt u ook zelf een keuze maken tussen HBO en WO. Verder kan u ook een totaallijn weergeven van alle studies of een totaallijn van de studies die u geselecteerd hebt."),
-              p("De grafiek biedt inzicht hoeveel studenten elk jaar afstuderen binnen een bepaalde studiesector. Er kan vervolgens uit opgemaakt worden of er een tekort of een teveel zal zijn aan studenten binnen een bepaalde studiesector voor in het bedrijfsleven.")
+            # Page title
+            fluidRow(
+              box(width = 12, collapsible = T, title = "Gediplomeerde studenten", 
+                  p("Op deze pagina vindt u het aantal gediplomeerde studenten per studiesector over de periode 1995 tot en met 2013. U kunt zelf kiezen welke studiesectoren u wilt weergeven. Daarnaast kunt u ook zelf een keuze maken tussen HBO en WO. Verder kan u ook een totaallijn weergeven van alle studies of een totaallijn van de studies die u geselecteerd hebt."),
+                  p("De grafiek biedt inzicht hoeveel studenten elk jaar afstuderen binnen een bepaalde studiesector. Er kan vervolgens uit opgemaakt worden of er een tekort of een teveel zal zijn aan studenten binnen een bepaalde studiesector voor in het bedrijfsleven.")
               ),
-          box(width=4, height = 170,
-              selectInput("StudentenGediplomeerden_SelectStudyImp",
-                          "Selecteer een of meerdere studiesectoren om weer te geven:",
-                          choices = studenten_gediplomeerden$iscedCode.iscedNaam,
-                          multiple = TRUE,
-                          selectize = TRUE
+              box(width=4, height = 170,
+                  selectInput("StudentenGediplomeerden_SelectStudyImp",
+                              "Selecteer een of meerdere studiesectoren om weer te geven:",
+                              choices = studenten_gediplomeerden$iscedCode.iscedNaam,
+                              multiple = TRUE,
+                              selectize = TRUE
+                  ),
+                  checkboxInput("StudentenGediplomeerden_AlleStudies",
+                                "Selecteer alle studies"
+                  ),
+                  #Hoogte handmatig aanpassen van alle select inputs
+                  tags$style(type='text/css',".selectize-input { height: 59px; overflow: auto;}")
               ),
-              checkboxInput("StudentenGediplomeerden_AlleStudies",
-                            "Selecteer alle studies"
+              box(width=4, height = 170,
+                  radioButtons("StudentenGediplomeerden_StudieNiveau",
+                               "Studie Niveau", 
+                               choices = list("HBO" = "HBO", 
+                                              "WO Bachelor"  = "WOB",
+                                              "WO Master" = "WOM",
+                                              "HBO en WO Master" = "HBOWO")
+                  )
               ),
-            #Hoogte handmatig aanpassen van alle select inputs
-           tags$style(type='text/css',".selectize-input { height: 59px; overflow: auto;}")
-          ),
-          box(width=4, height = 170,
-            radioButtons("StudentenGediplomeerden_StudieNiveau",
-                         "Studie Niveau", 
-                         choices = list("HBO" = "HBO", 
-                                        "WO Bachelor"  = "WOB",
-                                        "WO Master" = "WOM",
-                                        "HBO en WO Master" = "HBOWO")
-            )
-          ),
-          box(width=4, height = 170,
-              checkboxInput("StudentenGediplomeerden_TotaalSelect",
-                            "Totaal lijn weergeven van de geselecteerde studies"
+              box(width=4, height = 170,
+                  checkboxInput("StudentenGediplomeerden_TotaalSelect",
+                                "Totaal lijn weergeven van de geselecteerde studies"
+                  ),
+                  checkboxInput("StudentenGediplomeerden_Totaal",
+                                "Totaal lijn weergeven"
+                  )
               ),
-              checkboxInput("StudentenGediplomeerden_Totaal",
-                            "Totaal lijn weergeven"
-              )
-          ),
               
-          tabBox(width=12, height=550, 
-                 tabPanel("Huidige data",
-                          box(width=5, plotOutput("DiploPlot", height=450)),
-                          box(width=7, plotOutput("DiploBarPlot", height=450))
-                 ),
-                 tabPanel("Voorspelling",
-                          box(width=12,plotOutput("DiploVoorspellingPlot", height = 450))
-                 )
-          )
-        )
-      )
+              tabBox(width=12, height=550, 
+                     tabPanel("Huidige data",
+                              box(width=5, plotlyOutput("DiploPlot", height=450)),
+                              box(width=7, plotOutput("DiploBarPlot", height=450))
+                     ),
+                     tabPanel("Voorspelling",
+                              box(width=12,plotOutput("DiploVoorspellingPlot", height = 450))
+                     )
+              )
+            )
     )
+  )
 }
 
 StudentenGediplomeerdenServer <- function(input, output, session){
@@ -58,16 +58,16 @@ StudentenGediplomeerdenServer <- function(input, output, session){
   #######################
   ## NORMALE LINE PLOT ##
   #######################
-  output$DiploPlot <- renderPlot({
+  output$DiploPlot <- renderPlotly({
     #HBO BACH en WO MAST
     HWSet <- studenten_gediplomeerden[(studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor") | (studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master"),] 
     
     #data aanpassen nav keuzes gebruiker
     StudentenGediplomeerden_StudieSub <- switch (input$StudentenGediplomeerden_StudieNiveau,
-                     "HBO" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor",] ,
-                     "WOB" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Bachelor",],
-                     "WOM"= studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master",],
-                     "HBOWO" = aggregate(HWSet$aantal, by=list(iscedNaam=HWSet$iscedCode.iscedNaam, jaartal=HWSet$jaartal), FUN=sum)
+                                                 "HBO" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor",] ,
+                                                 "WOB" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Bachelor",],
+                                                 "WOM"= studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master",],
+                                                 "HBOWO" = aggregate(HWSet$aantal, by=list(iscedNaam=HWSet$iscedCode.iscedNaam, jaartal=HWSet$jaartal), FUN=sum)
     )
     
     #namen kolomtitels van de nieuwe gevormde data aanpassen
@@ -77,7 +77,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     
     StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,]
     PlotTitle <- "Aantal gediplomeerde studenten \nper jaar verdeeld per studie"
-      
+    
     if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       data <- HWSet
     } else {
@@ -93,7 +93,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       xlab("Jaar") +  
       ylab("Aantal studenten") + 
       ggtitle(PlotTitle) +
-      geom_line(data=StudentenGediplomeerden_StudieSub, 
+      geom_line(data=StudentenGediplomeerden_StudieSub, size = -1,
                 aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) + 
       geom_point(data=StudentenGediplomeerden_StudieSub,
                  aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
@@ -103,7 +103,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     #Totaal lijn toevoegen
     if (input$StudentenGediplomeerden_Totaal == TRUE ){
       SGLineBaseplot <- SGLineBaseplot +
-        geom_line(data=totaalaantal, 
+        geom_line(data=totaalaantal, size = -1,
                   aes(y=aantal, group=ondCode, color=ondCode), 
                   color = "black") + 
         geom_point(data=totaalaantal, 
@@ -117,9 +117,9 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                                selectInput = input$StudentenGediplomeerden_SelectStudyImp,
                                                studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
                                                filterParams= c("ondCode",'jaartal',"diploma"))
-
+      
       SGLineBaseplot <- SGLineBaseplot +
-        geom_line(data=totaalaantalselect, 
+        geom_line(data=totaalaantalselect, size = -1, 
                   aes(y=aantal, group=ondCode, color=ondCode),
                   color = "gray48") + 
         geom_point(data=totaalaantalselect,
@@ -128,7 +128,11 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     }
     
     #Render de plot
-    SGLineBaseplot 
+    if( length(input$StudentenGediplomeerden_SelectStudyImp) != 0) {
+      PrintGGPlotly(SGLineBaseplot)
+    } else {
+      return(SGLineBaseplot)
+    }
   })
   
   ######################
@@ -140,10 +144,10 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     
     #data aanpassen nav keuzes gebruiker
     StudentenGediplomeerden_StudieBarSub <- switch (input$StudentenGediplomeerden_StudieNiveau,
-                                                 "HBO" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor",] ,
-                                                 "WOB" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Bachelor",],
-                                                 "WOM"= studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master",],
-                                                 "HBOWO" = aggregate(HWBarSet$aantal, by=list(iscedNaam=HWBarSet$iscedCode.iscedNaam, jaartal=HWBarSet$jaartal), FUN=sum)
+                                                    "HBO" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor",] ,
+                                                    "WOB" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Bachelor",],
+                                                    "WOM"= studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master",],
+                                                    "HBOWO" = aggregate(HWBarSet$aantal, by=list(iscedNaam=HWBarSet$iscedCode.iscedNaam, jaartal=HWBarSet$jaartal), FUN=sum)
     )
     
     #namen kolomtitels van de nieuwe gevormde data aanpassen
@@ -158,10 +162,6 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       data <- studenten_gediplomeerden
     }
     
-    totaalaantal <- TotaalAantal(data = data, 
-                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                 filterParams= c("ondCode",'jaartal',"diploma"))
-    
     
     SGBarBaseplot <-  ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
       xlab("Jaar") +  
@@ -175,6 +175,9 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names)
     
     if (input$StudentenGediplomeerden_Totaal == TRUE ){
+      totaalaantal <- TotaalAantal(data = data, 
+                                   studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                   filterParams= c("ondCode",'jaartal',"diploma"))
       
       SGBarBaseplot <- SGBarBaseplot +
         geom_line(data=totaalaantal, 
@@ -218,7 +221,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
   output$DiploVoorspellingPlot <- renderPlot({
     #HBO BACH en WO MAST
     HWSet <- studenten_gediplomeerden[(studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor") | (studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master"),] 
-
+    
     #data aanpassen nav keuzes gebruiker
     StudentenGediplomeerden_StudieSub <- switch (input$StudentenGediplomeerden_StudieNiveau,
                                                  "HBO" = studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor",] ,
@@ -226,7 +229,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                                  "WOM"= studenten_gediplomeerden[studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master",],
                                                  "HBOWO" = aggregate(HWSet$aantal, by=list(iscedNaam=HWSet$iscedCode.iscedNaam, jaartal=HWSet$jaartal), FUN=sum)
     )
-
+    
     #namen kolomtitels van de nieuwe gevormde data aanpassen
     if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       colnames(StudentenGediplomeerden_StudieSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
@@ -235,7 +238,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     #data aanpassen nav keuze gebruiker: studie(s)
     StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,]
     StudentenGediplomeerden_forecastSub <- createForecastSub(StudentenGediplomeerden_StudieSub, "aantal", "iscedCode.iscedNaam", 1995, 2013,"")
-
+    
     PlotTitle <- "Aantal gediplomeerde studenten \nper jaar verdeeld per studie"
     
     if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
@@ -244,13 +247,6 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       data <- studenten_gediplomeerden
     }
     
-    #totaallijn
-    totaalaantal <- TotaalAantal(data = data,
-                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                 filterParams= c("ondCode",'jaartal',"diploma"))
-    forecastTotaal         <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1995, 2013, "")
-    forecastTotaal$soort   = "Totaal gediplomeerden" 
-
     SGForecastBaseplot <- ggplot(StudentenGediplomeerden_forecastSub, aes(x=jaartal)) +
       xlab("Jaar") + 
       ylab("Aantal gediplomeerden") +
@@ -262,9 +258,14 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam), name = "Studiesector")
     
     if (input$StudentenGediplomeerden_Totaal == TRUE ){
-
-      SGForecastBaseplot +
-        #TOTAAL
+      #totaallijn
+      totaalaantal <- TotaalAantal(data = data,
+                                   studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                   filterParams= c("ondCode",'jaartal',"diploma"))
+      forecastTotaal         <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1995, 2013, "")
+      forecastTotaal$soort   = "Totaal gediplomeerden" 
+      
+      SGForecastBaseplot <- SGForecastBaseplot +
         geom_line(data=forecastTotaal, aes(y=aantal, 
                                            group=soort,
                                            color=soort), color = "black") + 
@@ -286,11 +287,11 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       forecastTotaalselect       <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2013, "")
       forecastTotaalselect$soort = "Totaal geselecteerde gediplomeerden"
       
-      SGForecastBaseplot +
+      SGForecastBaseplot <- SGForecastBaseplot +
         geom_line(data=forecastTotaalselect, aes(y=aantal, group=soort, color=soort), 
                   color = "gray48") + 
         geom_point(data=forecastTotaalselect, aes(y=aantal, group=soort, color=soort),
-                  color = "gray48") +
+                   color = "gray48") +
         geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
                   aes(y=fitted, group=soort, color=soort), 
                   color = "gray48") +
