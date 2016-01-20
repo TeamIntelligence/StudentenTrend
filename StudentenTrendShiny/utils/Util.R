@@ -147,6 +147,7 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
   return(totaalaantal)
 }
 
+# Make a plotly from a ggplot. Apply our defaults to this plotly
 PrintGGPlotly <- function(plot, ...) {
   params <- list(p=ggplotly(plot), hovermode = "closest", titlefont=GetDefaultTitleFont(), ...)
   return(
