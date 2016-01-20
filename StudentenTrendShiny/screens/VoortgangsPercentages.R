@@ -65,9 +65,9 @@ VoortgangsPercentagesServer <- function(input, output, session) {
       i = 1
       j = 1
       
-      HBOColRange <- c(5:11)
-      WOColRange <- c(12:18)
-      UitColRange <- c(19:26)
+      HBOColRange <- c(7:13)
+      WOColRange <- c(14:20)
+      UitColRange <- c(21:28)
       
       for(i in 1:nrow(data)){
         for (index in max(HBOColRange) : min(HBOColRange)){
