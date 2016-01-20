@@ -22,21 +22,12 @@ GetColors <- function(values){
     len <- 2
   }
   
-  customColorArray <- c("tan4", "tomato3",
-                        "violetred", "turquoise4", 
-                        "wheat3", "steelblue3", 
-                        "salmon", "orchid", 
-                        "orange4", "limegreen", 
-                        "olivedrab1", "lightgoldenrod2", 
-                        "orange", "hotpink",
-                        "indianred2", "khaki", 
-                        "lightblue", "lightblue4",
-                        "khaki4", "navyblue",
-                        "lightcoral", "aquamarine",
-                        "orchid4", "purple",
-                        "gold", "palegreen4",
-                        "seagreen1", "peru",
-                        "red", "yellow4")
+  customColorArray <- c("#8B5A2C", "#CD4F39", "#D14390", "#3C868C", "#CDBA96",
+                        "#4F94CD", "#EE7E71", "#DA70D6", "#8B5A19", "#6BCE35",
+                        "#BDF43F", "#EEDC82", "#F3A433", "#E965B2", "#EB6263",
+                        "#F0E68C", "#ADD8E6", "#68838B", "#8B864E", "#082180",
+                        "#ED7F80", "#7CF7D4", "#8B4789", "#A151F0", "#FCD733",
+                        "#548B53", "#7CF5A0", "#CD853F", "#E93F34", "#8B8C15")
   
   if (len<=length(customColorArray)){
     return(customColorArray[1:len])
