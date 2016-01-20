@@ -259,8 +259,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       ggtitle("Aantal gediplomeerden per studiesector") +
       xlab("Jaar") + 
       ylab("Aantal gediplomeerden") 
-      # scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam), name = "Studiesector")
-    
+
     if (length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
       
       SGForecastBaseplot <- SGForecastBaseplot+
@@ -289,15 +288,14 @@ StudentenGediplomeerdenServer <- function(input, output, session){
           geom_point(data=forecastTotaalselect, aes(y=aantal, group=soort, color=soort),
                      color = "gray48") +
           geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
-                    aes(y=fitted, group=soort, color=soort), 
-                    color = "gray48") +
+                    aes(y=fitted, group=soort, color=soort)) +
           geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
           geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
         
         scmOptionsList$values <- c("gray48", scmOptionsList$values)
         scmOptionsList$breaks <- c("gray48", scmOptionsList$breaks)
         scmOptionsList$labels <- c("Totaallijn geselecteerde", scmOptionsList$labels)
-        
+
       }
     }
     
@@ -317,7 +315,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                                             group=soort,
                                             color=soort), color = "black") +
         geom_line(data=forecastTotaal, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), color = "black") + 
+                  aes(y=fitted, group=soort, color=soort)) + 
         geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
         geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
       
@@ -325,8 +323,6 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       scmOptionsList$breaks <- c("black", scmOptionsList$breaks)
       scmOptionsList$labels <- c("Totaallijn", scmOptionsList$labels)
     }
-    
-   
     
     #Render de plot
     SGForecastBaseplot +

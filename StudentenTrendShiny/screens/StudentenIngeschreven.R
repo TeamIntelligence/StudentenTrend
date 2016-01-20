@@ -249,7 +249,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
        
       SIForecastBaseplot <- SIForecastBaseplot +
         geom_line(linetype="dashed", size=1,
-                 aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
+                  aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
         geom_line(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))+
         geom_point(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))
        
@@ -268,12 +268,10 @@ StudentenIngeschrevenServer <- function(input, output, session){
         forecastTotaalselect$soort   = "Totaal geselecteerde ingeschreven studenten"
         
         SIForecastBaseplot <- SIForecastBaseplot +
-         geom_line(data=forecastTotaalselect, aes(y=aantal, 
-                                                  group=soort,
-                                                  color="gray48"),color="gray48") + 
-         geom_point(data=forecastTotaalselect, aes(y=aantal, 
-                                                   group=soort,
-                                                   color="gray48"),color="gray48") +
+         geom_line(data=forecastTotaalselect, aes(y=aantal, group=soort, color="gray48"),
+                   color="gray48") + 
+         geom_point(data=forecastTotaalselect, aes(y=aantal, group=soort, color="gray48"), 
+                    color="gray48") +
          geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
                    aes(y=fitted, group=soort, color="gray48")) +
          
@@ -301,8 +299,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
                   aes(y=fitted, group=soort, color="black")) + 
         geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
         geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
-        #labs(color = "Totaallijn")
-      
+
       scmOptionsList$values <- c("black",scmOptionsList$values)
       scmOptionsList$breaks <- c("black",scmOptionsList$breaks)
       scmOptionsList$labels <- c("Totaallijn",scmOptionsList$labels)
