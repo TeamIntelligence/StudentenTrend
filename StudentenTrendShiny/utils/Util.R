@@ -58,6 +58,7 @@ TotaalAantalSelect <- function(data, selectInput, studieNiveauInput = NULL, filt
   #Totaal berekenen
   totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=filterByList, FUN=sum)
   colnames(totaalaantalselect)<-append(filterParams, "aantal")
+  totaalaantalselect$soort <- "Totaal geselecteerd"
   
   if (!is.null(studieNiveauInput)){
     
@@ -106,6 +107,7 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
   #Totaal berekenen
   totaalaantal <- aggregate(totaalaantal$aantal, by=filterByList, FUN=sum)
   colnames(totaalaantal)<-append(filterParams, "aantal")
+  totaalaantal$soort <- "Totaal aantal"
   
   if (!is.null(studieNiveauInput)){
     
@@ -125,22 +127,22 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
     if (studieNiveauInput == "HBOWO"){
       colnames(totaalaantal)<-c("jaartal","aantal")
       if(isGedpl){
-        totaalaantal$ondCode = "Totaal aantal HBO Bachelor en WO Master studies"
+        totaalaantal$soort = "Totaal aantal HBO Bachelor en WO Master studies"
       } else{
-        totaalaantal$ondCode = "Totaal aantal HBO en WO studies"
+        totaalaantal$soort = "Totaal aantal HBO en WO studies"
       }
     }
     if (studieNiveauInput == "HBO"){
-      totaalaantal$ondCode = "Totaal aantal HBO studies"
+      totaalaantal$soort = "Totaal aantal HBO studies"
     }
     if (studieNiveauInput == "WOB"){
-      totaalaantal$ondCode = "Totaal aantal WO Bachelor studies"
+      totaalaantal$soort = "Totaal aantal WO Bachelor studies"
     }
     if (studieNiveauInput == "WOM"){
-      totaalaantal$ondCode = "Totaal aantal WO Master studies"
+      totaalaantal$soort = "Totaal aantal WO Master studies"
     }
     if (studieNiveauInput == "WO"){
-      totaalaantal$ondCode = "Totaal aantal WO studies"
+      totaalaantal$soort = "Totaal aantal WO studies"
     }
   }
   
