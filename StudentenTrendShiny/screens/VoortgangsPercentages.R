@@ -61,13 +61,19 @@ VoortgangsPercentagesServer <- function(input, output, session) {
     }
     
     morphSet <- function(dataIn){
-      data <- studievoortgang
+      data <- dataIn
       i = 1
       j = 1
       
-      HBOColRange <- c(7:13)
-      WOColRange <- c(14:20)
-      UitColRange <- c(21:28)
+      for(i in 1:length(names(data))){
+        print(names(data)[i])
+        if(length(grep("hbo", names(data)[i]) > 0)){
+          HBOColRange <- c(i:(i+6))
+          WOColRange <- c((i+7):(i+13))
+          UitColRange <- c((i+14):(i+21))
+          break
+        }
+      }
       
       for(i in 1:nrow(data)){
         for (index in max(HBOColRange) : min(HBOColRange)){
@@ -113,7 +119,6 @@ VoortgangsPercentagesServer <- function(input, output, session) {
 
       if(input$VoortgangsPercentages_check == "morphSet"){
         svSet <- morphedSet
-        
         yLim <- 100
         
       } else {
