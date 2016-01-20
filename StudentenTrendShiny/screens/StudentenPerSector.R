@@ -184,7 +184,7 @@ StudentenPerSectorServer <- function(input, output, session) {
         geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
         geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
     }
-    if (input$StudentenEerstejaars_Totaalselect == TRUE ){
+    if (input$StudentenEerstejaars_Totaalselect == TRUE && length(input$StudentenPerSector_selectStudyImp) != 0){
       #alleen select
       totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
                                                selectInput = input$StudentenPerSector_selectStudyImp, 
