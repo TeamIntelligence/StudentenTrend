@@ -147,7 +147,7 @@ VoortgangsPercentagesServer <- function(input, output, session) {
         xlab("Sector") +
         ylab("Percentage") +
         geom_bar(stat="identity") +
-        scale_fill_manual(values=GetColors(svSub$sector),name="Opleidings Sector") +
+        scale_fill_manual(values=GetColors(svSub$sector),name="Studiesector") +
         coord_cartesian(ylim=c(0,yLim)) + 
         theme(axis.text.x=element_blank()) +
         ggtitle(plotTitle)
