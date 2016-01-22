@@ -11,12 +11,12 @@ StatVervuldeBanenUI <- function(PageName){
               tabBox(width=12, height=550, 
                      tabPanel("HBO",
                               h1("Chikwadraat"),
-                              p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal studenten dat binnen drie jaar aan een baan komt per studiesector voor sommige bedrijfssectoren erg groot. Daarom is er het vermoeden dat er tussen de verschillende studiesectoren geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd. "),
+                              p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal studenten dat binnen drie jaar aan een baan komt per studiesector voor sommige bedrijfssectoren erg groot. Daarom is er het vermoeden dat er tussen de studiesectoren en bedrijfssectoren geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd. "),
                               plotOutput("VervuldeBanen_HBO", height = 450)
                      ),
                      tabPanel("WO",
                               h1("Chikwadraat"),
-                              p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal studenten dat binnen drie jaar aan een baan komt per studiesector voor sommige bedrijfssectoren erg groot. Daarom is er het vermoeden dat er tussen de verschillende studiesectoren geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd. "),
+                              p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal studenten dat binnen drie jaar aan een baan komt per studiesector voor sommige bedrijfssectoren erg groot. Daarom is er het vermoeden dat er tussen de studiesectoren en bedrijfssectoren geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd. "),
                               plotOutput("VervuldeBanen_WO", height = 450)      
                      ) 
               )
@@ -33,12 +33,12 @@ StatVervuldeBanenServer <- function(input,output, session){
     dataHBO <- read.csv("data/Studenten_met_baan_HBO_2005.csv", sep = ";")
     ggplot(data = dataHBO, aes(x = Bedrijfssector)) +
       xlab("Bedrijfssector") +
-      ylab("Aantal") +
-      ggtitle("Aantal HBO gediplomeerden in 2005 per studiesector versus de bedrijfssector waarin ze binnen drie jaar aan een baan komen") +
-      geom_line(data = dataHBO, aes(y = Aantal,   
+      ylab("Percentage") +
+      ggtitle("Percentage HBO gediplomeerden in 2005 per studiesector versus de bedrijfssector waarin ze binnen drie jaar aan een baan komen") +
+      geom_line(data = dataHBO, aes(y = Percentage,   
                                     group = Studiesector,
                                     color = Studiesector)) + 
-      geom_point(data = dataHBO,aes(y = Aantal, 
+      geom_point(data = dataHBO,aes(y = Percentage, 
                                     group = Studiesector,
                                     color = Studiesector))+ 
       theme(axis.text.x=element_text(angle=-45, hjust = -0.005))
@@ -48,12 +48,12 @@ StatVervuldeBanenServer <- function(input,output, session){
     dataWO <- read.csv("data/Studenten_met_baan_WO_2005.csv", sep = ";")
     ggplot(data = dataWO, aes(x = Bedrijfssector)) +
       xlab("Bedrijfssector") +
-      ylab("Aantal") +
-      ggtitle("Aantal WO gediplomeerden in 2005 per studiesector versus de bedrijfssector waarin ze binnen drie jaar aan een baan komen") +
-      geom_line(data = dataWO, aes(y = Aantal,   
+      ylab("Percentage") +
+      ggtitle("Percentage WO gediplomeerden in 2005 per studiesector versus de bedrijfssector waarin ze binnen drie jaar aan een baan komen") +
+      geom_line(data = dataWO, aes(y = Percentage,   
                                    group = Studiesector,
                                    color = Studiesector)) + 
-      geom_point(data = dataWO,aes(y = Aantal, 
+      geom_point(data = dataWO,aes(y = Percentage, 
                                    group = Studiesector,
                                    color = Studiesector)) +
       theme(axis.text.x=element_text(angle=-45, hjust = -0.005))
