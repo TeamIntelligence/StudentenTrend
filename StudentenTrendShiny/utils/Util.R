@@ -45,9 +45,13 @@ CallServerFunction <- function(Page, ...) {
   }
 }
 
-TotaalAantalSelect <- function(data, selectInput, studieNiveauInput = NULL, filterParams) {
+TotaalAantalSelect <- function(data, selectInput = NULL, studieNiveauInput = NULL, filterParams) {
   ##keuze maken welke studies
-  totaalaantalselect <- data[data$iscedCode.iscedNaam %in% selectInput,]
+  if(!is.null(selectInput)) {
+    totaalaantalselect <- data[data$iscedCode.iscedNaam %in% selectInput,]
+  } else {
+    totaalaantalselect <- data
+  }
   
   filterByList <- list() # list creeeren met  jaartal en evt ondcode en diploma voor de aggregate totaal
   for(filterValue in filterParams) {
@@ -148,7 +152,7 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
   return(totaalaantal)
 }
 
-AddTotaalLine <- function(plot, data, colors, forecast=FALSE, ...) {
+AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, ...) {
   color_vector <- data$soort
   if(forecast) {
     color_vector <- "black"
@@ -166,8 +170,11 @@ AddTotaalLine <- function(plot, data, colors, forecast=FALSE, ...) {
     plot <- plot +
       geom_line(data=data, linetype="dashed", ...,
                 aes(y=fitted, group=soort, color=color_vector)) + 
-      geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
-      geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
+      geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="red"), alpha=.25) +
+      geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkred"), alpha=.25)
+    
+    fills$values <- c(fills$values, c("red", "darkred"))
+    fills$labels <- c(fills$labels, c("80% Betrouwbaarheidsinterval", "95% Betrouwbaarheidsinterval"))
   }
   
   colors$values <- c(colors$values, "black")
@@ -177,10 +184,10 @@ AddTotaalLine <- function(plot, data, colors, forecast=FALSE, ...) {
   plot <- plot +
     labs(color = "Totaallijn")
   
-  return(list(plot=plot, colors=colors))
+  return(list(plot=plot, colors=colors, fills=fills))
 }
 
-AddTotaalSelectLine <- function(plot, data, colors, forecast=FALSE, ...) {
+AddTotaalSelectLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, ...) {
   color_vector <- data$soort
   if(forecast) {
     color_vector <- "gray48"
@@ -198,8 +205,11 @@ AddTotaalSelectLine <- function(plot, data, colors, forecast=FALSE, ...) {
     plot <- plot +
       geom_line(data=data, linetype="dashed", ...,
                 aes(y=fitted, group=soort, color=color_vector)) + #Add   But this adds an bug in the legend
-      geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
-      geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
+      geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="blue"), alpha=.25) +
+      geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkblue"), alpha=.25)
+    
+    fills$values <- c(fills$values, c("blue", "darkblue"))
+    fills$labels <- c(fills$labels, c("80% Betrouwbaarheidsinterval", "95% Betrouwbaarheidsinterval"))
   }
   
   
@@ -210,7 +220,7 @@ AddTotaalSelectLine <- function(plot, data, colors, forecast=FALSE, ...) {
   plot <- plot +
     labs(color = "Totaallijn")
   
-  return(list(plot=plot, colors=colors))
+  return(list(plot=plot, colors=colors, fills=fills))
 }
 
 # Make a plotly from a ggplot. Apply our defaults to this plotly

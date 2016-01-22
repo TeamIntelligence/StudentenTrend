@@ -136,8 +136,8 @@ VoortgangsPercentagesServer <- function(input, output, session) {
       
       
       plotTitle <- switch(input$VoortgangsPercentages_voortgangType,
-                          "uitschrijf" = paste("Percentage van alle studenten dat uitgeschreven is na", input$VoortgangsPercentages_yearRangeSlider, "jaar"),
-                          "afgestudeerd" = paste("Percentage van alle studenten dat geslaagd is na", input$VoortgangsPercentages_yearRangeSlider, "jaar")
+                          "uitschrijf" = paste("Percentage van alle studenten dat uitgeschreven is binnen", input$VoortgangsPercentages_yearRangeSlider, "jaar"),
+                          "afgestudeerd" = paste("Percentage van alle studenten dat geslaagd is binnen", input$VoortgangsPercentages_yearRangeSlider, "jaar")
       )
       
       colnames(svSub) <- c("sector", "mean")
