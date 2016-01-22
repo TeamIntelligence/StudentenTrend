@@ -1,51 +1,51 @@
-Studiesector;Geslacht;Aantal
-Lerarenopleidingen;Man;3401
-Vrije kunsten en wetenschappen;Man;306
-Kunstonderwijs;Man;2808
-Talen, theologie, geschiedenis;Man;2197
-Sociale wetenschappen;Man;5394
-Journalistiek, documentatie;Man;242
-Bedrijfskunde, administratie;Man;16951
-Rechten;Man;2808
-Natuurwetenschappen;Man;111
-Biowetenschappen;Man;631
-Fysische wetenschappen;Man;1165
-Wiskunde, statistiek;Man;320
-Informatica;Man;4104
-Techniek, technische dienstverlening;Man;4624
-Industrie, procestechniek;Man;250
-Architectuur, bouwkunde;Man;3405
-Landbouw, bosbouw;Man;670
-Diergeneeskunde;Man;92
-Gezondheidszorg en welzijn;Man;4
-Gezondheidszorg;Man;5096
-Maatschappelijke dienstverlening;Man;1089
-Persoonlijke dienstverlening;Man;1627
-Vervoerswetenschappen, logistiek;Man;872
-Milieubescherming;Man;409
-Veiligheid;Man;380
-Lerarenopleidingen;Vrouw;12722
-Vrije kunsten en wetenschappen;Vrouw;497
-Kunstonderwijs;Vrouw;3369
-Talen, theologie, geschiedenis;Vrouw;3509
-Sociale wetenschappen;Vrouw;11974
-Journalistiek, documentatie;Vrouw;316
-Bedrijfskunde, administratie;Vrouw;11925
-Rechten;Vrouw;5387
-Natuurwetenschappen;Vrouw;66
-Biowetenschappen;Vrouw;932
-Fysische wetenschappen;Vrouw;367
-Wiskunde, statistiek;Vrouw;166
-Informatica;Vrouw;819
-Techniek, technische dienstverlening;Vrouw;776
-Industrie, procestechniek;Vrouw;494
-Architectuur, bouwkunde;Vrouw;1179
-Landbouw, bosbouw;Vrouw;616
-Diergeneeskunde;Vrouw;332
-Gezondheidszorg en welzijn;Vrouw;15
-Gezondheidszorg;Vrouw;13574
-Maatschappelijke dienstverlening;Vrouw;5119
-Persoonlijke dienstverlening;Vrouw;3210
-Vervoerswetenschappen, logistiek;Vrouw;252
-Milieubescherming;Vrouw;328
-Veiligheid;Vrouw;117
+Studiesector;Geslacht;Aantal;Percentage
+Lerarenopleidingen;Man;3401;5.768708868
+Vrije kunsten en wetenschappen;Man;306;0.519031142
+Kunstonderwijs;Man;2808;4.762874008
+Talen. theologie. geschiedenis;Man;2197;3.726507904
+Sociale wetenschappen;Man;5394;9.149196011
+Journalistiek. documentatie;Man;242;0.410475609
+Bedrijfskunde. administratie;Man;16951;28.75195061
+Rechten;Man;2808;4.762874008
+Natuurwetenschappen;Man;111;0.188276002
+Biowetenschappen;Man;631;1.070289708
+Fysische wetenschappen;Man;1165;1.976049936
+Wiskunde. statistiek;Man;320;0.542777665
+Informatica;Man;4104;6.96112355
+Techniek. technische dienstverlening;Man;4624;7.843137255
+Industrie. procestechniek;Man;250;0.424045051
+Architectuur. bouwkunde;Man;3405;5.775493588
+Landbouw. bosbouw;Man;670;1.136440735
+Diergeneeskunde;Man;92;0.156048579
+Gezondheidszorg en welzijn;Man;4;0.006784721
+Gezondheidszorg;Man;5096;8.64373431
+Maatschappelijke dienstverlening;Man;1089;1.84714024
+Persoonlijke dienstverlening;Man;1627;2.759685189
+Vervoerswetenschappen. logistiek;Man;872;1.479069136
+Milieubescherming;Man;409;0.693737703
+Veiligheid;Man;380;0.644548477
+Lerarenopleidingen;Vrouw;12722;16.29751092
+Vrije kunsten en wetenschappen;Vrouw;497;0.63668157
+Kunstonderwijs;Vrouw;3369;4.315855549
+Talen. theologie. geschiedenis;Vrouw;3509;4.49520247
+Sociale wetenschappen;Vrouw;11974;15.33928594
+Journalistiek. documentatie;Vrouw;316;0.404811622
+Bedrijfskunde. administratie;Vrouw;11925;15.27651452
+Rechten;Vrouw;5387;6.90101331
+Natuurwetenschappen;Vrouw;66;0.084549263
+Biowetenschappen;Vrouw;932;1.193938074
+Fysische wetenschappen;Vrouw;367;0.470145143
+Wiskunde. statistiek;Vrouw;166;0.212654206
+Informatica;Vrouw;819;1.049179488
+Techniek. technische dienstverlening;Vrouw;776;0.994094362
+Industrie. procestechniek;Vrouw;494;0.632838421
+Architectuur. bouwkunde;Vrouw;1179;1.510357285
+Landbouw. bosbouw;Vrouw;616;0.789126452
+Diergeneeskunde;Vrouw;332;0.425308413
+Gezondheidszorg en welzijn;Vrouw;15;0.019215742
+Gezondheidszorg;Vrouw;13574;17.38896504
+Maatschappelijke dienstverlening;Vrouw;5119;6.557692061
+Persoonlijke dienstverlening;Vrouw;3210;4.112168689
+Vervoerswetenschappen. logistiek;Vrouw;252;0.322824458
+Milieubescherming;Vrouw;328;0.420184215
+Veiligheid;Vrouw;117;0.149882784
