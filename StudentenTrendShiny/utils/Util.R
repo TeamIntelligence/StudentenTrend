@@ -45,7 +45,6 @@ CallServerFunction <- function(Page, ...) {
   }
 }
 
-
 TotaalAantalSelect <- function(data, selectInput, studieNiveauInput = NULL, filterParams) {
   ##keuze maken welke studies
   totaalaantalselect <- data[data$iscedCode.iscedNaam %in% selectInput,]
@@ -147,6 +146,71 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
   }
   
   return(totaalaantal)
+}
+
+AddTotaalLine <- function(plot, data, colors, forecast=FALSE, ...) {
+  color_vector <- data$soort
+  if(forecast) {
+    color_vector <- "black"
+  }
+  
+  data$color_vector <- color_vector
+  
+  plot <- plot +
+    geom_line(data=data, ...,
+              aes(y=aantal, group=soort, color=color_vector)) + 
+    geom_point(data=data, 
+               aes(y=aantal, group=soort, color=color_vector))
+  
+  if(forecast) {
+    plot <- plot +
+      geom_line(data=data, linetype="dashed", ...,
+                aes(y=fitted, group=soort, color=color_vector)) + 
+      geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
+      geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
+  }
+  
+  colors$values <- c(colors$values, "black")
+  colors$breaks <- c(colors$breaks, "black")
+  colors$labels <- c(colors$labels, "Totaallijn")
+  
+  plot <- plot +
+    labs(color = "Totaallijn")
+  
+  return(list(plot=plot, colors=colors))
+}
+
+AddTotaalSelectLine <- function(plot, data, colors, forecast=FALSE, ...) {
+  color_vector <- data$soort
+  if(forecast) {
+    color_vector <- "gray48"
+  }
+  
+  data$color_vector <- color_vector
+  
+  plot <- plot +
+    geom_line(data=data, ..., 
+              aes(y=aantal, group=soort, color=color_vector)) + 
+    geom_point(data=data,
+               aes(y=aantal, group=soort, color=color_vector))
+  
+  if(forecast) {
+    plot <- plot +
+      geom_line(data=data, linetype="dashed", ...,
+                aes(y=fitted, group=soort, color=color_vector)) + #Add   But this adds an bug in the legend
+      geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
+      geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
+  }
+  
+  
+  colors$values <- c(colors$values, "gray48")
+  colors$breaks <- c(colors$breaks, "gray48")
+  colors$labels <- c(colors$labels, "Totaallijn geselecteerde")
+  
+  plot <- plot +
+    labs(color = "Totaallijn")
+  
+  return(list(plot=plot, colors=colors))
 }
 
 # Make a plotly from a ggplot. Apply our defaults to this plotly

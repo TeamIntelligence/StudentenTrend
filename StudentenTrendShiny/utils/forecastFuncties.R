@@ -1,4 +1,4 @@
-createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE,DF=2){
+createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE,DF=2, groupCol='soort'){
   if(GROUPBY == "singleColumn"){
     timeSeries   <- ts(INPUTSET[[COUNTCOL]], start=START, end=END, frequency=1)
     
@@ -31,21 +31,17 @@ createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE,D
     for(serie in timeSeries){
       tryCatch({
         fits[[i]] <<- Arima(serie, order=c(DF,0,0),method="CSS")
-        # print("CHOSE CSS")
       }
       ,error = function(cond) {
         tryCatch({
           fits[[i]] <<- Arima(serie, order=c(DF,0,0), method="ML")
-          # print("CHOSE ML")
         }
         ,error = function(cond) {
           fits[[i]] <<- auto.arima(serie)
-          # print("CHOSE AUTO")
         })
       })
       i <- i + 1
     }
-    # print("Completed arima's")
     
     if(is.null(fits)) {
       fits <- get("fits", envir = .GlobalEnv)
@@ -61,6 +57,8 @@ createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE,D
   }
   
   mergedSub <- mergeForecastframe(INPUTSET, forecastData, GROUPBY, EXCLUDE)
+  mergedSub[[groupCol]] <- mergedSub[1, groupCol]
+  return(mergedSub)
 }
 
 funggcast <- function(dn,fcast,fitStart,fitDuration){ 
@@ -125,7 +123,6 @@ mergeForecastframe <- function(normalSet, forecastSet, sbiOrIsced, excludeYear){
       }
       tempDf[["date"]] <- format(tempDf[["date"]], "%Y")
       names(tempDf)[names(tempDf)=="date"] <- "jaartal"
-      # names(tempDf)[names(tempDf)=="fitted"] <- "aantal"
       newDf <- merge(newDf, tempDf, all=T)
     }
   }

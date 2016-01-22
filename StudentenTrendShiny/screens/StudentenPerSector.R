@@ -71,11 +71,7 @@ StudentenPerSectorServer <- function(input, output, session) {
                                                ,selectInput = StudentenPerSector_selectStudyImp
                                                ,filterParams= c("jaartal"))
       
-      plot <- plot + 
-        geom_line(data=totaalaantalselect, size = -1, 
-                  aes(y=aantal, group=soort, color=soort), color = "gray48") + 
-        geom_point(data=totaalaantalselect, 
-                   aes(y=aantal, group=soort, color=soort), color = "gray48")
+      plot <- AddTotaalSelectLine(plot=plot, data=totaalaantalselect, size=-1)
     }
     
     #Totaal berekenen
@@ -83,13 +79,7 @@ StudentenPerSectorServer <- function(input, output, session) {
       totaalaantal <- TotaalAantal(data          = svSub
                                    ,filterParams = c("jaartal"))
       
-      plot <- plot + 
-        geom_line(data=totaalaantal, size = -1, 
-                  aes(y=aantal, group=soort, color=soort),
-                  color = "black") + 
-        geom_point(data=totaalaantal, 
-                   aes(y=aantal, group=soort, color=soort),
-                   color = "black")
+      plot <- AddTotaalLine(plot=plot, data=totaalaantal, size=-1)
     }
     
     PrintGGPlotly(plot)
