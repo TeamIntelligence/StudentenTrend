@@ -45,10 +45,13 @@ CallServerFunction <- function(Page, ...) {
   }
 }
 
-
-TotaalAantalSelect <- function(data, selectInput, studieNiveauInput = NULL, filterParams) {
+TotaalAantalSelect <- function(data, selectInput = NULL, studieNiveauInput = NULL, filterParams) {
   ##keuze maken welke studies
-  totaalaantalselect <- data[data$iscedCode.iscedNaam %in% selectInput,]
+  if(!is.null(selectInput)) {
+    totaalaantalselect <- data[data$iscedCode.iscedNaam %in% selectInput,]
+  } else {
+    totaalaantalselect <- data
+  }
   
   filterByList <- list() # list creeeren met  jaartal en evt ondcode en diploma voor de aggregate totaal
   for(filterValue in filterParams) {
@@ -58,6 +61,7 @@ TotaalAantalSelect <- function(data, selectInput, studieNiveauInput = NULL, filt
   #Totaal berekenen
   totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=filterByList, FUN=sum)
   colnames(totaalaantalselect)<-append(filterParams, "aantal")
+  totaalaantalselect$soort <- "Totaal geselecteerd"
   
   if (!is.null(studieNiveauInput)){
     
@@ -106,6 +110,7 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
   #Totaal berekenen
   totaalaantal <- aggregate(totaalaantal$aantal, by=filterByList, FUN=sum)
   colnames(totaalaantal)<-append(filterParams, "aantal")
+  totaalaantal$soort <- "Totaal aantal"
   
   if (!is.null(studieNiveauInput)){
     
@@ -125,26 +130,97 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
     if (studieNiveauInput == "HBOWO"){
       colnames(totaalaantal)<-c("jaartal","aantal")
       if(isGedpl){
-        totaalaantal$ondCode = "Totaal aantal HBO Bachelor en WO Master studies"
+        totaalaantal$soort = "Totaal aantal HBO Bachelor en WO Master studies"
       } else{
-        totaalaantal$ondCode = "Totaal aantal HBO en WO studies"
+        totaalaantal$soort = "Totaal aantal HBO en WO studies"
       }
     }
     if (studieNiveauInput == "HBO"){
-      totaalaantal$ondCode = "Totaal aantal HBO studies"
+      totaalaantal$soort = "Totaal aantal HBO studies"
     }
     if (studieNiveauInput == "WOB"){
-      totaalaantal$ondCode = "Totaal aantal WO Bachelor studies"
+      totaalaantal$soort = "Totaal aantal WO Bachelor studies"
     }
     if (studieNiveauInput == "WOM"){
-      totaalaantal$ondCode = "Totaal aantal WO Master studies"
+      totaalaantal$soort = "Totaal aantal WO Master studies"
     }
     if (studieNiveauInput == "WO"){
-      totaalaantal$ondCode = "Totaal aantal WO studies"
+      totaalaantal$soort = "Totaal aantal WO studies"
     }
   }
   
   return(totaalaantal)
+}
+
+AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, ...) {
+  color_vector <- data$soort
+  if(forecast) {
+    color_vector <- "black"
+  }
+  
+  data$color_vector <- color_vector
+  
+  plot <- plot +
+    geom_line(data=data, ...,
+              aes(y=aantal, group=soort, color=color_vector)) + 
+    geom_point(data=data, 
+               aes(y=aantal, group=soort, color=color_vector))
+  
+  if(forecast) {
+    plot <- plot +
+      geom_line(data=data, linetype="dashed", ...,
+                aes(y=fitted, group=soort, color=color_vector)) + 
+      geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="red"), alpha=.25) +
+      geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkred"), alpha=.25)
+    
+    fills$values <- c(fills$values, c("red", "darkred"))
+    fills$labels <- c(fills$labels, c("80% Betrouwbaarheidsinterval", "95% Betrouwbaarheidsinterval"))
+  }
+  
+  colors$values <- c(colors$values, "black")
+  colors$breaks <- c(colors$breaks, "black")
+  colors$labels <- c(colors$labels, "Totaallijn")
+  
+  plot <- plot +
+    labs(color = "Totaallijn")
+  
+  return(list(plot=plot, colors=colors, fills=fills))
+}
+
+AddTotaalSelectLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, ...) {
+  color_vector <- data$soort
+  if(forecast) {
+    color_vector <- "gray48"
+  }
+  
+  data$color_vector <- color_vector
+  
+  plot <- plot +
+    geom_line(data=data, ..., 
+              aes(y=aantal, group=soort, color=color_vector)) + 
+    geom_point(data=data,
+               aes(y=aantal, group=soort, color=color_vector))
+  
+  if(forecast) {
+    plot <- plot +
+      geom_line(data=data, linetype="dashed", ...,
+                aes(y=fitted, group=soort, color=color_vector)) + #Add   But this adds an bug in the legend
+      geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="blue"), alpha=.25) +
+      geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkblue"), alpha=.25)
+    
+    fills$values <- c(fills$values, c("blue", "darkblue"))
+    fills$labels <- c(fills$labels, c("80% Betrouwbaarheidsinterval", "95% Betrouwbaarheidsinterval"))
+  }
+  
+  
+  colors$values <- c(colors$values, "gray48")
+  colors$breaks <- c(colors$breaks, "gray48")
+  colors$labels <- c(colors$labels, "Totaallijn geselecteerde")
+  
+  plot <- plot +
+    labs(color = "Totaallijn")
+  
+  return(list(plot=plot, colors=colors, fills=fills))
 }
 
 # Make a plotly from a ggplot. Apply our defaults to this plotly

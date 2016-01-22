@@ -136,8 +136,8 @@ VoortgangsPercentagesServer <- function(input, output, session) {
       
       
       plotTitle <- switch(input$VoortgangsPercentages_voortgangType,
-                          "uitschrijf" = paste("Percentage van alle studenten dat uitgeschreven is na", input$VoortgangsPercentages_yearRangeSlider, "jaar"),
-                          "afgestudeerd" = paste("Percentage van alle studenten dat geslaagd is na", input$VoortgangsPercentages_yearRangeSlider, "jaar")
+                          "uitschrijf" = paste("Percentage van alle studenten dat uitgeschreven is binnen", input$VoortgangsPercentages_yearRangeSlider, "jaar"),
+                          "afgestudeerd" = paste("Percentage van alle studenten dat geslaagd is binnen", input$VoortgangsPercentages_yearRangeSlider, "jaar")
       )
       
       colnames(svSub) <- c("sector", "mean")
@@ -147,7 +147,7 @@ VoortgangsPercentagesServer <- function(input, output, session) {
         xlab("Sector") +
         ylab("Percentage") +
         geom_bar(stat="identity") +
-        scale_fill_manual(values=GetColors(svSub$sector),name="Opleidings Sector") +
+        scale_fill_manual(values=GetColors(svSub$sector),name="Studiesector") +
         coord_cartesian(ylim=c(0,yLim)) + 
         theme(axis.text.x=element_blank()) +
         ggtitle(plotTitle)

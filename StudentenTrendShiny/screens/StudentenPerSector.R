@@ -49,167 +49,196 @@ StudentenPerSectorServer <- function(input, output, session) {
     svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
     PlotTitle <- "Aantal eerstejaarsstudenten per jaar verdeeld per studie"
     
-    #plotten
     plot <- ggplot(svSub, aes(x=jaartal)) + 
       xlab("Jaar") +  
       ylab("Aantal studenten") + 
       ggtitle(PlotTitle) +
-      geom_line(data=svSub, size = -1, aes(y=aantal,     #lijn studies
-                                           group=iscedCode.iscedNaam,
-                                           color=iscedCode.iscedNaam)) + 
-      geom_point(data=svSub,aes(y=aantal, 
-                                group=iscedCode.iscedNaam,
-                                color=iscedCode.iscedNaam)) +
-      
-      scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam)) + 
       theme(legend.position="none")
     
+    #scale_color_manual options
+    scmOptionsList.names <- c("values", "breaks", "labels")
+    scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names)
     
-    #Totaal selectlijn
-    if (input$StudentenEerstejaars_Totaalselect == TRUE){ 
-      totaalaantalselect <- TotaalAantalSelect(data         = studievoortgang
-                                               ,selectInput = input$StudentenPerSector_selectStudyImp
-                                               ,filterParams= c("jaartal"))
+    scmOptionsList$values <- NULL
+    scmOptionsList$breaks <- NULL
+    scmOptionsList$labels <- NULL
+    
+    if(length(input$StudentenPerSector_selectStudyImp) != 0) {
+      plot <- plot +
+        geom_line(data=svSub, aes(y=aantal,     #lijn studies
+                                  group=iscedCode.iscedNaam,
+                                  color=iscedCode.iscedNaam), size = -1) + 
+        geom_point(data=svSub,aes(y=aantal, 
+                                  group=iscedCode.iscedNaam,
+                                  color=iscedCode.iscedNaam))
       
-      plot <- plot + geom_line(data=totaalaantalselect, aes(y=aantal), color = "gray48", size = -1) + 
-        geom_point(data=totaalaantalselect, aes(y=aantal), color = "gray48")
+      scmOptionsList$values <- c(scmOptionsList$values, GetColors(svSub$iscedCode.iscedNaam))
+      scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(svSub$iscedCode.iscedNaam))
+      scmOptionsList$labels <- c(scmOptionsList$labels, unique(svSub$iscedCode.iscedNaam))
     }
     
     #Totaal berekenen
     if(input$StudentenEerstejaars_Totaal == TRUE) {
-      totaalaantal <- TotaalAantal(data         = studievoortgang
+      totaalaantal <- TotaalAantal(data          = studievoortgang
                                    ,filterParams = c("jaartal"))
       
-      plot <- plot + geom_line(data=totaalaantal, aes(y=aantal)  
-                               ,color = "black", size = -1) + 
-        geom_point(data=totaalaantal, aes(y=aantal) 
-                   ,color = "black")
+      TotaalLine <- AddTotaalLine(plot=plot, 
+                                  data=totaalaantal, 
+                                  colors=scmOptionsList, 
+                                  size=-1)
+      
+      plot           <- TotaalLine$plot
+      scmOptionsList <- TotaalLine$colors
+    }
+    
+    #Totaal selectlijn
+    if (input$StudentenEerstejaars_Totaalselect == TRUE && length(input$StudentenPerSector_selectStudyImp) != 0){ 
+      totaalaantalselect <- TotaalAantalSelect(data          = svSub
+                                               ,filterParams = c("jaartal"))
+      
+      TotaalSelectLine <- AddTotaalSelectLine(plot=plot, 
+                                              data=totaalaantalselect, 
+                                              colors=scmOptionsList, 
+                                              size=-1)
+      
+      plot           <- TotaalSelectLine$plot
+      scmOptionsList <- TotaalSelectLine$colors
+    }
+    
+    plot <- plot +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
+    
+    #Render de plot
+    if(length(input$StudentenPerSector_selectStudyImp) != 0 || input$StudentenEerstejaars_Totaal == TRUE) {
+      PrintGGPlotly(plot)
+    } else {
+      return(plot)
     }
     
     PrintGGPlotly(plot)
   })
   
   output$StudentenPerSector_aantalStudentenBarPlot <- renderPlot({
-    svBarSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
+    svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
     PlotTitle <- "Aantal eerstejaarsstudenten per jaar verdeeld per studie"
     
-    plot <- ggplot(svBarSub, aes(x=jaartal)) + 
+    plot <- ggplot(svSub, aes(x=jaartal)) + 
       xlab("Jaar") +  
       ylab("Aantal studenten") + 
-      ggtitle(PlotTitle) +
-      geom_bar(data=svBarSub, stat = "identity",
-               aes(y=aantal,fill=iscedCode.iscedNaam)) +
-      scale_fill_manual(values=GetColors(svBarSub$iscedCode.iscedNaam), name="Studierichting") +
-      theme(plot.title = do.call(element_text, GetDefaultTitleFont()))
+      ggtitle(PlotTitle)
     
-    scale_color_manual_params <- list(values = c(), breaks = c(), labels = c())     
+    #scale_color_manual options
+    scmOptionsList.names <- c("values", "breaks", "labels")
+    scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names)
+    
+    scmOptionsList$values <- NULL
+    scmOptionsList$breaks <- NULL
+    scmOptionsList$labels <- NULL
+    
+    if(length(input$StudentenPerSector_selectStudyImp) != 0) {
+      plot <- plot +
+        geom_bar(stat = "identity", aes(y=aantal,fill=iscedCode.iscedNaam)) + 
+        scale_fill_manual(values=GetColors(svSub$iscedCode.iscedNaam), name="Studierichting")
+    }
     
     #Totaal berekenen
     if (input$StudentenEerstejaars_Totaal == TRUE){ 
-      totaalaantal <- TotaalAantal(data =studievoortgang, 
-                                   filterParams= c("jaartal"))
+      totaalaantal <- TotaalAantal(data = studievoortgang, filterParams= c("jaartal"))
+      TotaalLine   <- AddTotaalLine(plot = plot, data = totaalaantal, colors=scmOptionsList)
       
-      plot <- plot + geom_line(data=totaalaantal, aes(y=aantal  #totaal lijn
-                                                      ,color = "black")) + 
-        geom_point(data=totaalaantal, aes(y=aantal 
-                                          ,color = "black")) +
-        labs(color = "Totaallijn")
-      
-      scale_color_manual_params[["values"]] <- c(scale_color_manual_params[["values"]], "black")
-      scale_color_manual_params[["breaks"]] <- c(scale_color_manual_params[["breaks"]], "black")
-      scale_color_manual_params[["labels"]] <- c(scale_color_manual_params[["labels"]], "Totaallijn")
+      plot           <- TotaalLine$plot
+      scmOptionsList <- TotaalLine$colors
     }
     
     #select lijn
-    if(input$StudentenEerstejaars_Totaalselect == TRUE) {
-      totaalaantalselect <- TotaalAantalSelect(data =studievoortgang 
-                                               ,selectInput = input$StudentenPerSector_selectStudyImp 
-                                               ,filterParams= c("jaartal"))
+    if(input$StudentenEerstejaars_Totaalselect == TRUE && length(input$StudentenPerSector_selectStudyImp) != 0) {
+      totaalaantalselect <- TotaalAantalSelect(data = svSub, filterParams= c("jaartal"))
+      TotaalSelectLine   <- AddTotaalSelectLine(plot = plot, data = totaalaantalselect, colors=scmOptionsList)
       
-      plot <- plot + geom_line(data=totaalaantalselect, aes(y=aantal  #totaal select lijn
-                                                            ,color = "gray48")) + 
-        geom_point(data=totaalaantalselect, aes(y=aantal 
-                                                ,color = "gray48")) +
-        labs(color = "Totaallijn")
-      
-      scale_color_manual_params[["values"]] <- c(scale_color_manual_params[["values"]], "gray48")
-      scale_color_manual_params[["breaks"]] <- c(scale_color_manual_params[["breaks"]], "gray48")
-      scale_color_manual_params[["labels"]] <- c(scale_color_manual_params[["labels"]], "Totaallijn geselecteerde")
+      plot           <- TotaalSelectLine$plot
+      scmOptionsList <- TotaalSelectLine$colors
     }
     
-    if(input$StudentenEerstejaars_Totaal == TRUE || input$StudentenEerstejaars_Totaalselect == TRUE) {
-      plot <- plot + do.call(scale_color_manual, scale_color_manual_params)
-    }
-    
-    plot
+    plot +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
   })      
 
   #########################
   ## VOORSPELLINGEN PLOT ##
   #########################
   output$StudentenPerSector_aantalStudentenVoorspellingPlot <- renderPlot({
-    
     svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
     StudentenEerstejaars_forecastSub <- createForecastSub(svSub, "aantal", "iscedCode.iscedNaam", 1995, 2012,"")
     
-    #totaallijn
-    totaalaantal <- TotaalAantal(data =studievoortgang, 
-                                 filterParams= c("jaartal"))
-    forecastTotaal         <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1995, 2012, "")
-    forecastTotaal$soort   = "Totaal gediplomeerden" 
-
-    SEForecastBaseplot <- ggplot(StudentenEerstejaars_forecastSub, aes(x=jaartal)) +
+    plot <- ggplot(StudentenEerstejaars_forecastSub, aes(x=jaartal)) +
       xlab("Jaar") + 
       ylab("Aantal eerstejaars studenten") +
-      ggtitle("Aantal eerstejaars studenten per studiesector") +
-      geom_line(linetype="dashed", size=1,
-                aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
-      geom_line(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
-      geom_point(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
-      scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam), name = "Studiesector")
+      ggtitle("Aantal eerstejaars studenten per studiesector")
+
+    #scale_color_manual options
+    scmOptionsList.names <- c("values", "breaks", "labels")
+    scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names)
+    scmOptionsList$values <- NULL
+    scmOptionsList$breaks <- NULL
+    scmOptionsList$labels <- NULL
+    
+    sfillmanualOptionsList.names <- c("values", "breaks", "labels")
+    sfillmanualOptionsList <- setNames(vector("list", length(sfillmanualOptionsList.names )), sfillmanualOptionsList.names)
+    sfillmanualOptionsList$values <- NULL
+    sfillmanualOptionsList$breaks <- NULL
+    sfillmanualOptionsList$labels <- NULL
+    
+    if(length(input$StudentenPerSector_selectStudyImp) != 0) {
+      plot <- plot +
+        geom_line(linetype="dashed", size=1,
+                  aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
+        geom_line(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
+        geom_point(aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
+        scale_color_manual(values=GetColors(svSub$iscedCode.iscedNaam), name = "Studiesector") 
+      
+      scmOptionsList$values <- c(scmOptionsList$values, GetColors(StudentenEerstejaars_forecastSub$iscedCode.iscedNaam))
+      scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(StudentenEerstejaars_forecastSub$iscedCode.iscedNaam))
+      scmOptionsList$labels <- c(scmOptionsList$labels, unique(StudentenEerstejaars_forecastSub$iscedCode.iscedNaam))
+    }
     
     if (input$StudentenEerstejaars_Totaal == TRUE ){
+      #totaallijn
+      totaalaantal   <- TotaalAantal(data =studievoortgang, 
+                                     filterParams= c("jaartal"))
+      forecastTotaal <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1995, 2012, "")
+      TotaalLine     <- AddTotaalLine(plot=plot, 
+                                      data=forecastTotaal, 
+                                      colors=scmOptionsList, 
+                                      fills =sfillmanualOptionsList,
+                                      forecast=TRUE, size=1)
       
-      SEForecastBaseplot <- SEForecastBaseplot +
-        #TOTAAL
-        geom_line(data=forecastTotaal, 
-                  aes(y=aantal, group=soort, color=soort),
-                  color = "black") + 
-        geom_point(data=forecastTotaal, 
-                   aes(y=aantal, group=soort, color=soort), 
-                   color = "black") +
-        geom_line(data=forecastTotaal, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), 
-                  color = "black") + 
-        geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
-        geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
+      plot                   <- TotaalLine$plot
+      scmOptionsList         <- TotaalLine$colors
+      sfillmanualOptionsList <- TotaalLine$fills
     }
+    
     if (input$StudentenEerstejaars_Totaalselect == TRUE && length(input$StudentenPerSector_selectStudyImp) != 0){
       #alleen select
       totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
                                                selectInput = input$StudentenPerSector_selectStudyImp, 
                                                filterParams= c("jaartal"))
       
-      forecastTotaalselect         <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2012, "")
-      forecastTotaalselect$soort   = "Totaal eerstejaars studenten"
+      forecastTotaalselect  <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2012, "")
+      TotaalSelectLine      <- AddTotaalSelectLine(plot=plot, 
+                                                   data=forecastTotaalselect, 
+                                                   colors=scmOptionsList, 
+                                                   fills =sfillmanualOptionsList,
+                                                   forecast=TRUE, size=1)
       
-      SEForecastBaseplot <- SEForecastBaseplot +
-        #TOTAAL GESELECTEERD
-        geom_line(data=forecastTotaalselect, 
-                  aes(y=aantal, group=soort, color=soort),
-                  color = "gray48") + 
-        geom_point(data=forecastTotaalselect, 
-                   aes(y=aantal, group=soort, color=soort), 
-                   color = "gray48") +
-        geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort), 
-                  color = "gray48") +
-        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
-        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
+      plot                   <- TotaalSelectLine$plot
+      scmOptionsList         <- TotaalSelectLine$colors
+      sfillmanualOptionsList <- TotaalSelectLine$fills
     }
     
-    #Render plot
-    SEForecastBaseplot
+    #Render de plot
+    plot +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Studierichting") +
+      scale_fill_manual(values=sfillmanualOptionsList$values, labels=sfillmanualOptionsList$labels, name="Betrouwbaarheidsinterval")
   })
   
   observe({
@@ -218,6 +247,7 @@ StudentenPerSectorServer <- function(input, output, session) {
     updateCheckboxInput(session, "StudentenPerSector_AlleStudies", value = trueFalse)
     
   })
+  
   observeEvent(input$StudentenPerSector_AlleStudies, {
     trueFalse = length(input$StudentenPerSector_selectStudyImp) == length(unique(studievoortgang$iscedCode.iscedNaam))
     if(input$StudentenPerSector_AlleStudies == T && !trueFalse){
