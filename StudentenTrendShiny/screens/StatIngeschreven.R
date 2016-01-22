@@ -9,14 +9,14 @@ StatIngeschrevenUI <- function(PageName){
               ),
               
               tabBox(width=12, height=550, 
-                       tabPanel("HBO Bachelor en WO Bachelor",
+                       tabPanel("Studieniveau",
                                 h1("Chikwadraat"),
-                                p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal ingeschreven studenten voor HBO Bachelor en WO Bachelor voor sommige studiesectoren erg groot. Daarom is er het vermoeden dat er tussen HBO Bachelor en WO Bachelor studenten geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd."),
+                                p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal ingeschreven studenten per studieniveau voor sommige studiesectoren erg groot. Daarom is er het vermoeden dat er tussen studieniveau en studiesector geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd."),
                                 plotOutput("Ingeschreven_HBOB_WOB", height = 450)
                         ),
                         tabPanel("Geslacht",
                                  h1("Chikwadraat"),
-                                 p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal ingeschreven mannelijke en vrouwelijke studenten voor sommige studiesectoren erg groot. Daarom is er het vermoeden dat er tussen mannelijke en vrouwelijke studenten geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd. "),
+                                 p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal ingeschreven mannelijke en vrouwelijke studenten voor sommige studiesectoren erg groot. Daarom is er het vermoeden dat er tussen geslacht en studiesector geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd. "),
                                  plotOutput("Ingeschreven_Man_Vrouw", height = 450)      
                         ) 
               )
@@ -29,28 +29,28 @@ StatIngeschrevenUI <- function(PageName){
 StatIngeschrevenServer <- function(input,output, session){
   
   output$Ingeschreven_HBOB_WOB <- renderPlot({
-    DataIngeschreven <-read.csv("data/HO ingeschreven analyse csv.csv",header = T, sep = ";")
+    DataIngeschreven <-read.csv("data/HO ingeschreven analyse HBO WO csv.csv",header = T, sep = ";")
     
     ggplot(DataIngeschreven, aes(x=Studiesector, group = Studieniveau, colour = Studieniveau))+
       xlab("Studiesector") + 
-      ylab("Aantal studenten") +
-      ggtitle("Aantal HBO en WO Bachelor ingeschrevenen in 2014 per studieniveau versus studiesector") +
-      geom_line(aes(y=Aantal))+
-      geom_point(aes(y=Aantal))+
+      ylab("Percentage van het aantal studenten ten opzichte van het totaal aantal studenten per studieniveau") +
+      ggtitle("Percentage van het aantal ingeschreven in 2013 per studieniveau versus studiesector") +
+      geom_line(aes(y=Percentage))+
+      geom_point(aes(y=Percentage))+
       theme(axis.text.x=element_text(angle=-45, hjust = -0.005))
     
   })
-
+  
   output$Ingeschreven_Man_Vrouw <- renderPlot({
     DataIngeschrevenManVrouw <- read.csv("data/HO ingeschreven man vrouw analyse csv.csv",header = T, sep = ";")
-
+    
     ggplot(DataIngeschrevenManVrouw, aes(x=Studiesector, group = Geslacht, colour = Geslacht))+
       xlab("Studiesector") + 
-      ylab("Aantal studenten") +
-      ggtitle("Aantal man en vrouw ingeschrevenen in 2014 per studieniveau versus studiesector") +
-      geom_line(aes(y=Aantal))+
-      geom_point(aes(y=Aantal))+
+      ylab("Percentage van het aantal studenten ten opzichte van het totaal aantal studenten per studieniveau") +
+      ggtitle("Percentage van het aantal ingeschreven in 2013 per studieniveau versus studiesector") +
+      geom_line(aes(y=Percentage))+
+      geom_point(aes(y=Percentage))+
       theme(axis.text.x=element_text(angle=-45, hjust = -0.005))
   }) 
-    
+  
 }
