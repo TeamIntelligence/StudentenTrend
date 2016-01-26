@@ -45,8 +45,11 @@ StudentenPerSectorUI <- function(PageName) {
 #The Server function for the StudentenPerSector page
 StudentenPerSectorServer <- function(input, output, session) {
   
+  reac <- reactiveValues(redraw = TRUE, selections = isolate(input$StudentenPerSector_selectStudyImp))
+  
+  
   output$StudentenPerSector_aantalStudentenPlot <- renderPlotly({
-    svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
+    svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% reac$selections,]
     PlotTitle <- "Aantal eerstejaarsstudenten per jaar verdeeld per studie"
     
     plot <- ggplot(svSub, aes(x=jaartal)) + 
@@ -63,7 +66,7 @@ StudentenPerSectorServer <- function(input, output, session) {
     scmOptionsList$breaks <- NULL
     scmOptionsList$labels <- NULL
     
-    if(length(input$StudentenPerSector_selectStudyImp) != 0) {
+    if(length(reac$selections) != 0) {
       plot <- plot +
         geom_line(data=svSub, aes(y=aantal,     #lijn studies
                                   group=iscedCode.iscedNaam,
@@ -92,7 +95,7 @@ StudentenPerSectorServer <- function(input, output, session) {
     }
     
     #Totaal selectlijn
-    if (input$StudentenEerstejaars_Totaalselect == TRUE && length(input$StudentenPerSector_selectStudyImp) != 0){ 
+    if (input$StudentenEerstejaars_Totaalselect == TRUE && length(reac$selections) != 0){ 
       totaalaantalselect <- TotaalAantalSelect(data          = svSub
                                                ,filterParams = c("jaartal"))
       
@@ -109,7 +112,7 @@ StudentenPerSectorServer <- function(input, output, session) {
       scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
     
     #Render de plot
-    if(length(input$StudentenPerSector_selectStudyImp) != 0 || input$StudentenEerstejaars_Totaal == TRUE) {
+    if(length(reac$selections) != 0 || input$StudentenEerstejaars_Totaal == TRUE) {
       PrintGGPlotly(plot)
     } else {
       return(plot)
@@ -119,7 +122,7 @@ StudentenPerSectorServer <- function(input, output, session) {
   })
   
   output$StudentenPerSector_aantalStudentenBarPlot <- renderPlot({
-    svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
+    svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% reac$selections,]
     PlotTitle <- "Aantal eerstejaarsstudenten per jaar verdeeld per studie"
     
     plot <- ggplot(svSub, aes(x=jaartal)) + 
@@ -135,7 +138,7 @@ StudentenPerSectorServer <- function(input, output, session) {
     scmOptionsList$breaks <- NULL
     scmOptionsList$labels <- NULL
     
-    if(length(input$StudentenPerSector_selectStudyImp) != 0) {
+    if(length(reac$selections) != 0) {
       plot <- plot +
         geom_bar(stat = "identity", aes(y=aantal,fill=iscedCode.iscedNaam)) + 
         scale_fill_manual(values=GetColors(svSub$iscedCode.iscedNaam), name="Studierichting")
@@ -151,7 +154,7 @@ StudentenPerSectorServer <- function(input, output, session) {
     }
     
     #select lijn
-    if(input$StudentenEerstejaars_Totaalselect == TRUE && length(input$StudentenPerSector_selectStudyImp) != 0) {
+    if(input$StudentenEerstejaars_Totaalselect == TRUE && length(reac$selections) != 0) {
       totaalaantalselect <- TotaalAantalSelect(data = svSub, filterParams= c("jaartal"))
       TotaalSelectLine   <- AddTotaalSelectLine(plot = plot, data = totaalaantalselect, colors=scmOptionsList)
       
@@ -167,7 +170,7 @@ StudentenPerSectorServer <- function(input, output, session) {
   ## VOORSPELLINGEN PLOT ##
   #########################
   output$StudentenPerSector_aantalStudentenVoorspellingPlot <- renderPlot({
-    svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% input$StudentenPerSector_selectStudyImp,]
+    svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% reac$selections,]
     StudentenEerstejaars_forecastSub <- createForecastSub(svSub, "aantal", "iscedCode.iscedNaam", 1995, 2012,"")
     
     plot <- ggplot(StudentenEerstejaars_forecastSub, aes(x=jaartal)) +
@@ -188,7 +191,7 @@ StudentenPerSectorServer <- function(input, output, session) {
     sfillmanualOptionsList$breaks <- NULL
     sfillmanualOptionsList$labels <- NULL
     
-    if(length(input$StudentenPerSector_selectStudyImp) != 0) {
+    if(length(reac$selections) != 0) {
       plot <- plot +
         geom_line(linetype="dashed", size=1,
                   aes(y=fitted, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
@@ -217,10 +220,10 @@ StudentenPerSectorServer <- function(input, output, session) {
       sfillmanualOptionsList <- TotaalLine$fills
     }
     
-    if (input$StudentenEerstejaars_Totaalselect == TRUE && length(input$StudentenPerSector_selectStudyImp) != 0){
+    if (input$StudentenEerstejaars_Totaalselect == TRUE && length(reac$selections) != 0){
       #alleen select
       totaalaantalselect <- TotaalAantalSelect(data =studievoortgang, 
-                                               selectInput = input$StudentenPerSector_selectStudyImp, 
+                                               selectInput = reac$selections, 
                                                filterParams= c("jaartal"))
       
       forecastTotaalselect  <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1995, 2012, "")
@@ -256,4 +259,22 @@ StudentenPerSectorServer <- function(input, output, session) {
       )
     }
   })
+  
+  observe({
+    input$StudentenPerSector_selectStudyImp
+    
+    reac$redraw <- FALSE
+  })
+  
+  observe({
+    invalidateLater(500, session)
+    input$StudentenPerSector_selectStudyImp
+    input$redraw
+    if (isolate(reac$redraw)) {
+      reac$selections <- input$StudentenPerSector_selectStudyImp
+    } else {
+      isolate(reac$redraw <- TRUE)
+    }
+  })
+  
 }

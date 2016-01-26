@@ -52,6 +52,9 @@ StudentenIngeschrevenUI <- function(PageName){
 
 StudentenIngeschrevenServer <- function(input, output, session){
   
+  reac <- reactiveValues(redraw = TRUE, selections = isolate(input$StudentenIngeschreven_SelectStudyImp))
+  
+  
   #######################
   ## NORMALE LINE PLOT ##
   #######################
@@ -74,7 +77,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
     }
     
     #data aanpassen nav keuze gebruiker: studie(s)
-    siSub <- siSub[siSub$iscedCode.iscedNaam %in% input$StudentenIngeschreven_SelectStudyImp,]
+    siSub <- siSub[siSub$iscedCode.iscedNaam %in% reac$selections,]
     
     #plotten en titel laten afhangen
     plotTitle <- paste("Aantal ingeschreven bachelor studenten \nper jaar verdeeld per studie")
@@ -103,10 +106,10 @@ StudentenIngeschrevenServer <- function(input, output, session){
     }
     
     #Totaal geselecteerd lijn toevoegen
-    if (input$StudentenIngeschreven_Totaalselect == TRUE && length(input$StudentenIngeschreven_SelectStudyImp) != 0){
+    if (input$StudentenIngeschreven_Totaalselect == TRUE && length(reac$selections) != 0){
       
       totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
-                                               selectInput = input$StudentenIngeschreven_SelectStudyImp, 
+                                               selectInput = reac$selections, 
                                                studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
                                                filterParams= c("ondCode",'jaartal'))
       
@@ -145,7 +148,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
     } 
     
     #data aanpassen nav keuze gebruiker: studie(s)
-    siBarSub <- siBarSub[siBarSub$iscedCode.iscedNaam %in% input$StudentenIngeschreven_SelectStudyImp,]
+    siBarSub <- siBarSub[siBarSub$iscedCode.iscedNaam %in% reac$selections,]
     
     #plotten en titel laten afhangen
     plotTitle <- paste("Aantal ingeschreven bachelor studenten \nper jaar verdeeld per studie")
@@ -176,9 +179,9 @@ StudentenIngeschrevenServer <- function(input, output, session){
       scmOptionsList$labels <- c(scmOptionsList$labels, "Totaallijn")
     } 
     
-    if (input$StudentenIngeschreven_Totaalselect == TRUE && length(input$StudentenIngeschreven_SelectStudyImp) != 0){
+    if (input$StudentenIngeschreven_Totaalselect == TRUE && length(reac$selections) != 0){
       totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
-                                               selectInput = input$StudentenIngeschreven_SelectStudyImp, 
+                                               selectInput = reac$selections, 
                                                studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
                                                filterParams= c("ondCode",'jaartal'))
       
@@ -217,8 +220,8 @@ StudentenIngeschrevenServer <- function(input, output, session){
     }
     
     #data aanpassen nav keuze gebruiker: studie(s) en forecast maken
-    siSub<-siSub[siSub$iscedCode.iscedNaam %in% input$StudentenIngeschreven_SelectStudyImp,]
-#     if (is.null(input$StudentenIngeschreven_SelectStudyImp)==TRUE){
+    siSub<-siSub[siSub$iscedCode.iscedNaam %in% reac$selections,]
+#     if (is.null(reac$selections)==TRUE){
 #       StudentenIngeschreven_forecastSub<<-siSub
 #       }
 #     else{
@@ -245,7 +248,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
       ylab("Aantal ingeschreven studenten") +
       ggtitle("Aantal ingeschreven studenten per studiesector") 
 
-    if (length(input$StudentenIngeschreven_SelectStudyImp) != 0) {
+    if (length(reac$selections) != 0) {
        
       SIForecastBaseplot <- SIForecastBaseplot +
         geom_line(linetype="dashed", size=1,
@@ -260,7 +263,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
       if (input$StudentenIngeschreven_Totaalselect == TRUE){
         
         totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
-                                                selectInput = input$StudentenIngeschreven_SelectStudyImp, 
+                                                selectInput = reac$selections, 
                                                 studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
                                                 filterParams= c("ondCode",'jaartal'))
         
@@ -325,5 +328,23 @@ StudentenIngeschrevenServer <- function(input, output, session){
       )
     }
   })
+  
+  observe({
+    input$StudentenIngeschreven_SelectStudyImp
+    
+    reac$redraw <- FALSE
+  })
+  
+  observe({
+    invalidateLater(500, session)
+    input$StudentenIngeschreven_SelectStudyImp
+    input$redraw
+    if (isolate(reac$redraw)) {
+      reac$selections <- input$StudentenIngeschreven_SelectStudyImp
+    } else {
+      isolate(reac$redraw <- TRUE)
+    }
+  })
+  
 }   
   

@@ -54,6 +54,7 @@ StudentenGediplomeerdenUI <- function(PageName){
 }
 
 StudentenGediplomeerdenServer <- function(input, output, session){
+  reac <- reactiveValues(redraw = TRUE, selections = isolate(input$StudentenGediplomeerden_SelectStudyImp))
   
   #######################
   ## NORMALE LINE PLOT ##
@@ -75,7 +76,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       colnames(StudentenGediplomeerden_StudieSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
     }
     
-    StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,]
+    StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% reac$selections,]
     PlotTitle <- "Aantal gediplomeerde studenten \nper jaar verdeeld per studie"
     
     if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
@@ -97,7 +98,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       ylab("Aantal studenten") + 
       ggtitle(PlotTitle)
     
-    if(length(input$StudentenGediplomeerden_SelectStudyImp) != 0) {
+    if(length(reac$selections) != 0) {
       SGLineBaseplot <- SGLineBaseplot +
         geom_line(data=StudentenGediplomeerden_StudieSub, size = -1,
                   aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) + 
@@ -128,9 +129,9 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     }
     
     #alleen select
-    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
+    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
       totaalaantalselect <- TotaalAantalSelect(data = data,
-                                               selectInput = input$StudentenGediplomeerden_SelectStudyImp,
+                                               selectInput = reac$selections,
                                                studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
                                                filterParams= c("ondCode",'jaartal',"diploma"))
       
@@ -147,7 +148,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
     
     #Render de plot
-    if( length(input$StudentenGediplomeerden_SelectStudyImp) != 0) {
+    if( length(reac$selections) != 0) {
       PrintGGPlotly(SGLineBaseplot)
     } else {
       return(SGLineBaseplot)
@@ -173,7 +174,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       colnames(StudentenGediplomeerden_StudieBarSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
     }
-    StudentenGediplomeerden_StudieBarSub <- StudentenGediplomeerden_StudieBarSub[StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,]
+    StudentenGediplomeerden_StudieBarSub <- StudentenGediplomeerden_StudieBarSub[StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam %in% reac$selections,]
     
     if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       data <- HWBarSet
@@ -194,7 +195,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       ylab("Aantal studenten") + 
       ggtitle("Aantal gediplomeerde studenten")
     
-    if (length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
+    if (length(reac$selections) != 0){
       SGBarBaseplot <- SGBarBaseplot +
         geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
         scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studierichting")
@@ -211,9 +212,9 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       scmOptionsList <- TotaalLine$colors
     }
     
-    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
+    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
       totaalaantalselect <- TotaalAantalSelect(data = data,
-                                               selectInput = input$StudentenGediplomeerden_SelectStudyImp,
+                                               selectInput = reac$selections,
                                                studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
                                                filterParams= c("ondCode",'jaartal',"diploma"))
       
@@ -249,7 +250,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     }
     
     #data aanpassen nav keuze gebruiker: studie(s)
-    StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% input$StudentenGediplomeerden_SelectStudyImp,]
+    StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% reac$selections,]
     StudentenGediplomeerden_forecastSub <- createForecastSub(StudentenGediplomeerden_StudieSub, "aantal", "iscedCode.iscedNaam", 1995, 2013,"")
     
     PlotTitle <- "Aantal gediplomeerde studenten \nper jaar verdeeld per studie"
@@ -278,7 +279,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       xlab("Jaar") + 
       ylab("Aantal gediplomeerden") 
     
-    if (length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
+    if (length(reac$selections) != 0){
       
       SGForecastBaseplot <- SGForecastBaseplot+
         geom_line(linetype="dashed", size=1,
@@ -310,10 +311,10 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       
     }
     
-    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(input$StudentenGediplomeerden_SelectStudyImp) != 0){
+    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
       
       totaalaantalselect <- TotaalAantalSelect(data = data,
-                                               selectInput = input$StudentenGediplomeerden_SelectStudyImp, 
+                                               selectInput = reac$selections, 
                                                studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
                                                filterParams= c("ondCode",'jaartal',"diploma"))
       
@@ -349,4 +350,22 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       )
     }
   })
+  
+  observe({
+    input$StudentenGediplomeerden_SelectStudyImp
+    
+    reac$redraw <- FALSE
+  })
+  
+  observe({
+    invalidateLater(500, session)
+    input$StudentenGediplomeerden_SelectStudyImp
+    input$redraw
+    if (isolate(reac$redraw)) {
+      reac$selections <- input$StudentenGediplomeerden_SelectStudyImp
+    } else {
+      isolate(reac$redraw <- TRUE)
+    }
+  })
+  
 }  
