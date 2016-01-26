@@ -48,12 +48,15 @@ AantalVacaturesUI <- function(PageName){
 
 AantalVacaturesServer <- function(input,output, session){
   
+  reac <- reactiveValues(redraw = TRUE, selections = isolate(input$AantalVacatures_SelectImp))
+  
+  
   #######################
   ## NORMALE LINE PLOT ##
   #######################
   output$VacaPlot <- renderPlotly({
     #Data aanpassen nav keuze bedrijfssector
-    AantalVacatures_vacSub <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% input$AantalVacatures_SelectImp,]
+    AantalVacatures_vacSub <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% reac$selections,]
     
     plot <- ggplot(AantalVacatures_vacSub, aes(x=jaartal)) +
       xlab("Jaar") + 
@@ -65,7 +68,7 @@ AantalVacaturesServer <- function(input,output, session){
     scmOptionsList <- InitGGLegend()
     
     #Baseplot
-    if(length(input$AantalVacatures_SelectImp) != 0) {
+    if(length(reac$selections) != 0) {
       plot <- plot +
         geom_line(data=AantalVacatures_vacSub,
                   aes(y=aantal, group=sbiCode.sbiNaam, color=sbiCode.sbiNaam), size=-1) +
@@ -93,7 +96,7 @@ AantalVacaturesServer <- function(input,output, session){
     }
     
     #Als totaalselect lijn aan staat en er meer als 0 studies geselecteerd zijn
-    if (input$AantalVacatures_TotaalSelect == TRUE && length(input$AantalVacatures_SelectImp) != 0) { 
+    if (input$AantalVacatures_TotaalSelect == TRUE && length(reac$selections) != 0) { 
       totaalaantalselect <- TotaalAantalSelect(data = AantalVacatures_vacSub,
                                                filterParams= c("jaartal"))
       
@@ -112,7 +115,7 @@ AantalVacaturesServer <- function(input,output, session){
       scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
     
     #Render de plot
-    if( length(input$AantalVacatures_SelectImp) != 0 || input$AantalVacatures_Totaal == TRUE) {
+    if( length(reac$selections) != 0 || input$AantalVacatures_Totaal == TRUE) {
       PrintGGPlotly(plot)
     } else {
       return(plot)
@@ -124,7 +127,7 @@ AantalVacaturesServer <- function(input,output, session){
   ######################
   output$VacaBarPlot <- renderPlot({
     #Data aanpassen nav keuze bedrijfssector
-    AantalVacatures_vacBarSub <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% input$AantalVacatures_SelectImp,]
+    AantalVacatures_vacBarSub <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% reac$selections,]
     
     #scale_color_manual options
     scmOptionsList <- InitGGLegend()
@@ -134,7 +137,7 @@ AantalVacaturesServer <- function(input,output, session){
       ylab("Aantal vacatures") +
       ggtitle("Aantal vacatures per sector")
       
-    if(length(input$AantalVacatures_SelectImp) != 0) {
+    if(length(reac$selections) != 0) {
       plot <- plot +
         geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
         scale_fill_manual(values=GetColors(AantalVacatures_vacBarSub$sbiCode.sbiNaam), name = "Bedrijfssector")
@@ -153,7 +156,7 @@ AantalVacaturesServer <- function(input,output, session){
       scmOptionsList <- TotaalLine$colors
     } 
     
-    if (input$AantalVacatures_TotaalSelect == TRUE && length(input$AantalVacatures_SelectImp) != 0){ 
+    if (input$AantalVacatures_TotaalSelect == TRUE && length(reac$selections) != 0){ 
       totaalaantalselect <- TotaalAantalSelect(data = AantalVacatures_vacBarSub,
                                                filterParams= c("jaartal"))
       
@@ -176,7 +179,7 @@ AantalVacaturesServer <- function(input,output, session){
   output$VacaVoorspellingPlot <- renderPlot({
     
     #Data aanpassen nav keuze bedrijfssector
-    AantalVacatures_vacSub      <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% input$AantalVacatures_SelectImp,]
+    AantalVacatures_vacSub      <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% reac$selections,]
     aantalVacatures_forecastSub <- createForecastSub(AantalVacatures_vacSub, "aantal", "sbiCode.sbiNaam", 1997, 2014, 2015)
 
     #Totaal berekenen
@@ -188,7 +191,7 @@ AantalVacaturesServer <- function(input,output, session){
       ylab("Aantal vacatures") +
       ggtitle("Aantal vacatures per sector")
     
-    if(length(input$AantalVacatures_SelectImp) != 0) {
+    if(length(reac$selections) != 0) {
       plot <- plot +
         geom_line(linetype="dashed", size=1,
                   aes(y=fitted,
@@ -222,7 +225,7 @@ AantalVacaturesServer <- function(input,output, session){
       sfillmanualOptionsList <- TotaalLine$fills
     } 
     
-    if (input$AantalVacatures_TotaalSelect == TRUE && length(input$AantalVacatures_SelectImp) != 0) {
+    if (input$AantalVacatures_TotaalSelect == TRUE && length(reac$selections) != 0) {
       totaalaantalselect <- TotaalAantalSelect(data = aantalVacatures_forecastSub, 
                                                filterParams= c('jaartal'))
       forecastTotaalselect   <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1997, 2014, 2015)
@@ -254,6 +257,23 @@ AantalVacaturesServer <- function(input,output, session){
       updateSelectInput(session, "AantalVacatures_SelectImp",
                         selected = vacatures$sbiCode.sbiNaam
       )
+    }
+  })
+  
+  observe({
+    input$AantalVacatures_SelectImp
+    
+    reac$redraw <- FALSE
+  })
+  
+  observe({
+    invalidateLater(500, session)
+    input$AantalVacatures_SelectImp
+    input$redraw
+    if (isolate(reac$redraw)) {
+      reac$selections <- input$AantalVacatures_SelectImp
+    } else {
+      isolate(reac$redraw <- TRUE)
     }
   })
 }
