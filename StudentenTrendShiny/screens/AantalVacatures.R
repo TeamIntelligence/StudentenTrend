@@ -34,7 +34,7 @@ AantalVacaturesUI <- function(PageName){
         ),
         tabBox(width=12, height=550, 
           tabPanel("Huidige data",
-            box(width=5,plotOutput("VacaPlot", height = 450)),
+            box(width=5,plotlyOutput("VacaPlot", height = 450)),
             box(width=7,plotOutput("VacaBarPlot", height=450))
           ),
           tabPanel("Voorspelling",
@@ -51,117 +51,121 @@ AantalVacaturesServer <- function(input,output, session){
   #######################
   ## NORMALE LINE PLOT ##
   #######################
-  output$VacaPlot <- renderPlot({
-    
+  output$VacaPlot <- renderPlotly({
     #Data aanpassen nav keuze bedrijfssector
     AantalVacatures_vacSub <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% input$AantalVacatures_SelectImp,]
     
-    #Totaal set
-    totaalaantal <- aggregate(vacatures_jaartallen$aantal, by=list(jaartal=vacatures_jaartallen$jaartal), FUN=sum)
-    colnames(totaalaantal)<-c("jaartal","aantal") 
-    totaalaantal$soort = "Totale vacatures" 
-    
-    #Baseplot
-    AVLineBaseplot <- ggplot(AantalVacatures_vacSub, aes(x=jaartal)) +
+    plot <- ggplot(AantalVacatures_vacSub, aes(x=jaartal)) +
       xlab("Jaar") + 
       ylab("Aantal vacatures") +
       ggtitle("Aantal vacatures per sector") +
-      geom_line(data=AantalVacatures_vacSub,
-                aes(y=aantal, color=sbiCode.sbiNaam)) +
-      geom_point(data=AantalVacatures_vacSub,
-                 aes(y=aantal, color=sbiCode.sbiNaam)) +
-      scale_color_manual(values=GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam)) +
       theme(legend.position="none")
     
-    #Als totaalselect lijn aan staat en er meer als 0 studies geselecteerd zijn
-    if (input$AantalVacatures_TotaalSelect == TRUE && length(input$AantalVacatures_SelectImp) != 0) { 
+    #scale_color_manual options
+    scmOptionsList <- InitGGLegend()
+    
+    #Baseplot
+    if(length(input$AantalVacatures_SelectImp) != 0) {
+      plot <- plot +
+        geom_line(data=AantalVacatures_vacSub,
+                  aes(y=aantal, group=sbiCode.sbiNaam, color=sbiCode.sbiNaam), size=-1) +
+        geom_point(data=AantalVacatures_vacSub,
+                   aes(y=aantal, group=sbiCode.sbiNaam, color=sbiCode.sbiNaam))
       
-      #Totaalselect subset maken
-      totaalaantalselect <- aggregate(AantalVacatures_vacSub$aantal, by=list(jaartal=AantalVacatures_vacSub$jaartal), FUN=sum)
-      colnames(totaalaantalselect)<-c("jaartal", "aantal")
-      totaalaantalselect$soort = "Totale geselecteerde vacatures"
-        
-      AVLineBaseplot <- AVLineBaseplot + 
-        geom_line(data=totaalaantalselect, 
-                  aes(y=aantal, group=soort, color=soort),
-                  color = "gray48") + 
-        geom_point(data=totaalaantalselect, 
-                   aes(y=aantal, group=soort, color=soort),
-                   color = "gray48")
+      scmOptionsList$values <- c(scmOptionsList$values, GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam))
+      scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam))
+      scmOptionsList$labels <- c(scmOptionsList$labels, unique(AantalVacatures_vacSub$sbiCode.sbiNaam))
     }
     
     if (input$AantalVacatures_Totaal == TRUE) {
+      #Totaallijn
+      totaalaantal <- TotaalAantal(data = vacatures_jaartallen,
+                                   filterParams= c("jaartal") )
+      
+      TotaalLine <- AddTotaalLine(plot=plot, 
+                                  data=totaalaantal, 
+                                  colors=scmOptionsList, 
+                                  size=-1)
+      
+      plot           <- TotaalLine$plot
+      scmOptionsList <- TotaalLine$colors
+    }
+    
+    #Als totaalselect lijn aan staat en er meer als 0 studies geselecteerd zijn
+    if (input$AantalVacatures_TotaalSelect == TRUE && length(input$AantalVacatures_SelectImp) != 0) { 
+      totaalaantalselect <- TotaalAantalSelect(data = AantalVacatures_vacSub,
+                                               filterParams= c("jaartal"))
+      
+      TotaalSelectLine <- AddTotaalSelectLine(plot=plot, 
+                                              data=totaalaantalselect, 
+                                              colors=scmOptionsList, 
+                                              size=-1)
+      
+      plot           <- TotaalSelectLine$plot
+      scmOptionsList <- TotaalSelectLine$colors
+    }
 
-      AVLineBaseplot <- AVLineBaseplot +
-        geom_line(data=totaalaantal, 
-                  aes(y=aantal, group=soort, color=soort),
-                  color = "black") + 
-        geom_point(data=totaalaantal,
-                   aes(y=aantal, group=soort, color=soort),
-                   color = "black")
-     }
-
-     AVLineBaseplot
+    
+    plot <- plot +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
+    
+    #Render de plot
+    if( length(input$AantalVacatures_SelectImp) != 0 || input$AantalVacatures_Totaal == TRUE) {
+      PrintGGPlotly(plot)
+    } else {
+      return(plot)
+    }
   })
   
   ######################
   ## NORMALE BAR PLOT ##
   ######################
   output$VacaBarPlot <- renderPlot({
-    
     #Data aanpassen nav keuze bedrijfssector
     AantalVacatures_vacBarSub <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiNaam %in% input$AantalVacatures_SelectImp,]
     
-    totaalaantal <- aggregate(vacatures_jaartallen$aantal, by=list(jaartal=vacatures_jaartallen$jaartal), FUN=sum)
-    colnames(totaalaantal)<-c("jaartal","aantal") 
-    totaalaantal$soort = "Totale vacatures" 
+    #scale_color_manual options
+    scmOptionsList <- InitGGLegend()
     
-    AVBarBaseplot <- ggplot(AantalVacatures_vacBarSub, aes(x=jaartal)) +
+    plot <- ggplot(AantalVacatures_vacBarSub, aes(x=jaartal)) +
       xlab("Jaar") + 
       ylab("Aantal vacatures") +
-      ggtitle("Aantal vacatures per sector") +
-      geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
-      scale_fill_manual(values=GetColors(AantalVacatures_vacBarSub$sbiCode.sbiNaam), name = "Bedrijfssector")
-    
-    #scale_color_manual options
-    scmOptionsList.names <- c("values", "breaks", "labels")
-    scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names )
+      ggtitle("Aantal vacatures per sector")
+      
+    if(length(input$AantalVacatures_SelectImp) != 0) {
+      plot <- plot +
+        geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode.sbiNaam)) + 
+        scale_fill_manual(values=GetColors(AantalVacatures_vacBarSub$sbiCode.sbiNaam), name = "Bedrijfssector")
+    }
     
     if (input$AantalVacatures_Totaal == TRUE ){
+      #Totaallijn
+      totaalaantal <- TotaalAantal(data = vacatures_jaartallen,
+                                   filterParams= c("jaartal") )
       
-      AVBarBaseplot <- AVBarBaseplot +
-        geom_line(data=totaalaantal, aes(y=aantal,  #totaal lijn
-                                         group=soort,
-                                         color= "black")) + 
-        geom_point(data=totaalaantal, 
-                   aes(y=aantal,  group=soort, color="black")) +
-        labs(color = "Totaallijn")
+      TotaalLine <- AddTotaalLine(plot=plot, 
+                                  data=totaalaantal, 
+                                  colors=scmOptionsList)
       
-      scmOptionsList$values <- c(scmOptionsList$values, "black")
-      scmOptionsList$breaks <- c(scmOptionsList$breaks, "black")
-      scmOptionsList$labels <- c(scmOptionsList$labels, "Totaallijn")
+      plot           <- TotaalLine$plot
+      scmOptionsList <- TotaalLine$colors
     } 
     
     if (input$AantalVacatures_TotaalSelect == TRUE && length(input$AantalVacatures_SelectImp) != 0){ 
-
-      totaalaantalselect <- aggregate(AantalVacatures_vacBarSub$aantal, by=list(jaartal=AantalVacatures_vacBarSub$jaartal), FUN=sum)
-      colnames(totaalaantalselect)<-c("jaartal", "aantal")
-      totaalaantalselect$soort = "Totale geselecteerde vacatures"
+      totaalaantalselect <- TotaalAantalSelect(data = AantalVacatures_vacBarSub,
+                                               filterParams= c("jaartal"))
       
-      AVBarBaseplot <- AVBarBaseplot +
-          geom_line(data=totaalaantalselect, 
-                    aes(y=aantal, group=soort, color="gray48")) + 
-          geom_point(data=totaalaantalselect, 
-                     aes(y=aantal, group=soort, color= "gray48")) +
-          labs(color = "Totaallijn")
+      TotaalSelectLine <- AddTotaalSelectLine(plot=plot, 
+                                              data=totaalaantalselect, 
+                                              colors=scmOptionsList)
       
-      scmOptionsList$values <- c(scmOptionsList$values, "gray48")
-      scmOptionsList$breaks <- c(scmOptionsList$breaks, "gray48")
-      scmOptionsList$labels <- c(scmOptionsList$labels, "Totaallijn geselecteerde")
+      plot           <- TotaalSelectLine$plot
+      scmOptionsList <- TotaalSelectLine$colors
     }
     
-    AVBarBaseplot +
-      scale_color_manual(values=scmOptionsList$values,breaks=scmOptionsList$breaks, labels=scmOptionsList$labels)
+    #Render de plot
+    plot +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
   })
   
   #########################
@@ -174,67 +178,67 @@ AantalVacaturesServer <- function(input,output, session){
     aantalVacatures_forecastSub <- createForecastSub(AantalVacatures_vacSub, "aantal", "sbiCode.sbiNaam", 1997, 2014, 2015)
 
     #Totaal berekenen
-    totaalaantal           <- aggregate(vacatures_jaartallen$aantal, by=list(jaartal=vacatures_jaartallen$jaartal), FUN=sum)
-    colnames(totaalaantal) <- c("jaartal","aantal") 
-    forecastTotaal         <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1997, 2014, 2015)
-    forecastTotaal$soort   = "Totale vacatures" 
+    scmOptionsList         <- InitGGLegend()
+    sfillmanualOptionsList <- InitGGLegend()
     
-    AVForecastBaseplot <- ggplot(aantalVacatures_forecastSub, aes(x=jaartal)) +
+    plot <- ggplot(aantalVacatures_forecastSub, aes(x=jaartal)) +
       xlab("Jaar") + 
       ylab("Aantal vacatures") +
-      ggtitle("Aantal vacatures per sector") +
-      geom_line(linetype="dashed", size=1,
-                aes(y=fitted,
-                    group=sbiCode.sbiNaam,
-                    color=sbiCode.sbiNaam))+
-      geom_line(aes(y=aantal, 
-                    group=sbiCode.sbiNaam,
-                    color=sbiCode.sbiNaam))+
-      geom_point(aes(y=aantal, 
-                     group=sbiCode.sbiNaam,
-                     color=sbiCode.sbiNaam))+
-      scale_color_manual(values=GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam), name = "Bedrijfssector")
+      ggtitle("Aantal vacatures per sector")
+    
+    if(length(input$AantalVacatures_SelectImp) != 0) {
+      plot <- plot +
+        geom_line(linetype="dashed", size=1,
+                  aes(y=fitted,
+                      group=sbiCode.sbiNaam,
+                      color=sbiCode.sbiNaam))+
+        geom_line(aes(y=aantal, 
+                      group=sbiCode.sbiNaam,
+                      color=sbiCode.sbiNaam))+
+        geom_point(aes(y=aantal, 
+                       group=sbiCode.sbiNaam,
+                       color=sbiCode.sbiNaam))
+      
+      scmOptionsList$values <- c(scmOptionsList$values, GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam))
+      scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(AantalVacatures_vacSub$sbiCode.sbiNaam))
+      scmOptionsList$labels <- c(scmOptionsList$labels, unique(AantalVacatures_vacSub$sbiCode.sbiNaam))
+    }
 
     if (input$AantalVacatures_Totaal == TRUE ){
-
-      AVForecastBaseplot <- AVForecastBaseplot +
-        #TOTAALLIJN
-        geom_line(data=forecastTotaal, 
-                  aes(y=aantal, group=soort, color=soort),
-                  color = "black") + 
-        geom_point(data=forecastTotaal, 
-                   aes(y=aantal, group=soort, color=soort),
-                   color = "black") +
-        geom_line(data=forecastTotaal, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort),
-                  color = "black") + 
-        geom_ribbon(data=forecastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
-        geom_ribbon(data=forecastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25)
-    } 
-    if (input$AantalVacatures_TotaalSelect == TRUE && length(input$AantalVacatures_SelectImp) != 0){
+      #totaallijn
+      totaalaantal <- TotaalAantal(data = vacatures_jaartallen, 
+                                   filterParams= c('jaartal'))
+      forecastTotaal <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1997, 2014, 2015)
+      TotaalLine     <- AddTotaalLine(plot=plot, 
+                                      data=forecastTotaal, 
+                                      colors=scmOptionsList, 
+                                      fills=sfillmanualOptionsList,
+                                      forecast=TRUE, size=1)
       
-      totaalaantalselect <- aggregate(aantalVacatures_forecastSub$aantal, by=list(jaartal=aantalVacatures_forecastSub$jaartal), FUN=sum)
-      colnames(totaalaantalselect)<-c("jaartal", "aantal")
-      totaalaantalselect <- totaalaantalselect[totaalaantalselect$jaartal != 2015,]
-      
-      forecastTotaalselect   <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1997, 2014, 2015)
-      forecastTotaalselect$soort = "Totale geselecteerde vacatures"
-      
-      AVForecastBaseplot <- AVForecastBaseplot +
-        geom_line(data=forecastTotaalselect, 
-                  aes(y=aantal, group=soort, color=soort), 
-                  color = "gray48") + 
-        geom_point(data=forecastTotaalselect,
-                   aes(y=aantal, group=soort, color=soort),
-                   color = "gray48") +
-        geom_line(data=forecastTotaalselect, linetype="dashed", size=1,
-                  aes(y=fitted, group=soort, color=soort),
-                  color = "gray48") + 
-        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="blue", alpha=.25) +
-        geom_ribbon(data=forecastTotaalselect, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkblue", alpha=.25)
+      plot                   <- TotaalLine$plot
+      scmOptionsList         <- TotaalLine$colors
+      sfillmanualOptionsList <- TotaalLine$fills
     } 
     
-    AVForecastBaseplot
+    if (input$AantalVacatures_TotaalSelect == TRUE && length(input$AantalVacatures_SelectImp) != 0) {
+      totaalaantalselect <- TotaalAantalSelect(data = aantalVacatures_forecastSub, 
+                                               filterParams= c('jaartal'))
+      forecastTotaalselect   <- createForecastSub(totaalaantalselect, "aantal", "singleColumn", 1997, 2014, 2015)
+      TotaalSelectLine      <- AddTotaalSelectLine(plot=plot, 
+                                                   data=forecastTotaalselect, 
+                                                   colors=scmOptionsList, 
+                                                   fills=sfillmanualOptionsList,
+                                                   forecast=TRUE, size=1)
+      
+      plot                   <- TotaalSelectLine$plot
+      scmOptionsList         <- TotaalSelectLine$colors
+      sfillmanualOptionsList <- TotaalSelectLine$fills
+    } 
+    
+    #Render de plot
+    plot +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Bedrijfssector") +
+      scale_fill_manual(values=sfillmanualOptionsList$values, labels=sfillmanualOptionsList$labels, name="Betrouwbaarheidsinterval")
   })
   
   observe({

@@ -162,9 +162,9 @@ AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, ...) {
   
   plot <- plot +
     geom_line(data=data, ...,
-              aes(y=aantal, group=soort, color=color_vector)) + 
+              aes(y=aantal, group=soort, color="black")) + 
     geom_point(data=data, 
-               aes(y=aantal, group=soort, color=color_vector))
+               aes(y=aantal, group=soort, color="black"))
   
   if(forecast) {
     plot <- plot +
@@ -178,7 +178,6 @@ AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, ...) {
   }
   
   colors$values <- c(colors$values, "black")
-  colors$breaks <- c(colors$breaks, "black")
   colors$labels <- c(colors$labels, "Totaallijn")
   
   plot <- plot +
@@ -197,14 +196,14 @@ AddTotaalSelectLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, 
   
   plot <- plot +
     geom_line(data=data, ..., 
-              aes(y=aantal, group=soort, color=color_vector)) + 
+              aes(y=aantal, group=soort, color="gray48")) + 
     geom_point(data=data,
-               aes(y=aantal, group=soort, color=color_vector))
+               aes(y=aantal, group=soort, color="gray48"))
   
   if(forecast) {
     plot <- plot +
       geom_line(data=data, linetype="dashed", ...,
-                aes(y=fitted, group=soort, color=color_vector)) + #Add   But this adds an bug in the legend
+                aes(y=fitted, group=soort, color=color_vector)) + #Add but this adds an bug in the legend
       geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="blue"), alpha=.25) +
       geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkblue"), alpha=.25)
     
@@ -214,13 +213,24 @@ AddTotaalSelectLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, 
   
   
   colors$values <- c(colors$values, "gray48")
-  colors$breaks <- c(colors$breaks, "gray48")
   colors$labels <- c(colors$labels, "Totaallijn geselecteerde")
   
   plot <- plot +
     labs(color = "Totaallijn")
   
   return(list(plot=plot, colors=colors, fills=fills))
+}
+
+InitGGLegend <- function() {
+  #scale_color_manual options
+  legend.names <- c("values", "breaks", "labels")
+  legend <- setNames(vector("list", length(legend.names )), legend.names)
+  
+  legend$values <- NULL
+  legend$breaks <- NULL
+  legend$labels <- NULL
+  
+  return(legend)
 }
 
 # Make a plotly from a ggplot. Apply our defaults to this plotly

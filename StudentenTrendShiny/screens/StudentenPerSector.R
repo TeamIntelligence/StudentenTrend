@@ -56,12 +56,7 @@ StudentenPerSectorServer <- function(input, output, session) {
       theme(legend.position="none")
     
     #scale_color_manual options
-    scmOptionsList.names <- c("values", "breaks", "labels")
-    scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names)
-    
-    scmOptionsList$values <- NULL
-    scmOptionsList$breaks <- NULL
-    scmOptionsList$labels <- NULL
+    scmOptionsList <- InitGGLegend()
     
     if(length(input$StudentenPerSector_selectStudyImp) != 0) {
       plot <- plot +
@@ -128,12 +123,7 @@ StudentenPerSectorServer <- function(input, output, session) {
       ggtitle(PlotTitle)
     
     #scale_color_manual options
-    scmOptionsList.names <- c("values", "breaks", "labels")
-    scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names)
-    
-    scmOptionsList$values <- NULL
-    scmOptionsList$breaks <- NULL
-    scmOptionsList$labels <- NULL
+    scmOptionsList <- InitGGLegend()
     
     if(length(input$StudentenPerSector_selectStudyImp) != 0) {
       plot <- plot +
@@ -176,17 +166,8 @@ StudentenPerSectorServer <- function(input, output, session) {
       ggtitle("Aantal eerstejaars studenten per studiesector")
 
     #scale_color_manual options
-    scmOptionsList.names <- c("values", "breaks", "labels")
-    scmOptionsList <- setNames(vector("list", length(scmOptionsList.names )), scmOptionsList.names)
-    scmOptionsList$values <- NULL
-    scmOptionsList$breaks <- NULL
-    scmOptionsList$labels <- NULL
-    
-    sfillmanualOptionsList.names <- c("values", "breaks", "labels")
-    sfillmanualOptionsList <- setNames(vector("list", length(sfillmanualOptionsList.names )), sfillmanualOptionsList.names)
-    sfillmanualOptionsList$values <- NULL
-    sfillmanualOptionsList$breaks <- NULL
-    sfillmanualOptionsList$labels <- NULL
+    scmOptionsList         <- InitGGLegend()
+    sfillmanualOptionsList <- InitGGLegend()
     
     if(length(input$StudentenPerSector_selectStudyImp) != 0) {
       plot <- plot +
