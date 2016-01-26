@@ -144,7 +144,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
     
     #Render de plot
-    if( length(reac$selections) != 0) {
+    if( length(reac$selections) != 0 || input$StudentenGediplomeerden_Totaal == TRUE) {
       PrintGGPlotly(SGLineBaseplot)
     } else {
       return(SGLineBaseplot)

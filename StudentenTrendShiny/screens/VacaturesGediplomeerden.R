@@ -22,7 +22,7 @@ VacaturesGediplomeerdenUI <- function(PageName){
               ),
               tabBox(width=12, height=550, 
                      tabPanel("Huidige data",
-                              box(width=5, height = 470, plotOutput("VacaGedipPlot", height = 450)),
+                              box(width=5, height = 470, plotlyOutput("VacaGedipPlot", height = 450)),
                               box(width=7, height = 470, plotOutput("VacaGedipBarPlot", height=450))
                      ),
                      tabPanel("Voorspelling",
@@ -36,38 +36,35 @@ VacaturesGediplomeerdenUI <- function(PageName){
 
 VacaturesGediplomeerdenServer <- function(input, output, session){
   
-  output$VacaGedipPlot <- renderPlot({
+  output$VacaGedipPlot <- renderPlotly({
 
     plotCalcs <- VacaturesGediplomeerdenPlotCalc(input)
+    scmOptionsList        <- InitGGLegend()
+    scmOptionsList$values <- c(scmOptionsList$values, GetColors(plotCalcs$vgSub$soiCode.soiNaam))
+    scmOptionsList$labels <- c(scmOptionsList$labels, unique(plotCalcs$vgSub$soiCode.soiNaam))
     
-    #vacatures jaartallen inladen
-    # gekozen SBI93 omzetten naar 2008
-#     selectie2008 <- sbicodes93[sbicodes93$sbiNaam93 %in% input$VacaturesGediplomeerden_SelectImp,]$sbiCodes[[1]]
-#      # aantal vacatures omzetten naar gekozen 
-#     aantalvacatures <- vacatures_jaartallen[vacatures_jaartallen$sbiCode.sbiCode %in% selectie2008$sbiCode, ]
-#     aantalvacatures <- aggregate(aantalvacatures$aantal, by=list(jaartal=aantalvacatures$jaartal), FUN=sum)
-#     colnames(aantalvacatures) <- c("jaartal","aantal")
-    
-    ggplot(plotCalcs$totaalaantal,   
-           aes(x=jaartal)) + 
+    plot <- ggplot(plotCalcs$totaalaantal,   
+                   aes(x=jaartal)) + 
       xlab("Afstudeerjaar") +  
       ylab("Aantal vervulde banen") + 
       ggtitle("Vervulde banen per bedrijfs- per studiesector") +
       geom_line(data=plotCalcs$vgSub, aes(y=aantal,     #lijnen studies
-                                group=soiCode.soiNaam,
-                                color=soiCode.soiNaam)) + 
+                                          group=soiCode.soiNaam,
+                                          color=soiCode.soiNaam), size=-1) + 
       geom_point(data=plotCalcs$vgSub,aes(y=aantal, 
-                                group=soiCode.soiNaam,
-                                color=soiCode.soiNaam)) +
-      geom_line(data=plotCalcs$totaalaantal, aes(y=aantal),  #totaal lijn
-                                        color = "black") + 
-      geom_point(data=plotCalcs$totaalaantal, aes(y=aantal), 
-                                         color = "black") + 
-      scale_color_manual(values=GetColors(plotCalcs$vgSub$soiCode.soiNaam)) +
+                                          group=soiCode.soiNaam,
+                                          color=soiCode.soiNaam), size=-1) +
       theme(legend.position="none") +
       xlim(2000,plotCalcs$toYear)
     
-    })
+    TotaalLine     <- AddTotaalLine(plot=plot, data=plotCalcs$totaalaantal, colors=scmOptionsList, size=-1)
+    plot           <- TotaalLine$plot
+    scmOptionsList <- TotaalLine$colors
+    
+    PrintGGPlotly(plot + 
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
+    )
+  })
   
   output$VacaGedipBarPlot <- renderPlot({
 
@@ -114,36 +111,38 @@ VacaturesGediplomeerdenServer <- function(input, output, session){
     VGVForeCastTotaal       <- createForecastSub(plotCalcs$totaalaantal, "aantal", "singleColumn", minYear, maxYear, "",DF = 1)
     VGVForeCastTotaal$soort = "Totaal" 
     
-    ggplot(VGVForeCastSub,   
-           aes(x=jaartal)) + 
+    scmOptionsList         <- InitGGLegend()
+    sfillmanualOptionsList <- InitGGLegend()
+    scmOptionsList$values  <- c(scmOptionsList$values, GetColors(VGVForeCastSub$soiCode.soiNaam))
+    scmOptionsList$labels  <- c(scmOptionsList$labels, unique(VGVForeCastSub$soiCode.soiNaam))
+    
+    plot <- ggplot(VGVForeCastSub,   
+                   aes(x=jaartal)) + 
       xlab("Afstudeerjaar") +  
       ylab("Aantal vervulde banen") + 
       ggtitle("Vervulde banen per bedrijfs- per studiesector") +
       geom_line(data=VGVForeCastSub, aes(y=aantal,     #lijnen studies
-                                          group=soiCode.soiNaam,
-                                          color=soiCode.soiNaam)) + 
+                                         group=soiCode.soiNaam,
+                                         color=soiCode.soiNaam)) + 
       geom_point(data=VGVForeCastSub,aes(y=aantal, 
-                                          group=soiCode.soiNaam,
-                                          color=soiCode.soiNaam)) +
-      geom_line(data=VGVForeCastSub, linetype="dashed", size=1, aes(y=fitted,
                                          group=soiCode.soiNaam,
                                          color=soiCode.soiNaam)) +
-      geom_line(data=VGVForeCastTotaal, 
-                aes(y=aantal, 
-                    group=soort), 
-                color = "black") +  #totaal lijn
-      geom_point(data=VGVForeCastTotaal, aes(y=aantal), 
-                 color = "black") +
-      geom_line(data=VGVForeCastTotaal, linetype="dashed", size=1, 
-                aes(y=fitted, 
-                    group=soort),  #totaal lijn
-                color = "black") +
-      geom_ribbon(data=VGVForeCastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort), fill="red", alpha=.25) +
-      geom_ribbon(data=VGVForeCastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort), fill="darkred", alpha=.25) 
-      #xlim(2000,plotCalcs$toYear)
-      #scale_color_manual(values=GetColors(VGVForeCastSub$soiCode.soiNaam)) +
-      #theme(legend.position="none") +
-      
+      geom_line(data=VGVForeCastSub, linetype="dashed", size=1, aes(y=fitted,
+                                                                    group=soiCode.soiNaam,
+                                                                    color=soiCode.soiNaam))
+  
+    TotaalLine             <- AddTotaalLine(plot=plot, 
+                                            data=VGVForeCastTotaal, 
+                                            colors=scmOptionsList, 
+                                            fills=sfillmanualOptionsList,
+                                            forecast = TRUE)
+    plot                   <- TotaalLine$plot
+    scmOptionsList         <- TotaalLine$colors
+    sfillmanualOptionsList <- TotaalLine$fills
+    
+    plot +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Studiesector") +
+      scale_fill_manual(values=sfillmanualOptionsList$values, labels=sfillmanualOptionsList$labels, name="Betrouwbaarheidsinterval")
   })
 }
 
@@ -172,6 +171,7 @@ VacaturesGediplomeerdenPlotCalc <- function(input) {
   #Totaal berekenen aantal studenten
   totaalaantal <- aggregate(vgSub$aantal, by=list(jaartal=vgSub$jaartal), FUN=sum)
   colnames(totaalaantal)<-c("jaartal","aantal")
+  totaalaantal$soort <- "Totaal aantal"
   
   return(
     list(vgSub = vgSub, toYear=toYear, totaalaantal=totaalaantal)
