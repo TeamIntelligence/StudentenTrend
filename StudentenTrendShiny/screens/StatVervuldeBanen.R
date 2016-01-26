@@ -41,7 +41,8 @@ StatVervuldeBanenServer <- function(input,output, session){
       geom_point(data = dataHBO,aes(y = Percentage, 
                                     group = Studiesector,
                                     color = Studiesector))+ 
-      theme(axis.text.x=element_text(angle=-45, hjust = -0.005))
+      theme(axis.text.x=element_text(angle=-45, hjust = -0.005))+
+      scale_color_manual(values=GetColors(dataHBO$Studiesector), labels=unique(dataHBO$Studiesector))
   })  
   
   output$VervuldeBanen_WO <- renderPlot({
@@ -55,8 +56,9 @@ StatVervuldeBanenServer <- function(input,output, session){
                                    color = Studiesector)) + 
       geom_point(data = dataWO,aes(y = Percentage, 
                                    group = Studiesector,
-                                   color = Studiesector)) +
-      theme(axis.text.x=element_text(angle=-45, hjust = -0.005))
+                                   color = dataWO$Studiesector)) +
+      theme(axis.text.x=element_text(angle=-45, hjust = -0.005)) +
+      scale_color_manual(values=GetColors(dataWO$Studiesector), labels=unique(dataWO$Studiesector))
   })
   
   

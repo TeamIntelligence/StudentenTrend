@@ -39,7 +39,8 @@ StatIngeschrevenServer <- function(input,output, session){
       ggtitle("Percentage van het aantal ingeschreven in 2013 per studieniveau versus studiesector") +
       geom_line(aes(y=Percentage))+
       geom_point(aes(y=Percentage))+
-      theme(axis.text.x=element_text(angle=-45, hjust = -0.005))
+      theme(axis.text.x=element_text(angle=-45, hjust = -0.005)) +
+      scale_color_manual(values=GetColors(DataIngeschreven$Studieniveau), labels=unique(DataIngeschreven$Studieniveau))
     
   })
   
@@ -52,7 +53,8 @@ StatIngeschrevenServer <- function(input,output, session){
       ggtitle("Percentage van het aantal ingeschreven in 2013 per studieniveau versus studiesector") +
       geom_line(aes(y=Percentage))+
       geom_point(aes(y=Percentage))+
-      theme(axis.text.x=element_text(angle=-45, hjust = -0.005))
+      theme(axis.text.x=element_text(angle=-45, hjust = -0.005)) +
+      scale_color_manual(values=GetColors(DataIngeschrevenManVrouw$Geslacht), labels=unique(DataIngeschrevenManVrouw$Geslacht))
   }) 
   
 }

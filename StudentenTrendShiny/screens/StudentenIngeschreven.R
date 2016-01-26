@@ -277,7 +277,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
       sfillmanualOptionsList <- TotaalLine$fills
     }
     
-    if (input$StudentenIngeschreven_Totaalselect == TRUE || length(reac$selections) != 0){
+    if (input$StudentenIngeschreven_Totaalselect == TRUE && length(reac$selections) != 0){
       totaalaantalselect <- TotaalAantalSelect(data = studenten_ingeschrevenen,
                                                selectInput = reac$selections, 
                                                studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 

@@ -40,7 +40,8 @@ StatGediplomeerdenServer <- function(input,output, session){
       ggtitle("Percentage van het aantal gediplomeerden in 2013 per studieniveau versus studiesector") +
       geom_line(aes(y=Percentage))+
       geom_point(aes(y=Percentage))+
-      theme(axis.text.x=element_text(angle=-45, hjust = -0.005))
+      theme(axis.text.x=element_text(angle=-45, hjust = -0.005)) +
+      scale_color_manual(values=GetColors(DataDiploStudie$Studieniveau), labels=unique(DataDiploStudie$Studieniveau))
   })
   
   output$Gediplomeeren_Man_Vrouw <- renderPlot({
@@ -51,7 +52,8 @@ StatGediplomeerdenServer <- function(input,output, session){
       ggtitle("Percentage van het aantal gediplomeerden in 2013 per studieniveau versus studiesector") +
       geom_line(aes(y=Percentage))+
       geom_point(aes(y=Percentage))+
-      theme(axis.text.x=element_text(angle=-45, hjust = -0.005))
+      theme(axis.text.x=element_text(angle=-45, hjust = -0.005)) +
+      scale_color_manual(values=GetColors(DataDiploGeslacht$Geslacht), labels=unique(DataDiploGeslacht$Geslacht) )
   })
   
 }
