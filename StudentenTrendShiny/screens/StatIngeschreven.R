@@ -11,12 +11,14 @@ StatIngeschrevenUI <- function(PageName){
               tabBox(width=12, height=550, 
                        tabPanel("Studieniveau",
                                 h1("Chikwadraat"),
-                                p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal ingeschreven studenten per studieniveau voor sommige studiesectoren erg groot. Daarom is er het vermoeden dat er tussen studieniveau en studiesector geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd."),
+                                p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal ingeschreven studenten per studieniveau voor sommige studiesectoren erg groot. Daarom is er het vermoeden dat er tussen studieniveau en studiesector geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd.<br/>"),
+                                p("Er zijn geen onderlinge onafhankelijkheden gevonden voor studieniveau"),
                                 plotOutput("Ingeschreven_HBOB_WOB", height = 450)
                         ),
                         tabPanel("Geslacht",
                                  h1("Chikwadraat"),
                                  p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal ingeschreven mannelijke en vrouwelijke studenten voor sommige studiesectoren erg groot. Daarom is er het vermoeden dat er tussen geslacht en studiesector geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd. "),
+                                 p("Voor de studiesector kunstonderwijs is het aantal studenten onafhankelijk van het geslacht."),
                                  plotOutput("Ingeschreven_Man_Vrouw", height = 450)      
                         ) 
               )
@@ -33,7 +35,7 @@ StatIngeschrevenServer <- function(input,output, session){
     
     ggplot(DataIngeschreven, aes(x=Studiesector, group = Studieniveau, colour = Studieniveau))+
       xlab("Studiesector") + 
-      ylab("Percentage van het aantal studenten ten opzichte van het totaal aantal studenten per studieniveau") +
+      ylab("Percentage") +
       ggtitle("Percentage van het aantal ingeschreven in 2013 per studieniveau versus studiesector") +
       geom_line(aes(y=Percentage))+
       geom_point(aes(y=Percentage))+
@@ -46,7 +48,7 @@ StatIngeschrevenServer <- function(input,output, session){
     
     ggplot(DataIngeschrevenManVrouw, aes(x=Studiesector, group = Geslacht, colour = Geslacht))+
       xlab("Studiesector") + 
-      ylab("Percentage van het aantal studenten ten opzichte van het totaal aantal studenten per studieniveau") +
+      ylab("Percentage") +
       ggtitle("Percentage van het aantal ingeschreven in 2013 per studieniveau versus studiesector") +
       geom_line(aes(y=Percentage))+
       geom_point(aes(y=Percentage))+
