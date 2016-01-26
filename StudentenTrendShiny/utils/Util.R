@@ -80,18 +80,18 @@ TotaalAantalSelect <- function(data, selectInput = NULL, studieNiveauInput = NUL
     if (studieNiveauInput == "HBOWO"){
       colnames(totaalaantalselect)<-c("jaartal","aantal")
       if(isGedpl){
-        totaalaantalselect$ondCode = "Totaal geselecteerde HBO Bachelor en WO Master studies"
+        totaalaantalselect$soort = "Totaal geselecteerde HBO Bachelor en WO Master studies"
       } else{
-        totaalaantalselect$ondCode = "Totaal geselecteerde HBO en WO studies"
+        totaalaantalselect$soort = "Totaal geselecteerde HBO en WO studies"
       }
     } else if (studieNiveauInput == "HBO"){
-      totaalaantalselect$ondCode = "Totaal geselecteerde HBO studies"
+      totaalaantalselect$soort = "Totaal geselecteerde HBO studies"
     } else if (studieNiveauInput == "WOB"){
-      totaalaantalselect$ondCode = "Totaal geselecteerde WO Bachelor studies"
+      totaalaantalselect$soort = "Totaal geselecteerde WO Bachelor studies"
     } else if (studieNiveauInput == "WOM"){
-      totaalaantalselect$ondCode = "Totaal geselecteerde WO Master studies"
+      totaalaantalselect$soort = "Totaal geselecteerde WO Master studies"
     } else if (studieNiveauInput == "WO"){
-      totaalaantalselect$ondCode = "Totaal geselecteerde WO studies"
+      totaalaantalselect$soort = "Totaal geselecteerde WO studies"
     } 
   }
   
