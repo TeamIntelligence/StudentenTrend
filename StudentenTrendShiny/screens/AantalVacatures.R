@@ -85,7 +85,8 @@ AantalVacaturesServer <- function(input,output, session){
       TotaalLine <- AddTotaalLine(plot=plot, 
                                   data=totaalaantal, 
                                   colors=scmOptionsList, 
-                                  size=-1)
+                                  size=-1,
+                                  color="black")
       
       plot           <- TotaalLine$plot
       scmOptionsList <- TotaalLine$colors
@@ -99,7 +100,8 @@ AantalVacaturesServer <- function(input,output, session){
       TotaalSelectLine <- AddTotaalSelectLine(plot=plot, 
                                               data=totaalaantalselect, 
                                               colors=scmOptionsList, 
-                                              size=-1)
+                                              size=-1,
+                                              color="gray48")
       
       plot           <- TotaalSelectLine$plot
       scmOptionsList <- TotaalSelectLine$colors

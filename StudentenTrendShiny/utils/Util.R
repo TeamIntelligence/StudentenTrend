@@ -152,18 +152,17 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
   return(totaalaantal)
 }
 
-AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, ...) {
+AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE,  ...) {
   color_vector <- data$soort
   if(forecast) {
     color_vector <- "black"
   }
-  
   data$color_vector <- color_vector
   
   plot <- plot +
     geom_line(data=data, ...,
               aes(y=aantal, group=soort, color="black")) + 
-    geom_point(data=data, 
+    geom_point(data=data, ...,
                aes(y=aantal, group=soort, color="black"))
   
   if(forecast) {
@@ -191,13 +190,12 @@ AddTotaalSelectLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, 
   if(forecast) {
     color_vector <- "gray48"
   }
-  
   data$color_vector <- color_vector
   
   plot <- plot +
     geom_line(data=data, ..., 
               aes(y=aantal, group=soort, color="gray48")) + 
-    geom_point(data=data,
+    geom_point(data=data, ...,
                aes(y=aantal, group=soort, color="gray48"))
   
   if(forecast) {
