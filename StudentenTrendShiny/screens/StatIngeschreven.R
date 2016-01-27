@@ -8,10 +8,10 @@ StatIngeschrevenUI <- function(PageName){
                   p("De onafhankelijkheidstoets van chikwadraat, toetst of twee gegeven indelingen onafhankelijk zijn van elkaar. Als de uitkomst van deze toets een te grote waarde oplevert, mag er geconcludeerd worden dat er geen onafhankelijkheid is tussen te twee gegeven indelingen.")
               ),
               
-              tabBox(width=12, height=550, 
+              tabBox(width=12, height=650, 
                        tabPanel("Studieniveau",
                                 h1("Chikwadraat"),
-                                p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal ingeschreven studenten per studieniveau voor sommige studiesectoren erg groot. Daarom is er het vermoeden dat er tussen studieniveau en studiesector geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd.<br/>"),
+                                p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal ingeschreven studenten per studieniveau voor sommige studiesectoren erg groot. Daarom is er het vermoeden dat er tussen studieniveau en studiesector geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd."),
                                 p("Er zijn geen onderlinge onafhankelijkheden gevonden voor studieniveau"),
                                 plotOutput("Ingeschreven_HBOB_WOB", height = 450)
                         ),

@@ -8,7 +8,7 @@ StatVervuldeBanenUI <- function(PageName){
                   p("De onafhankelijkheidstoets van chikwadraat, toetst of twee gegeven indelingen onafhankelijk zijn van elkaar. Als de uitkomst van deze toets een te grote waarde oplevert, mag er geconcludeerd worden dat er geen onafhankelijkheid is tussen te twee gegeven indelingen.")
               ),
               
-              tabBox(width=12, height=550, 
+              tabBox(width=12, height=650, 
                      tabPanel("HBO",
                               h1("Chikwadraat"),
                               p("Zoals u in onderstaande grafiek kunt zien, is het verschil in het aantal studenten dat binnen drie jaar aan een baan komt per studiesector voor sommige bedrijfssectoren erg groot. Daarom is er het vermoeden dat er tussen de studiesectoren en bedrijfssectoren geen onafhankelijkheid is. Na het toetsen met chikwadraat, wordt dit vermoeden bevestigd. "),

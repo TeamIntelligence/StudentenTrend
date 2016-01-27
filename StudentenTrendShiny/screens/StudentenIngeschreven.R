@@ -183,7 +183,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
       plot <- plot +
         geom_bar(data = siBarSub, stat = "identity",
                  aes(y=aantal, fill=iscedCode.iscedNaam))+
-        scale_fill_manual(values=GetColors(siBarSub$iscedCode.iscedNaam),name="Studierichting")
+        scale_fill_manual(values=GetColors(siBarSub$iscedCode.iscedNaam),name="Studiesector")
     }
       
     if (input$StudentenIngeschreven_Totaal == TRUE ){
@@ -298,7 +298,7 @@ StudentenIngeschrevenServer <- function(input, output, session){
 
     #Render de plot
     plot +
-      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Studierichting") +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Studiesector") +
       scale_fill_manual(values=sfillmanualOptionsList$values, labels=sfillmanualOptionsList$labels, name="Betrouwbaarheidsinterval")
   })
   

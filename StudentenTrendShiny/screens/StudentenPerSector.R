@@ -133,7 +133,7 @@ StudentenPerSectorServer <- function(input, output, session) {
     if(length(reac$selections) != 0) {
       plot <- plot +
         geom_bar(stat = "identity", aes(y=aantal,fill=iscedCode.iscedNaam)) + 
-        scale_fill_manual(values=GetColors(svSub$iscedCode.iscedNaam), name="Studierichting")
+        scale_fill_manual(values=GetColors(svSub$iscedCode.iscedNaam), name="Studiesector")
     }
     
     #Totaal berekenen
@@ -223,7 +223,7 @@ StudentenPerSectorServer <- function(input, output, session) {
     
     #Render de plot
     plot +
-      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Studierichting") +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Studiesector") +
       scale_fill_manual(values=sfillmanualOptionsList$values, labels=sfillmanualOptionsList$labels, name="Betrouwbaarheidsinterval")
   })
   
