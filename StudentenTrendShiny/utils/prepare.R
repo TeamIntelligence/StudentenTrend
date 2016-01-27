@@ -1,7 +1,7 @@
 # Load a R package. If not yet installed, install it
 LoadPackage <- function(packageName, ...) {
   if(!require(packageName, character.only = T)){
-    install.packages(packageName, ...)
+    install.packages(packageName, repos='http://cran.fhcrc.org', ...)
   }
   
   library(packageName, character.only = T)
