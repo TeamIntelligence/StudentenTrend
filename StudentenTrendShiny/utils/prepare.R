@@ -1,7 +1,7 @@
 # Load a R package. If not yet installed, install it
 LoadPackage <- function(packageName, ...) {
   if(!require(packageName, character.only = T)){
-    install.packages(packageName, dependencies=TRUE, repos='http://cran.rstudio.com/', ...)
+    install.packages(packageName, ...)
   }
   
   library(packageName, character.only = T)
@@ -41,7 +41,7 @@ GetDefaultTitleFont <- function() {
 # Load all the R packages needed
 LoadPackage("shiny")
 LoadPackage("shinydashboard")
-LoadPackage("dplyr")
+LoadPackage("plyr")
 LoadPackage("jsonlite")
 LoadPackage("ggplot2")
 LoadPackage("data.table")
