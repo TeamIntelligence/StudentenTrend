@@ -161,14 +161,14 @@ AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE,  ...) 
   
   plot <- plot +
     geom_line(data=data, ...,
-              aes(y=aantal, group=soort, color="black")) + 
+              aes(y=aantal, group=soort, color="black"), color="black") + 
     geom_point(data=data, ...,
-               aes(y=aantal, group=soort, color="black"))
+               aes(y=aantal, group=soort, color="black"), color="black")
   
   if(forecast) {
     plot <- plot +
       geom_line(data=data, linetype="dashed", ...,
-                aes(y=fitted, group=soort, color=color_vector)) + 
+                aes(y=fitted, group=soort, color=color_vector), color="black") + 
       geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="red"), alpha=.25) +
       geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkred"), alpha=.25)
     
@@ -194,14 +194,14 @@ AddTotaalSelectLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, 
   
   plot <- plot +
     geom_line(data=data, ..., 
-              aes(y=aantal, group=soort, color="gray48")) + 
+              aes(y=aantal, group=soort, color="gray48"), color="gray48") + 
     geom_point(data=data, ...,
-               aes(y=aantal, group=soort, color="gray48"))
+               aes(y=aantal, group=soort, color="gray48"), color="gray48")
   
   if(forecast) {
     plot <- plot +
       geom_line(data=data, linetype="dashed", ...,
-                aes(y=fitted, group=soort, color=color_vector)) + #Add but this adds an bug in the legend
+                aes(y=fitted, group=soort, color=color_vector), color="gray48") + #Add but this adds an bug in the legend
       geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="blue"), alpha=.25) +
       geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkblue"), alpha=.25)
     
@@ -233,7 +233,7 @@ InitGGLegend <- function() {
 
 # Make a plotly from a ggplot. Apply our defaults to this plotly
 PrintGGPlotly <- function(plot, ...) {
-  params <- list(p=ggplotly(plot), hovermode = "closest", titlefont=GetDefaultTitleFont(), ...)
+  params <- list(p=ggplotly(plot), hovermode = "closest", titlefont=GetDefaultTitleFont(), font=list(size=10), ...)
   return(
     do.call(layout, params)
   )
