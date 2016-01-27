@@ -7,6 +7,7 @@ ui <- dashboardPage(
   ,dashboardSidebar(BuildSideBarMenu())
   ,dashboardBody(LoadApplicationBody(), 
                  includeCSS("resources/custom_plotly.css"),
+                 tags$head(tags$script(src="underscore-min.js")),
                  tags$head(tags$script(src="plotly_legend.js")))
   #Custom CSS for box titles
   ,tags$head(tags$style(HTML('
