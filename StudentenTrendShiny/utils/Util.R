@@ -161,6 +161,30 @@ TotaalAantal <- function(data, subSet, selectInput, filterColumn, studieNiveauIn
   return(merge(subSet, totaalaantal, all=TRUE))
 }
 
+UniqueLabels <- function(data) {
+  unique_values <- data$soort[!is.na(data$soort)]
+  blackValue <- NULL
+  grayValue  <- NULL
+  
+  for(i in 1:length(unique_values)) {
+    value <- unique_values[i]
+    
+    if(length(grep("Totaal aantal", value)) > 0) {
+      blackValue <- value
+    } else if(length(grep("Totaal geselecteerd", value)) > 0) {
+      grayValue <- value
+    }
+  }
+  
+  if(!is.null(grayValue) && !is.null(blackFound) ) {
+    unique_values <- replace(unique_values, unique_values==blackValue, "blackTemp")
+    unique_values <- replace(unique_values, unique_values==grayValue, blackValue)
+    unique_values <- replace(unique_values, unique_values=="blackTemp", grayValue)
+  }
+  
+  return(unique_values)
+}
+
 AddTotaalLines <- function(plot, data, forecast=FALSE,  ...) {
   if("soort" %in% colnames(data)) {
     plot <- plot +
@@ -168,7 +192,7 @@ AddTotaalLines <- function(plot, data, forecast=FALSE,  ...) {
                 aes(y=aantal, group=soort, color=soort)) + 
       geom_point(data=data, ...,
                  aes(y=aantal, group=soort, color=soort)) +
-      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)]), labels=rev(unique(data$soort[!is.na(data$soort)]))) +
+      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)]), labels=UniqueLabels(data)) +
       labs(color = "Totaallijn")
     
     if(forecast) {
@@ -177,7 +201,8 @@ AddTotaalLines <- function(plot, data, forecast=FALSE,  ...) {
                   aes(y=fitted, group=soort, color=soort)) + 
         geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="red"), alpha=.25) +
         geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkred"), alpha=.25) +
-        scale_fill_manual(values=unique(c(data$fill80Vals, data$fill95Vals) ), labels=unique(c(data$fill80Labels, data$fill95Labels)))
+        scale_fill_manual(values=unique(c(data$fill80Vals, data$fill95Vals) ), labels=unique(c(data$fill80Labels, data$fill95Labels))) +
+        labs(color = "Test2")
     }
   }
   

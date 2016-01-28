@@ -53,7 +53,7 @@ createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE,D
       forecastData[[name]] <- funggcast(timeSeries[[name]], forecast(fits[[name]], h=5), END+1, 5)
       forecastData[[name]] <- subset(forecastData[[name]],is.na(forecastData[[name]]$observed))
     }
-    
+    print(names(forecastData))
   }
   
   mergedSub <- mergeForecastframe(INPUTSET, forecastData, GROUPBY, EXCLUDE)
