@@ -116,11 +116,12 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       TotaalLine <- AddTotaalLine(plot=SGLineBaseplot, 
                                   data=totaalaantal, 
                                   colors=scmOptionsList, 
-                                  size=-1,
-                                  color="black")
+                                  size=-1)
       
       SGLineBaseplot <- TotaalLine$plot
       scmOptionsList <- TotaalLine$colors
+#       scmOptionsList$values <- c("black",scmOptionsList$values)
+#       scmOptionsList$labels <- c("Totaallijn",scmOptionsList$labels)
     }
     
     #alleen select
