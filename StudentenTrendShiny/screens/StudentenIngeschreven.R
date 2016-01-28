@@ -10,7 +10,7 @@ StudentenIngeschrevenUI <- function(PageName){
         box(width=4, height = 170, 
           selectInput("StudentenIngeschreven_SelectStudyImp",
                       "Selecteer een of meerdere studiesectoren om weer te geven:",
-                      choices = studenten_ingeschrevenen$iscedCode.iscedNaam,
+                      choices = list(Studiesectoren = unique(studenten_ingeschrevenen$iscedCode.iscedNaam), "Selecteer een studiesector" = ""),
                       multiple = TRUE,
                       selectize = TRUE
           ),

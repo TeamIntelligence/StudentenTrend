@@ -11,7 +11,7 @@ VacaturesGediplomeerdenUI <- function(PageName){
                   
                   selectInput("VacaturesGediplomeerden_SelectImp",
                               "Selecteer een bedrijfssector om weer te geven:",
-                              choices = gediplomeerden_vacatures$sbiCode93.sbiNaam93,
+                              choices = list(Bedrijfssectoren = unique(gediplomeerden_vacatures$sbiCode93.sbiNaam93), "Selecteer een bedrijfssector" = ""),
                               multiple = FALSE,
                               selectize = TRUE,
                               selected=1 

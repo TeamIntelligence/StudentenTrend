@@ -10,7 +10,7 @@ BanenStudieSectorJaarUI <- function(PageName){
               box(width=12, height = 150, 
                   selectInput("BanenStudieSectorJaar_SelectImp",
                               "Selecteer een studiesector om weer te geven:",
-                              choices = gediplomeerden_vacatures$soiCode.soiNaam,
+                              choices = list(Studiesectoren = unique(gediplomeerden_vacatures$soiCode.soiNaam), "Selecteer een studiesector" = ""),
                               multiple = FALSE,
                               selectize = TRUE,
                               selected=1 

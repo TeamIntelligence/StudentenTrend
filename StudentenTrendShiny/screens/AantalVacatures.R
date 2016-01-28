@@ -12,7 +12,7 @@ AantalVacaturesUI <- function(PageName){
             
             selectInput("AantalVacatures_SelectImp",
                         "Selecteer een of meerdere bedrijfssectoren om weer te geven:",
-                        choices = vacatures$sbiCode.sbiNaam,
+                        choices = list(Bedrijfssectoren = unique(vacatures$sbiCode.sbiNaam), "Selecteer een bedrijfssector" = ""),
                         multiple = TRUE,
                         selectize = TRUE
             ),

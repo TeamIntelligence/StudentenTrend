@@ -11,7 +11,7 @@ StudentenPerSectorUI <- function(PageName) {
               box(width=6, height = 170,
                   selectInput("StudentenPerSector_selectStudyImp",
                               "Selecteer een of meerdere studiesectoren om weer te geven:",
-                              choices = studievoortgang$iscedCode.iscedNaam,
+                              choices = list(Studiesectoren = unique(studievoortgang$iscedCode.iscedNaam), "Selecteer een studiesector" = ""),
                               multiple = TRUE,
                               selectize = TRUE),
                   checkboxInput("StudentenPerSector_AlleStudies",
