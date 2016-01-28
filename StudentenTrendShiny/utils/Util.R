@@ -46,9 +46,9 @@ CallServerFunction <- function(Page, ...) {
 }
 
 TotaalAantalSelect <- function(data, selectInput = NULL, studieNiveauInput = NULL, filterParams) {
-  ##keuze maken welke studies
+  #Make a subset
   if(!is.null(selectInput)) {
-    totaalaantalselect <- data[data$iscedCode.iscedNaam %in% selectInput,]
+    totaalaantalselect <- data[data$soort %in% selectInput,]
   } else {
     totaalaantalselect <- data
   }
@@ -61,14 +61,19 @@ TotaalAantalSelect <- function(data, selectInput = NULL, studieNiveauInput = NUL
   #Totaal berekenen
   totaalaantalselect <- aggregate(totaalaantalselect$aantal, by=filterByList, FUN=sum)
   colnames(totaalaantalselect)<-append(filterParams, "aantal")
-  totaalaantalselect$soort <- "Totaal geselecteerd"
+  totaalaantalselect$soort        <- "Totaal geselecteerd"
+  totaalaantalselect$fill80Vals   <- "blue"
+  totaalaantalselect$fill95Vals   <- "darkblue"
+  totaalaantalselect$fill80Labels <- "80% Betrouwbaarheidsinterval"
+  totaalaantalselect$fill95Labels <- "95% Betrouwbaarheidsinterval"
+  
   
   if (!is.null(studieNiveauInput)){
-    
     isGedpl <- FALSE
     if(!is.null(data$diploma)){
       isGedpl <- TRUE
     }
+    
     #keuze maken welk studie niveau
     totaalaantalselect <- switch (studieNiveauInput,
                                   "HBO" = totaalaantalselect[totaalaantalselect$ondCode == "HBO",],
@@ -95,14 +100,14 @@ TotaalAantalSelect <- function(data, selectInput = NULL, studieNiveauInput = NUL
     } 
   }
   
-  return(totaalaantalselect)
+  return(merge(data, totaalaantalselect, all=TRUE))
 }
 
 
-TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterParams){
-  totaalaantal<-data
+TotaalAantal <- function(data, subSet, selectInput, filterColumn, studieNiveauInput = NULL, filterParams){
+  totaalaantal <- data
   
-  filterByList <- list() # list creeeren met  jaartal en evt ondcode en diploma voor de aggregate totaal
+  filterByList <- list() # list creeeren met jaartal en evt ondcode en diploma voor de aggregate totaal
   for(filterValue in filterParams) {
     filterByList[filterValue] = totaalaantal[filterValue]
   }
@@ -110,7 +115,11 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
   #Totaal berekenen
   totaalaantal <- aggregate(totaalaantal$aantal, by=filterByList, FUN=sum)
   colnames(totaalaantal)<-append(filterParams, "aantal")
-  totaalaantal$soort <- "Totaal aantal"
+  totaalaantal$soort        <- "Totaal aantal"
+  totaalaantal$fill80Vals   <- "red"
+  totaalaantal$fill95Vals   <- "darkred"
+  totaalaantal$fill80Labels <- "80% Betrouwbaarheidsinterval"
+  totaalaantal$fill95Labels <- "95% Betrouwbaarheidsinterval"
   
   if (!is.null(studieNiveauInput)){
     
@@ -149,7 +158,30 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
     }
   }
   
-  return(totaalaantal)
+  return(merge(subSet, totaalaantal, all=TRUE))
+}
+
+AddTotaalLines <- function(plot, data, forecast=FALSE,  ...) {
+  if("soort" %in% colnames(data)) {
+    plot <- plot +
+      geom_line(data=data, ...,
+                aes(y=aantal, group=soort, color=soort)) + 
+      geom_point(data=data, ...,
+                 aes(y=aantal, group=soort, color=soort)) +
+      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)]), labels=unique(data$soort[!is.na(data$soort)])) +
+      labs(color = "Totaallijn")
+    
+    if(forecast) {
+      plot <- plot +
+        geom_line(data=data, linetype="dashed", ...,
+                  aes(y=fitted, group=soort, color=soort)) + 
+        geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="red"), alpha=.25) +
+        geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkred"), alpha=.25) +
+        scale_fill_manual(values=unique(c(data$fill80Vals, data$fill95Vals) ), labels=unique(c(data$fill80Labels, data$fill95Labels)))
+    }
+  }
+  
+  return(plot)
 }
 
 AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE,  ...) {
