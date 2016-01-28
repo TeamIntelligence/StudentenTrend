@@ -66,6 +66,7 @@ TotaalAantalSelect <- function(data, selectInput = NULL, studieNiveauInput = NUL
   totaalaantalselect$fill95Vals   <- "darkblue"
   totaalaantalselect$fill80Labels <- "80% Betrouwbaarheidsinterval"
   totaalaantalselect$fill95Labels <- "95% Betrouwbaarheidsinterval"
+  totaalaantalselect$total        <- TRUE
   
   
   if (!is.null(studieNiveauInput)){
@@ -120,6 +121,7 @@ TotaalAantal <- function(data, subSet, selectInput, filterColumn, studieNiveauIn
   totaalaantal$fill95Vals   <- "darkred"
   totaalaantal$fill80Labels <- "80% Betrouwbaarheidsinterval"
   totaalaantal$fill95Labels <- "95% Betrouwbaarheidsinterval"
+  totaalaantal$total        <- TRUE
   
   if (!is.null(studieNiveauInput)){
     
@@ -161,7 +163,7 @@ TotaalAantal <- function(data, subSet, selectInput, filterColumn, studieNiveauIn
   return(merge(subSet, totaalaantal, all=TRUE))
 }
 
-UniqueLabels <- function(data) {
+UniqueLabels <- function(data, rev) {
   unique_values <- data$soort[!is.na(data$soort)]
   blackValue <- NULL
   grayValue  <- NULL
@@ -176,33 +178,67 @@ UniqueLabels <- function(data) {
     }
   }
   
-  if(!is.null(grayValue) && !is.null(blackFound) ) {
+  if(!is.null(grayValue) && !is.null(blackValue) && rev) {
     unique_values <- replace(unique_values, unique_values==blackValue, "blackTemp")
     unique_values <- replace(unique_values, unique_values==grayValue, blackValue)
     unique_values <- replace(unique_values, unique_values=="blackTemp", grayValue)
   }
   
-  return(unique_values)
+  return(list(values=unique_values, hasTotaal=!is.null(blackValue), hasSelect=!is.null(grayValue)))
 }
 
 AddTotaalLines <- function(plot, data, forecast=FALSE,  ...) {
   if("soort" %in% colnames(data)) {
+    unique_values <- UniqueLabels(data, rev=!forecast)
+    
     plot <- plot +
       geom_line(data=data, ...,
                 aes(y=aantal, group=soort, color=soort)) + 
       geom_point(data=data, ...,
                  aes(y=aantal, group=soort, color=soort)) +
-      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)]), labels=UniqueLabels(data)) +
-      labs(color = "Totaallijn")
+      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)], rev=FALSE), labels=unique_values$values) 
+    
+    if(!forecast) {
+      plot <- plot +
+        labs(color = "Totaallijn")
+    }
     
     if(forecast) {
       plot <- plot +
         geom_line(data=data, linetype="dashed", ...,
-                  aes(y=fitted, group=soort, color=soort)) + 
-        geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="red"), alpha=.25) +
-        geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkred"), alpha=.25) +
-        scale_fill_manual(values=unique(c(data$fill80Vals, data$fill95Vals) ), labels=unique(c(data$fill80Labels, data$fill95Labels))) +
-        labs(color = "Test2")
+                  aes(y=fitted, group=soort, color=soort))+
+        labs(color = "Totaallijn")
+      
+      if(unique_values$hasTotaal || unique_values$hasSelect) {
+        new_data <- data[data$total == TRUE, ]
+        new_data <- new_data[!(is.na(new_data$soort)), ]
+        labels   <- c()
+        values   <- c()
+        dataTest <<- new_data
+        
+        if(unique_values$hasTotaal) {
+          new_data_totaal <- new_data[new_data$fill80Vals == "red", ]
+          labels <- c(labels, unique(new_data$fill80Labels), unique(new_data$fill95Labels))
+          values <- c(values, "red", "darkred")
+          
+          plot <- plot +
+            geom_ribbon(data=new_data_totaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="red"), alpha=.25) +
+            geom_ribbon(data=new_data_totaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkred"), alpha=.25)
+        }
+        
+        if(unique_values$hasSelect) {
+          new_data_totaal_sel <- new_data[new_data$fill80Vals == "blue", ]
+          labels <- c(labels, unique(new_data$fill80Labels), unique(new_data$fill95Labels))
+          values <- c("blue", "darkblue", values)
+          
+          plot <- plot +
+            geom_ribbon(data=new_data_totaal_sel, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="blue"), alpha=.25) +
+            geom_ribbon(data=new_data_totaal_sel, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkblue"), alpha=.25)
+        }
+        
+        plot <- plot +
+          scale_fill_manual(values=values, labels=labels, name="Betrouwbaarheidsintervallen")
+      }
     }
   }
   

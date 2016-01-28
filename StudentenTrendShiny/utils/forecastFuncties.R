@@ -52,6 +52,21 @@ createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE,D
     for(name in names(timeSeries)){
       forecastData[[name]] <- funggcast(timeSeries[[name]], forecast(fits[[name]], h=5), END+1, 5)
       forecastData[[name]] <- subset(forecastData[[name]],is.na(forecastData[[name]]$observed))
+      
+      if(length(grep("Totaal aantal", name)) > 0) {
+        forecastData[[name]]$fill80Vals   <- "red"
+        forecastData[[name]]$fill95Vals   <- "darkred"
+        forecastData[[name]]$fill80Labels <- "80% Betrouwbaarheidsinterval"
+        forecastData[[name]]$fill95Labels <- "95% Betrouwbaarheidsinterval"
+        forecastData[[name]]$total        <- TRUE
+      } else if(length(grep("Totaal geselecteerd", name)) > 0) {
+        forecastData[[name]]$fill80Vals   <- "blue"
+        forecastData[[name]]$fill95Vals   <- "darkblue"
+        forecastData[[name]]$fill80Labels <- "80% Betrouwbaarheidsinterval"
+        forecastData[[name]]$fill95Labels <- "95% Betrouwbaarheidsinterval"
+        forecastData[[name]]$total        <- TRUE
+      }
+      
     }
     
   }

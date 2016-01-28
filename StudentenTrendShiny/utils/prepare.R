@@ -17,7 +17,7 @@ LoadFromServer <- function(vName, ...) {
 }
 
 #Get better colors to show within the plots
-GetColors <- function(values){
+GetColors <- function(values, rev=TRUE){
   unique_values <- unique(values)
   len           <- length(unique_values)
   
@@ -45,7 +45,7 @@ GetColors <- function(values){
       }
     }
     
-    if(grayFound && blackFound) {
+    if(grayFound && blackFound && rev) {
       colors <- replace(colors, colors=="black", "blackTemp")
       colors <- replace(colors, colors=="gray48", "black")
       colors <- replace(colors, colors=="blackTemp", "gray48")
