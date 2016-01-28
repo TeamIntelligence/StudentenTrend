@@ -44,9 +44,7 @@ StudentenPerSectorUI <- function(PageName) {
 
 #The Server function for the StudentenPerSector page
 StudentenPerSectorServer <- function(input, output, session) {
-  
   reac <- reactiveValues(redraw = TRUE, selections = isolate(input$StudentenPerSector_selectStudyImp))
-  
   
   output$StudentenPerSector_aantalStudentenPlot <- renderPlotly({
     svSub <- studievoortgang[studievoortgang$iscedCode.iscedNaam %in% reac$selections,]
@@ -83,8 +81,7 @@ StudentenPerSectorServer <- function(input, output, session) {
       TotaalLine <- AddTotaalLine(plot=plot, 
                                   data=totaalaantal, 
                                   colors=scmOptionsList, 
-                                  size=-1,
-                                  color="black")
+                                  size=-1)
       
       plot           <- TotaalLine$plot
       scmOptionsList <- TotaalLine$colors
@@ -98,8 +95,7 @@ StudentenPerSectorServer <- function(input, output, session) {
       TotaalSelectLine <- AddTotaalSelectLine(plot=plot, 
                                               data=totaalaantalselect, 
                                               colors=scmOptionsList, 
-                                              size=-1,
-                                              color="gray48")
+                                              size=-1)
       
       plot           <- TotaalSelectLine$plot
       scmOptionsList <- TotaalSelectLine$colors

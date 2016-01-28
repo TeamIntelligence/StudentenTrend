@@ -120,8 +120,6 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       
       SGLineBaseplot <- TotaalLine$plot
       scmOptionsList <- TotaalLine$colors
-#       scmOptionsList$values <- c("black",scmOptionsList$values)
-#       scmOptionsList$labels <- c("Totaallijn",scmOptionsList$labels)
     }
     
     #alleen select
@@ -134,8 +132,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       TotaalSelectLine <- AddTotaalSelectLine(plot=SGLineBaseplot, 
                                               data=totaalaantalselect, 
                                               colors=scmOptionsList, 
-                                              size=-1,
-                                              color="gray")
+                                              size=-1)
       
       SGLineBaseplot <- TotaalSelectLine$plot
       scmOptionsList <- TotaalSelectLine$colors
@@ -244,7 +241,6 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     #data aanpassen nav keuze gebruiker: studie(s)
     StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% reac$selections,]
     StudentenGediplomeerden_forecastSub <- createForecastSub(StudentenGediplomeerden_StudieSub, "aantal", "iscedCode.iscedNaam", 1995, 2013,"")
-    PlotTitle <- "Aantal gediplomeerde studenten \nper jaar verdeeld per studie"
     
     if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       data <- HWSet
@@ -347,5 +343,4 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       isolate(reac$redraw <- TRUE)
     }
   })
-  
 }  
