@@ -89,7 +89,6 @@ StudentenIngeschrevenServer <- function(input, output, session){
     
     #Totaal lijn toevoegen
     if (input$StudentenIngeschreven_Totaal == TRUE ){
-      #totaallijn
       siSub <- TotaalAantal(data = studenten_ingeschrevenen,
                             subSet = siSub,
                             studieNiveauInput = input$StudentenIngeschreven_StudieNiveau, 
