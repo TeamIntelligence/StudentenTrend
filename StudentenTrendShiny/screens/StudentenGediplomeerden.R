@@ -91,15 +91,15 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     SGLineBaseplot <- ggplot(StudentenGediplomeerden_StudieSub, aes(x=jaartal)) + 
       xlab("Jaar") +  
       ylab("Aantal studenten") + 
-      ggtitle(PlotTitle)
+      ggtitle(PlotTitle) +
+      theme(legend.position="none")
     
     if(length(reac$selections) != 0) {
       SGLineBaseplot <- SGLineBaseplot +
         geom_line(data=StudentenGediplomeerden_StudieSub, size = -1,
                   aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) + 
         geom_point(data=StudentenGediplomeerden_StudieSub,
-                   aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) +
-        theme(legend.position="none")
+                   aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))
       
       scmOptionsList$values <- c(scmOptionsList$values, GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam))
       scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam))

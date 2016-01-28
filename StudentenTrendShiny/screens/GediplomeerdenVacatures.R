@@ -151,7 +151,7 @@ GediplomeerdenVacaturesServer <- function(input, output, session){
     sfillmanualOptionsList <- TotaalLine$fills
     
     plot +
-      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Studiesector") +
+      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Bedrijfssector") +
       scale_fill_manual(values=sfillmanualOptionsList$values, labels=sfillmanualOptionsList$labels, name="Betrouwbaarheidsinterval")
   })
   

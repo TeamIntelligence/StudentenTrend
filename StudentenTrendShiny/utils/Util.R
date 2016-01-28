@@ -153,22 +153,16 @@ TotaalAantal <- function(data, selectInput, studieNiveauInput = NULL, filterPara
 }
 
 AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE,  ...) {
-  color_vector <- data$soort
-  if(forecast) {
-    color_vector <- "black"
-  }
-  data$color_vector <- color_vector
-  
   plot <- plot +
     geom_line(data=data, ...,
-              aes(y=aantal, group=soort, color="black"), color="black") + 
+              aes(y=aantal, group=soort, color="black")) + 
     geom_point(data=data, ...,
-               aes(y=aantal, group=soort, color="black"), color="black")
+               aes(y=aantal, group=soort, color="black"))
   
   if(forecast) {
     plot <- plot +
       geom_line(data=data, linetype="dashed", ...,
-                aes(y=fitted, group=soort, color=color_vector), color="black") + 
+                aes(y=fitted, group=soort, color="black")) + 
       geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="red"), alpha=.25) +
       geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkred"), alpha=.25)
     
@@ -186,22 +180,16 @@ AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE,  ...) 
 }
 
 AddTotaalSelectLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, ...) {
-  color_vector <- data$soort
-  if(forecast) {
-    color_vector <- "gray48"
-  }
-  data$color_vector <- color_vector
-  
   plot <- plot +
     geom_line(data=data, ..., 
-              aes(y=aantal, group=soort, color="gray48"), color="gray48") + 
+              aes(y=aantal, group=soort, color="gray48")) + 
     geom_point(data=data, ...,
-               aes(y=aantal, group=soort, color="gray48"), color="gray48")
+               aes(y=aantal, group=soort, color="gray48"))
   
   if(forecast) {
     plot <- plot +
       geom_line(data=data, linetype="dashed", ...,
-                aes(y=fitted, group=soort, color=color_vector), color="gray48") + #Add but this adds an bug in the legend
+                aes(y=fitted, group=soort, color="gray48")) + #Add but this adds an bug in the legend
       geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="blue"), alpha=.25) +
       geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkblue"), alpha=.25)
     
@@ -223,10 +211,6 @@ InitGGLegend <- function() {
   #scale_color_manual options
   legend.names <- c("values", "breaks", "labels")
   legend <- setNames(vector("list", length(legend.names )), legend.names)
-  
-  legend$values <- NULL
-  legend$breaks <- NULL
-  legend$labels <- NULL
   
   return(legend)
 }

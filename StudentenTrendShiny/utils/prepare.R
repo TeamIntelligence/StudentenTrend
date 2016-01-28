@@ -41,7 +41,7 @@ GetDefaultTitleFont <- function() {
 # Load all the R packages needed
 LoadPackage("shiny")
 LoadPackage("shinydashboard")
-LoadPackage("dplyr")
+LoadPackage("plyr")
 LoadPackage("jsonlite")
 LoadPackage("ggplot2")
 LoadPackage("data.table")
