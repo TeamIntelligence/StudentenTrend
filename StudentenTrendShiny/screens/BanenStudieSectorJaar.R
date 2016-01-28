@@ -51,9 +51,9 @@ BanenStudieSectorJaarServer <- function(input, output, session){
       geom_point(data=bsjSub,aes(y=binnenDrieJaar,color="Purple")) +
       geom_line(data=aantalgediplomeerden, aes(y=aantal,color="Black")) + 
       geom_point(data=aantalgediplomeerden,aes(y=aantal,color="Black")) +
-      scale_color_manual(values = c("Red","Green","Blue","Purple","Black"), 
-                         labels=c("Direct","Binnen een jaar","Binnen twee jaar","Binnen drie jaar", "Aantal gediplomeerden"), 
-                         breaks = c("Red","Green","Blue","Purple","Black"), name = "Peilmoment") +
+      scale_color_manual(values=c("Black","Green","Blue","Purple", "Red"), 
+                         labels=c("Aantal gediplomeerden","Binnen een jaar","Binnen twee jaar","Binnen drie jaar", "Direct"), 
+                         breaks=c("Black","Green","Blue","Purple", "Red"), name = "Peilmoment") +
       xlim(2000,2008)
   })
   
@@ -103,9 +103,9 @@ BanenStudieSectorJaarServer <- function(input, output, session){
       geom_ribbon(data=bSJForeCastTotaal, aes(ymin=lo80, ymax=hi80, x=jaartal, group=group), fill="red", alpha=.25) +
       geom_ribbon(data=bSJForeCastTotaal, aes(ymin=lo95, ymax=hi95, x=jaartal, group=group), fill="darkred", alpha=.25) +
       
-      scale_color_manual(values = c("Red","Green","Blue","Purple","Black"), 
-                         labels=c("Direct","Binnen een jaar","Binnen twee jaar","Binnen drie jaar", "Aantal gediplomeerden"), 
-                         breaks = c("Red","Green","Blue","Purple","Black"), name = "Peilmoment")
+      scale_color_manual(values=c("Black","Green","Blue","Purple", "Red"), 
+                         labels=c("Aantal gediplomeerden","Binnen een jaar","Binnen twee jaar","Binnen drie jaar", "Direct"), 
+                         breaks=c("Black","Green","Blue","Purple", "Red"), name = "Peilmoment")
 #       xlim(2000,2008)
     
     
@@ -121,14 +121,13 @@ BanenStudieSectorJaarServer <- function(input, output, session){
     
     # gekozen soi omzetten naar isced
     gekozenisced <- soicodes[soicodes$soiNaam %in% input$BanenStudieSectorJaar_SelectImp,]$iscedCodes[[1]]
-    #gekozenisced <- soicodes[soicodes$soiNaam %in% "Leraren",]$iscedCodes[[1]]
     
     # aantal gediplomeerden omzetten naar gekozen soi
     aantalgediplomeerden <- studenten_gediplomeerden[studenten_gediplomeerden$iscedCode.iscedCode %in% gekozenisced$iscedCode, ]
     aantalgediplomeerden <- aantalgediplomeerden[(aantalgediplomeerden$ondCode == "HBO" & aantalgediplomeerden$diploma == "Bachelor") | (aantalgediplomeerden$ondCode == "WO" & aantalgediplomeerden$diploma == "Wo-master"),] 
     aantalgediplomeerden <- aggregate(aantalgediplomeerden$aantal, by=list(jaartal=aantalgediplomeerden$jaartal), FUN=sum)
     colnames(aantalgediplomeerden) <- c("jaartal","aantal")
-    
+    aantalgediplomeerden$soort <- "Totaal aantal"
     
     return(
       list(bsjSub = bsjSub, aantalgediplomeerden=aantalgediplomeerden)

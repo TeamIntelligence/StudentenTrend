@@ -82,7 +82,7 @@ AantalVacaturesServer <- function(input,output, session) {
                 aes(y=aantal, group=soort, color=soort), size=-1) +
       geom_point(data=AantalVacatures_vacSub,
                  aes(y=aantal, group=soort, color=soort)) +
-      scale_color_manual(values=GetColors(AantalVacatures_vacSub$soort, rev = TRUE), labels=unique(AantalVacatures_vacSub$soort))
+      scale_color_manual(values=GetColors(AantalVacatures_vacSub$soort), labels=unique(AantalVacatures_vacSub$soort))
     
     #Render de plot
     if( length(reac$selections) != 0 || input$AantalVacatures_Totaal == TRUE) {

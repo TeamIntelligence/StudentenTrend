@@ -41,56 +41,39 @@ GediplomeerdenVacaturesServer <- function(input, output, session){
   output$GedipVacaPlot <- renderPlotly({
     plotCalcs <- GediplomeerdenVacaturesPlotCalc(input)
 
-    plot <- ggplot(plotCalcs$totaalaantal,   
-                   aes(x=jaartal)) + 
+    plot <- ggplot(plotCalcs$gvSub, aes(x=jaartal)) + 
       xlab("Afstudeerjaar") +  
       ylab("Aantal vervulde banen") + 
       ggtitle("Vervulde banen per studie- per bedrijfssector") +
       theme(legend.position="none") +
       geom_line(data=plotCalcs$gvSub, aes(y=aantal,     #lijnen studies
-                                          group=sbiCode93.sbiNaam93,
-                                          color=sbiCode93.sbiNaam93), size=-1) + 
+                                          group=soort,
+                                          color=soort), size=-1) + 
       geom_point(data=plotCalcs$gvSub,aes(y=aantal, 
-                                          group=sbiCode93.sbiNaam93,
-                                          color=sbiCode93.sbiNaam93), size=-1) +
-      xlim(2000,plotCalcs$toYear)
+                                          group=soort,
+                                          color=soort), size=-1) +
+      xlim(2000,plotCalcs$toYear) +
+      scale_color_manual(values=GetColors(plotCalcs$gvSub$soort), labels=unique(plotCalcs$gvSub$soort))
     
-    #scale_color_manual options
-    scmOptionsList         <- InitGGLegend()
-    scmOptionsList$values <- c(scmOptionsList$values, GetColors(plotCalcs$gvSub$sbiCode93.sbiNaam93))
-    scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(plotCalcs$gvSub$sbiCode93.sbiNaam93))
-    scmOptionsList$labels <- c(scmOptionsList$labels, unique(plotCalcs$gvSub$sbiCode93.sbiNaam93))
-    
-    TotaalLine     <- AddTotaalLine(plot=plot, data=plotCalcs$totaalaantal, colors=scmOptionsList, size=-1)
-    plot           <- TotaalLine$plot
-    scmOptionsList <- TotaalLine$colors
-    
-    PrintGGPlotly(plot + 
-      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
-    )
+    PrintGGPlotly(plot)
   })
   
   ######################
   ## NORMALE BAR PLOT ##
   ######################
   output$GedipVacaBarPlot <- renderPlot({
-    plotCalcs <- GediplomeerdenVacaturesPlotCalc(input)
+    plotCalcs <- GediplomeerdenVacaturesPlotCalc(input, isBar=TRUE)
     
-    ggplot(plotCalcs$gvSub, 
-           aes(x=jaartal)) + 
+    plot <- ggplot(plotCalcs$gvSub, aes(x=jaartal)) + 
       xlab("Afstudeerjaar") +  
       ylab("Aantal vervulde banen") + 
       ggtitle("Vervulde banen per studie- per bedrijfssector") +
-      geom_bar(data = plotCalcs$gvSub, stat = "identity",
-               aes(y=aantal, fill=sbiCode93.sbiNaam93))+
-      geom_line(data=plotCalcs$totaalaantal, aes(y=aantal,  #totaal lijn
-                                                 color = "black")) + 
-      geom_point(data=plotCalcs$totaalaantal, aes(y=aantal, 
-                                                  color = "black")) + 
+      geom_bar(stat = "identity", aes(y=aantal, fill=sbiCode93.sbiNaam93))+
       scale_fill_manual(values=GetColors(plotCalcs$gvSub$sbiCode93.sbiNaam93),name="Bedrijfssector") +
-      scale_color_manual(values=c("black"),breaks=c("black"), labels=c("Totaal aantal vervulde banen"))+
       labs(color = "Totaallijn")+
       xlim(1999,plotCalcs$toYear+1)
+    
+    AddTotaalLines(plot=plot, data=plotCalcs$gvSub)
   })
   
   #########################
@@ -115,50 +98,21 @@ GediplomeerdenVacaturesServer <- function(input, output, session){
         plotCalcs$gvSub <- plotCalcs$gvSub[setdiff(rownames(plotCalcs$gvSub),rownames(removal_candidates)),]
       }
     } 
-
-    GVVForeCastSub          <- createForecastSub(plotCalcs$gvSub, "aantal", "sbiCode93.sbiNaam93", minYear, maxYear, "",DF = 1)
-    GVVForeCastTotaal       <- createForecastSub(plotCalcs$totaalaantal, "aantal", "singleColumn", minYear, maxYear, "",DF = 1)
-    GVVForeCastTotaal$soort = "Totaal" 
     
-    scmOptionsList         <- InitGGLegend()
-    sfillmanualOptionsList <- InitGGLegend()
-    scmOptionsList$values  <- c(scmOptionsList$values, GetColors(GVVForeCastSub$sbiCode93.sbiNaam93))
-    scmOptionsList$labels  <- c(scmOptionsList$labels, unique(GVVForeCastSub$sbiCode93.sbiNaam93))
+    GVVForeCastSub          <- createForecastSub(plotCalcs$gvSub, "aantal", "soort", minYear, maxYear, "",DF = 1)
     
-    plot <- ggplot(plotCalcs$totaalaantal,   
-           aes(x=jaartal)) + 
+    plot <- ggplot(GVVForeCastSub, aes(x=jaartal)) + 
       xlab("Afstudeerjaar") +  
       ylab("Aantal vervulde banen") + 
-      ggtitle("Vervulde banen per studie- per bedrijfssector") +
-      geom_line(data=GVVForeCastSub, aes(y=aantal,     #lijnen studies
-                                          group=sbiCode93.sbiNaam93,
-                                          color=sbiCode93.sbiNaam93)) + 
-      geom_point(data=GVVForeCastSub,aes(y=aantal, 
-                                          group=sbiCode93.sbiNaam93,
-                                          color=sbiCode93.sbiNaam93)) +
-      geom_line(data=GVVForeCastSub, linetype="dashed", size=1, aes(y=fitted,
-                                                                    group=sbiCode93.sbiNaam93,
-                                                                    color=sbiCode93.sbiNaam93))
+      ggtitle("Vervulde banen per studie- per bedrijfssector")
     
-    TotaalLine             <- AddTotaalLine(plot=plot, 
-                                            data=GVVForeCastTotaal, 
-                                            colors=scmOptionsList, 
-                                            fills=sfillmanualOptionsList,
-                                            forecast = TRUE)
-    
-    plot                   <- TotaalLine$plot
-    scmOptionsList         <- TotaalLine$colors
-    sfillmanualOptionsList <- TotaalLine$fills
-    
-    plot +
-      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels, name="Bedrijfssector") +
-      scale_fill_manual(values=sfillmanualOptionsList$values, labels=sfillmanualOptionsList$labels, name="Betrouwbaarheidsinterval")
+    AddTotaalLines(plot=plot, data=GVVForeCastSub, forecast=T, name="Bedrijfssector")
   })
   
   
 }
 
-GediplomeerdenVacaturesPlotCalc <- function(input) {
+GediplomeerdenVacaturesPlotCalc <- function(input, isBar=FALSE) {
   #data aanpassen nav keuze gebruiker: SBI Studielijntjes
   gvSub <- gediplomeerden_vacatures[gediplomeerden_vacatures$soiCode.soiNaam %in% input$GediplomeerdenVacatures_SelectImp, ]
   
@@ -178,14 +132,19 @@ GediplomeerdenVacaturesPlotCalc <- function(input) {
   
   #data aanpassen: HBO en WO optellen voor biinnen3jaar
   gvSub <- aggregate(columnNames, by=list(jaartal =gvSub$jaartal,sbiCode93.sbiNaam93=gvSub$sbiCode93.sbiNaam93), FUN=sum)
-  colnames(gvSub)<-c("jaartal","sbiCode93.sbiNaam93","aantal")
+  
+  if(isBar) {
+    colnames(gvSub)<-c("jaartal","sbiCode93.sbiNaam93","aantal")
+  } else {
+    colnames(gvSub)<-c("jaartal","soort","aantal")
+  }
   
   #Totaal berekenen aantal studenten
-  totaalaantal <- aggregate(gvSub$aantal, by=list(jaartal=gvSub$jaartal), FUN=sum)
-  colnames(totaalaantal)<-c("jaartal","aantal")
-  totaalaantal$soort <- "Totaal aantal"
+  gvSub <- TotaalAantal(data = gvSub,
+                        subSet = gvSub,
+                        filterParams = c("jaartal"))
   
   return(
-    list(gvSub = gvSub, toYear=toYear, totaalaantal=totaalaantal)
+    list(gvSub = gvSub, toYear=toYear)
   )
 }
