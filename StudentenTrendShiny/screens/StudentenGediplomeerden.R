@@ -11,7 +11,7 @@ StudentenGediplomeerdenUI <- function(PageName){
               box(width=4, height = 170,
                   selectInput("StudentenGediplomeerden_SelectStudyImp",
                               "Selecteer een of meerdere studiesectoren om weer te geven:",
-                              choices = studenten_gediplomeerden$iscedCode.iscedNaam,
+                              choices = list(Studiesectoren = unique(studenten_gediplomeerden$iscedCode.iscedNaam), "Selecteer een studiesector" = ""),
                               multiple = TRUE,
                               selectize = TRUE
                   ),
@@ -73,11 +73,13 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     
     #namen kolomtitels van de nieuwe gevormde data aanpassen
     if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
-      colnames(StudentenGediplomeerden_StudieSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
+      colnames(StudentenGediplomeerden_StudieSub)<-c("soort","jaartal","aantal")
+    } else {
+      colnames(StudentenGediplomeerden_StudieSub)[colnames(StudentenGediplomeerden_StudieSub)=="iscedCode.iscedNaam"] <- "soort"
     }
     
-    StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% reac$selections,]
-    PlotTitle <- "Aantal gediplomeerde studenten \nper jaar verdeeld per studie"
+    StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$soort %in% reac$selections,]
+    PlotTitle <- "Aantal gediplomeerde studenten per jaar verdeeld per studie"
     
     if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       data <- HWSet
@@ -88,58 +90,34 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     #scale_color_manual options
     scmOptionsList <- InitGGLegend()
     
-    SGLineBaseplot <- ggplot(StudentenGediplomeerden_StudieSub, aes(x=jaartal)) + 
-      xlab("Jaar") +  
-      ylab("Aantal studenten") + 
-      ggtitle(PlotTitle) +
-      theme(legend.position="none")
-    
-    if(length(reac$selections) != 0) {
-      SGLineBaseplot <- SGLineBaseplot +
-        geom_line(data=StudentenGediplomeerden_StudieSub, size = -1,
-                  aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam)) + 
-        geom_point(data=StudentenGediplomeerden_StudieSub,
-                   aes(y=aantal, group=iscedCode.iscedNaam, color=iscedCode.iscedNaam))
-      
-      scmOptionsList$values <- c(scmOptionsList$values, GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam))
-      scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam))
-      scmOptionsList$labels <- c(scmOptionsList$labels, unique(StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam))
+    #Alleen select
+    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
+      StudentenGediplomeerden_StudieSub <- TotaalAantalSelect(data = StudentenGediplomeerden_StudieSub,
+                                                              studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
+                                                              filterParams= c("ondCode",'jaartal',"diploma"))
     }
     
     #Totaal lijn toevoegen
     if (input$StudentenGediplomeerden_Totaal == TRUE ){
       #totaallijn
-      totaalaantal <- TotaalAantal(data = data,
-                                   studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                   filterParams = c("ondCode",'jaartal',"diploma"))
-      
-      TotaalLine <- AddTotaalLine(plot=SGLineBaseplot, 
-                                  data=totaalaantal, 
-                                  colors=scmOptionsList, 
-                                  size=-1)
-      
-      SGLineBaseplot <- TotaalLine$plot
-      scmOptionsList <- TotaalLine$colors
+      StudentenGediplomeerden_StudieSub <- TotaalAantal(data = data,
+                                                        subSet = StudentenGediplomeerden_StudieSub,
+                                                        studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                                        filterParams = c("ondCode",'jaartal',"diploma"))
     }
     
-    #alleen select
-    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
-      totaalaantalselect <- TotaalAantalSelect(data = data,
-                                               selectInput = reac$selections,
-                                               studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
-                                               filterParams= c("ondCode",'jaartal',"diploma"))
-      
-      TotaalSelectLine <- AddTotaalSelectLine(plot=SGLineBaseplot, 
-                                              data=totaalaantalselect, 
-                                              colors=scmOptionsList, 
-                                              size=-1)
-      
-      SGLineBaseplot <- TotaalSelectLine$plot
-      scmOptionsList <- TotaalSelectLine$colors
-    }
+    StudentenGediplomeerden_StudieSub <<- StudentenGediplomeerden_StudieSub
     
-    SGLineBaseplot <- SGLineBaseplot +
-      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
+    SGLineBaseplot <- ggplot(StudentenGediplomeerden_StudieSub, aes(x=jaartal)) + 
+      xlab("Jaar") +  
+      ylab("Aantal studenten") + 
+      ggtitle(PlotTitle) +
+      theme(legend.position="none") +
+      geom_line(data=StudentenGediplomeerden_StudieSub, size = -1,
+                aes(y=aantal, group=soort, color=soort)) + 
+      geom_point(data=StudentenGediplomeerden_StudieSub,
+                 aes(y=aantal, group=soort, color=soort)) +
+      scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$soort), labels=unique(StudentenGediplomeerden_StudieSub$soort))
     
     #Render de plot
     if( length(reac$selections) != 0 || input$StudentenGediplomeerden_Totaal == TRUE) {
@@ -153,8 +131,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
   ## NORMALE BAR PLOT ##
   ######################
   output$DiploBarPlot <- renderPlot({
-    
-    HWBarSet <<- studenten_gediplomeerden[(studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor") | (studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master") ,] 
+    HWBarSet <- studenten_gediplomeerden[(studenten_gediplomeerden$ondCode == "HBO" & studenten_gediplomeerden$diploma == "Bachelor") | (studenten_gediplomeerden$ondCode == "WO" & studenten_gediplomeerden$diploma == "Wo-master") ,] 
     
     #data aanpassen nav keuzes gebruiker
     StudentenGediplomeerden_StudieBarSub <- switch (input$StudentenGediplomeerden_StudieNiveau,
@@ -166,9 +143,11 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     
     #namen kolomtitels van de nieuwe gevormde data aanpassen
     if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
-      colnames(StudentenGediplomeerden_StudieBarSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
+      colnames(StudentenGediplomeerden_StudieBarSub)<-c("soort","jaartal","aantal")
     }
+    
     StudentenGediplomeerden_StudieBarSub <- StudentenGediplomeerden_StudieBarSub[StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam %in% reac$selections,]
+    PlotTitle <- "Aantal gediplomeerde studenten per jaar verdeeld per studie"
     
     if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       data <- HWBarSet
@@ -179,43 +158,27 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     #scale_color_manual options
     scmOptionsList <- InitGGLegend()
     
-    SGBarBaseplot <-  ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
-      xlab("Jaar") +  
-      ylab("Aantal studenten") + 
-      ggtitle("Aantal gediplomeerde studenten")
-    
-    if (length(reac$selections) != 0){
-      SGBarBaseplot <- SGBarBaseplot +
-        geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
-        scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studiesector")
+    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
+      StudentenGediplomeerden_StudieBarSub <- TotaalAantalSelect(data = StudentenGediplomeerden_StudieBarSub,
+                                                                 studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
+                                                                 filterParams= c("ondCode",'jaartal',"diploma"))
     }
     
     if (input$StudentenGediplomeerden_Totaal == TRUE ){
-      totaalaantal <- TotaalAantal(data = data, 
-                                   studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                   filterParams= c("ondCode",'jaartal',"diploma"))
-      
-      TotaalLine <- AddTotaalLine(plot = SGBarBaseplot, data = totaalaantal, colors=scmOptionsList)
-      
-      SGBarBaseplot  <- TotaalLine$plot
-      scmOptionsList <- TotaalLine$colors
+      StudentenGediplomeerden_StudieBarSub <- TotaalAantal(data = data, 
+                                                           subSet = StudentenGediplomeerden_StudieBarSub,
+                                                           studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                                           filterParams= c("ondCode",'jaartal',"diploma"))
     }
-    
-    if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
-      totaalaantalselect <- TotaalAantalSelect(data = data,
-                                               selectInput = reac$selections,
-                                               studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
-                                               filterParams= c("ondCode",'jaartal',"diploma"))
       
-      TotaalSelectLine <- AddTotaalSelectLine(plot = SGBarBaseplot, data = totaalaantalselect, colors=scmOptionsList)
-      
-      SGBarBaseplot  <- TotaalSelectLine$plot
-      scmOptionsList <- TotaalSelectLine$colors
-    }
+    SGBarBaseplot <- ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
+      xlab("Jaar") +  
+      ylab("Aantal studenten") + 
+      ggtitle(PlotTitle) +
+      geom_bar(stat = "identity", aes(y=aantal, fill=iscedCode.iscedNaam)) + 
+      scale_fill_manual(values=GetColors(StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam), name= "Studiesector")
     
-    #Render de plot
-    SGBarBaseplot +
-      scale_color_manual(values=scmOptionsList$values, labels=scmOptionsList$labels)
+    AddTotaalLines(plot=SGBarBaseplot, data=StudentenGediplomeerden_StudieBarSub)
   })
   
   #########################
@@ -239,8 +202,9 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     }
     
     #data aanpassen nav keuze gebruiker: studie(s)
-    StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$iscedCode.iscedNaam %in% reac$selections,]
+    StudentenGediplomeerden_StudieSub   <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$soort %in% reac$selections,]
     StudentenGediplomeerden_forecastSub <- createForecastSub(StudentenGediplomeerden_StudieSub, "aantal", "iscedCode.iscedNaam", 1995, 2013,"")
+    PlotTitle <- "Aantal gediplomeerde studenten per jaar verdeeld per studie"
     
     if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       data <- HWSet
@@ -253,7 +217,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     sfillmanualOptionsList <- InitGGLegend()
     
     SGForecastBaseplot <- ggplot(StudentenGediplomeerden_forecastSub, aes(x=jaartal)) +
-      ggtitle("Aantal gediplomeerden per studiesector") +
+      ggtitle(PlotTitle) +
       xlab("Jaar") + 
       ylab("Aantal gediplomeerden") 
     
@@ -267,24 +231,6 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       scmOptionsList$values <- c(scmOptionsList$values, GetColors(StudentenGediplomeerden_forecastSub$iscedCode.iscedNaam))
       scmOptionsList$breaks <- c(scmOptionsList$breaks, GetColors(StudentenGediplomeerden_forecastSub$iscedCode.iscedNaam))
       scmOptionsList$labels <- c(scmOptionsList$labels, unique(StudentenGediplomeerden_forecastSub$iscedCode.iscedNaam))
-    }
-    
-    if (input$StudentenGediplomeerden_Totaal == TRUE ){
-      #totaallijn
-      totaalaantal <- TotaalAantal(data = data,
-                                   studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                   filterParams= c("ondCode",'jaartal',"diploma"))
-      forecastTotaal <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1995, 2013, "")
-      
-      TotaalLine     <- AddTotaalLine(plot=SGForecastBaseplot, 
-                                      data=forecastTotaal, 
-                                      colors=scmOptionsList, 
-                                      fills=sfillmanualOptionsList,
-                                      forecast=TRUE, size=1)
-      
-      SGForecastBaseplot     <- TotaalLine$plot
-      scmOptionsList         <- TotaalLine$colors
-      sfillmanualOptionsList <- TotaalLine$fills
     }
     
     if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
@@ -304,6 +250,26 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       SGForecastBaseplot     <- TotaalSelectLine$plot
       scmOptionsList         <- TotaalSelectLine$colors
       sfillmanualOptionsList <- TotaalSelectLine$fills
+    }
+    
+    if (input$StudentenGediplomeerden_Totaal == TRUE ){
+      #Totaallijn
+      totaalaantal <- TotaalAantal(data = data,
+                                   subSet = StudentenGediplomeerden_forecastSub,
+                                   studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
+                                   filterParams= c("ondCode",'jaartal',"diploma"))
+      
+      forecastTotaal <- createForecastSub(totaalaantal, "aantal", "singleColumn", 1995, 2013, "")
+      
+      TotaalLine     <- AddTotaalLine(plot=SGForecastBaseplot, 
+                                      data=forecastTotaal, 
+                                      colors=scmOptionsList, 
+                                      fills=sfillmanualOptionsList,
+                                      forecast=TRUE, size=1)
+      
+      SGForecastBaseplot     <- TotaalLine$plot
+      scmOptionsList         <- TotaalLine$colors
+      sfillmanualOptionsList <- TotaalLine$fills
     }
     
     #Render de plot
