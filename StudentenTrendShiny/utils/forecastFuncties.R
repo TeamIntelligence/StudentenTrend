@@ -72,12 +72,6 @@ createForecastSub <- function(INPUTSET, COUNTCOL, GROUPBY, START, END, EXCLUDE,D
   }
   
   mergedSub <- mergeForecastframe(INPUTSET, forecastData, GROUPBY, EXCLUDE)
-#   print("merged sub :")
-#   print(mergedSub[[groupCol]])
-#   
-#   print("merged sub row")
-#   print(mergedSub[1, groupCol])
-#   mergedSub[[groupCol]] <- mergedSub[1, groupCol]
   return(mergedSub)
 }
 

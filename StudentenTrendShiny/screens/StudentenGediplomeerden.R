@@ -74,8 +74,10 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     #namen kolomtitels van de nieuwe gevormde data aanpassen
     if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       colnames(StudentenGediplomeerden_StudieSub)<-c("soort","jaartal","aantal")
+      filterParams <- c('jaartal')
     } else {
       colnames(StudentenGediplomeerden_StudieSub)[colnames(StudentenGediplomeerden_StudieSub)=="iscedCode.iscedNaam"] <- "soort"
+      filterParams <- c("ondCode",'jaartal',"diploma")
     }
     
     StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$soort %in% reac$selections,]
@@ -91,7 +93,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
       StudentenGediplomeerden_StudieSub <- TotaalAantalSelect(data = StudentenGediplomeerden_StudieSub,
                                                               studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
-                                                              filterParams= c("ondCode",'jaartal',"diploma"))
+                                                              filterParams=filterParams)
     }
     
     #Totaal lijn toevoegen
@@ -100,10 +102,8 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       StudentenGediplomeerden_StudieSub <- TotaalAantal(data = data,
                                                         subSet = StudentenGediplomeerden_StudieSub,
                                                         studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                                        filterParams = c("ondCode",'jaartal',"diploma"))
+                                                        filterParams = filterParams)
     }
-    
-    StudentenGediplomeerden_StudieSub <<- StudentenGediplomeerden_StudieSub
     
     SGLineBaseplot <- ggplot(StudentenGediplomeerden_StudieSub, aes(x=jaartal)) + 
       xlab("Jaar") +  
@@ -140,7 +140,10 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     
     #namen kolomtitels van de nieuwe gevormde data aanpassen
     if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
-      colnames(StudentenGediplomeerden_StudieBarSub)<-c("soort","jaartal","aantal")
+      colnames(StudentenGediplomeerden_StudieBarSub)<-c("iscedCode.iscedNaam","jaartal","aantal")
+      filterParams <- c('jaartal')
+    } else {
+      filterParams <- c("ondCode",'jaartal',"diploma")
     }
     
     StudentenGediplomeerden_StudieBarSub <- StudentenGediplomeerden_StudieBarSub[StudentenGediplomeerden_StudieBarSub$iscedCode.iscedNaam %in% reac$selections,]
@@ -158,14 +161,14 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
       StudentenGediplomeerden_StudieBarSub <- TotaalAantalSelect(data = StudentenGediplomeerden_StudieBarSub,
                                                                  studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau,
-                                                                 filterParams= c("ondCode",'jaartal',"diploma"))
+                                                                 filterParams= filterParams)
     }
     
     if (input$StudentenGediplomeerden_Totaal == TRUE ){
       StudentenGediplomeerden_StudieBarSub <- TotaalAantal(data = data, 
                                                            subSet = StudentenGediplomeerden_StudieBarSub,
                                                            studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                                           filterParams= c("ondCode",'jaartal',"diploma"))
+                                                           filterParams= filterParams)
     }
       
     SGBarBaseplot <- ggplot(StudentenGediplomeerden_StudieBarSub, aes(x=jaartal)) + 
@@ -196,15 +199,15 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     #namen kolomtitels van de nieuwe gevormde data aanpassen
     if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       colnames(StudentenGediplomeerden_StudieSub)<-c("soort","jaartal","aantal")
+      filterParams <- c('jaartal')
     } else {
       colnames(StudentenGediplomeerden_StudieSub)[colnames(StudentenGediplomeerden_StudieSub)=="iscedCode.iscedNaam"] <- "soort"
+      filterParams <- c("ondCode",'jaartal',"diploma")
     }
     
     #data aanpassen nav keuze gebruiker: studie(s)
     StudentenGediplomeerden_StudieSub   <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$soort %in% reac$selections,]
     PlotTitle <- "Aantal gediplomeerde studenten per jaar verdeeld per studie"
-    
-    StudentenGediplomeerden_StudieSub <<- StudentenGediplomeerden_StudieSub
     
     if (input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       data <- HWSet
@@ -215,7 +218,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     if (input$StudentenGediplomeerden_TotaalSelect == TRUE && length(reac$selections) != 0){
       StudentenGediplomeerden_StudieSub <- TotaalAantalSelect(data = StudentenGediplomeerden_StudieSub,
                                                               studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                                              filterParams= c("ondCode",'jaartal',"diploma"))
+                                                              filterParams= filterParams)
     }
     
     #Totaallijn
@@ -223,10 +226,8 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       StudentenGediplomeerden_StudieSub <- TotaalAantal(data = data,
                                                         subSet = StudentenGediplomeerden_StudieSub,
                                                         studieNiveauInput = input$StudentenGediplomeerden_StudieNiveau, 
-                                                        filterParams= c("ondCode",'jaartal',"diploma"))
+                                                        filterParams= filterParams)
     }
-    
-    StudentenGediplomeerden_StudieSub <<- StudentenGediplomeerden_StudieSub
     
     StudentenGediplomeerden_forecastSub <- createForecastSub(StudentenGediplomeerden_StudieSub, "aantal", "soort", 1995, 2013,"")
     
@@ -234,8 +235,6 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       ggtitle(PlotTitle) +
       xlab("Jaar") + 
       ylab("Aantal gediplomeerden")
-    
-    StudentenGediplomeerden_forecastSub <<- StudentenGediplomeerden_forecastSub
   
     AddTotaalLines(plot=SGForecastBaseplot, data=StudentenGediplomeerden_forecastSub, forecast=T)  
   })

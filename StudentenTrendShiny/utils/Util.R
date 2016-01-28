@@ -68,7 +68,6 @@ TotaalAantalSelect <- function(data, selectInput = NULL, studieNiveauInput = NUL
   totaalaantalselect$fill95Labels <- "95% Betrouwbaarheidsinterval"
   totaalaantalselect$total        <- TRUE
   
-  
   if (!is.null(studieNiveauInput)){
     isGedpl <- FALSE
     if(!is.null(data$diploma)){
@@ -196,7 +195,7 @@ AddTotaalLines <- function(plot, data, forecast=FALSE,  ...) {
                 aes(y=aantal, group=soort, color=soort)) + 
       geom_point(data=data, ...,
                  aes(y=aantal, group=soort, color=soort)) +
-      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)], rev=FALSE), labels=unique_values$values) 
+      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)], rev=!forecast), labels=unique_values$values) 
     
     if(!forecast) {
       plot <- plot +
@@ -214,7 +213,6 @@ AddTotaalLines <- function(plot, data, forecast=FALSE,  ...) {
         new_data <- new_data[!(is.na(new_data$soort)), ]
         labels   <- c()
         values   <- c()
-        dataTest <<- new_data
         
         if(unique_values$hasTotaal) {
           new_data_totaal <- new_data[new_data$fill80Vals == "red", ]
