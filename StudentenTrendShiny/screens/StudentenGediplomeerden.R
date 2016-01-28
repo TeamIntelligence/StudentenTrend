@@ -237,7 +237,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     
     StudentenGediplomeerden_forecastSub <<- StudentenGediplomeerden_forecastSub
   
-    AddTotaalLines(plot=SGForecastBaseplot, data=StudentenGediplomeerden_forecastSub)  
+    AddTotaalLines(plot=SGForecastBaseplot, data=StudentenGediplomeerden_forecastSub, forecast=T)  
   })
   
   observe({
