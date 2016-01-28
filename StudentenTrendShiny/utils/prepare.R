@@ -33,13 +33,13 @@ GetColors <- function(values, rev=TRUE){
     blackFound <- FALSE
     grayFound  <- FALSE
     
-    for(i in 1:length(unique_values)) {
+    for(i in length(unique_values):length(unique_values)-2) {
       value <- unique_values[i]
       
-      if(length(grep("Totaal aantal", value)) > 0) {
+      if(grepl("Totaal aantal", value)) {
         blackFound <- TRUE
         colors[i] <- "black"
-      } else if(length(grep("Totaal geselecteerd", value)) > 0) {
+      } else if(grepl("Totaal geselecteerd", value)) {
         grayFound <- TRUE
         colors[i] <- "gray48"
       }

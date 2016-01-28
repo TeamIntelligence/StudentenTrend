@@ -75,9 +75,11 @@ StudentenGediplomeerdenServer <- function(input, output, session){
     if(input$StudentenGediplomeerden_StudieNiveau == "HBOWO"){
       colnames(StudentenGediplomeerden_StudieSub)<-c("soort","jaartal","aantal")
       filterParams <- c('jaartal')
+      rev <- FALSE
     } else {
       colnames(StudentenGediplomeerden_StudieSub)[colnames(StudentenGediplomeerden_StudieSub)=="iscedCode.iscedNaam"] <- "soort"
       filterParams <- c("ondCode",'jaartal',"diploma")
+      rev <- TRUE
     }
     
     StudentenGediplomeerden_StudieSub <- StudentenGediplomeerden_StudieSub[StudentenGediplomeerden_StudieSub$soort %in% reac$selections,]
@@ -114,7 +116,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
                 aes(y=aantal, group=soort, color=soort)) + 
       geom_point(data=StudentenGediplomeerden_StudieSub,
                  aes(y=aantal, group=soort, color=soort)) +
-      scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$soort), labels=unique(StudentenGediplomeerden_StudieSub$soort))
+      scale_color_manual(values=GetColors(StudentenGediplomeerden_StudieSub$soort, rev=rev), labels=unique(StudentenGediplomeerden_StudieSub$soort))
     
     #Render de plot
     if( length(reac$selections) != 0 || input$StudentenGediplomeerden_Totaal == TRUE) {
@@ -236,7 +238,7 @@ StudentenGediplomeerdenServer <- function(input, output, session){
       xlab("Jaar") + 
       ylab("Aantal gediplomeerden")
   
-    AddTotaalLines(plot=SGForecastBaseplot, data=StudentenGediplomeerden_forecastSub, forecast=T)  
+    AddTotaalLines(plot=SGForecastBaseplot, data=StudentenGediplomeerden_forecastSub, forecast=T, name="Studiesector")  
   })
   
   observe({

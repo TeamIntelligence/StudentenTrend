@@ -163,7 +163,7 @@ TotaalAantal <- function(data, subSet, selectInput, filterColumn, studieNiveauIn
 }
 
 UniqueLabels <- function(data, rev) {
-  unique_values <- data$soort[!is.na(data$soort)]
+  unique_values <- unique(data$soort[!is.na(data$soort)])
   blackValue <- NULL
   grayValue  <- NULL
   
@@ -197,16 +197,10 @@ AddTotaalLines <- function(plot, data, name="Totaallijn", forecast=FALSE,  ...) 
                  aes(y=aantal, group=soort, color=soort)) +
       scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)], rev=!forecast), labels=unique_values$values, name = name) 
     
-    if(!forecast) {
-      plot <- plot +
-        labs(color = "Totaallijn")
-    }
-    
     if(forecast) {
       plot <- plot +
         geom_line(data=data, linetype="dashed", ...,
-                  aes(y=fitted, group=soort, color=soort))+
-        labs(color = "Totaallijn")
+                  aes(y=fitted, group=soort, color=soort))
       
       if(unique_values$hasTotaal || unique_values$hasSelect) {
         new_data <- data[data$total == TRUE, ]
@@ -237,6 +231,9 @@ AddTotaalLines <- function(plot, data, name="Totaallijn", forecast=FALSE,  ...) 
         plot <- plot +
           scale_fill_manual(values=values, labels=labels, name="Betrouwbaarheidsintervallen")
       }
+    } else {
+      plot <- plot +
+        labs(color = "Totaallijn")
     }
   }
   
