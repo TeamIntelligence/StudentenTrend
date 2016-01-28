@@ -160,18 +160,22 @@ AddTotaalLine <- function(plot, data, colors, fills=NULL, forecast=FALSE,  ...) 
                aes(y=aantal, group=soort, color="black"))
   
   if(forecast) {
-    plot <- plot +
+    plot <- plot+
       geom_line(data=data, linetype="dashed", ...,
                 aes(y=fitted, group=soort, color="black")) + 
       geom_ribbon(data=data, aes(ymin=lo80, ymax=hi80, x=jaartal, group=soort, fill="red"), alpha=.25) +
       geom_ribbon(data=data, aes(ymin=lo95, ymax=hi95, x=jaartal, group=soort, fill="darkred"), alpha=.25)
-    
     fills$values <- c(fills$values, c("red", "darkred"))
     fills$labels <- c(fills$labels, c("80% Betrouwbaarheidsinterval", "95% Betrouwbaarheidsinterval"))
   }
   
-  colors$values <- c(colors$values, "black")
-  colors$labels <- c(colors$labels, "Totaallijn")
+  if(system_name == 'Windows' || system_name == 'Linux') {
+    colors$values <- c("black",colors$values)
+    colors$labels <- c("Totaallijn",colors$labels)
+  } else {
+    colors$values <- c(colors$values, "black")
+    colors$labels <- c(colors$labels, "Totaallijn")
+  }
   
   plot <- plot +
     labs(color = "Totaallijn")
@@ -197,9 +201,13 @@ AddTotaalSelectLine <- function(plot, data, colors, fills=NULL, forecast=FALSE, 
     fills$labels <- c(fills$labels, c("80% Betrouwbaarheidsinterval", "95% Betrouwbaarheidsinterval"))
   }
   
-  
-  colors$values <- c(colors$values, "gray48")
-  colors$labels <- c(colors$labels, "Totaallijn geselecteerde")
+  if(system_name == 'Windows' || system_name == 'Linux') {
+    colors$values <- c("gray48", colors$values)
+    colors$labels <- c("Totaallijn geselecteerde", colors$labels)
+  } else {
+    colors$values <- c(colors$values, "gray48")
+    colors$labels <- c(colors$labels, "Totaallijn geselecteerde")
+  }
   
   plot <- plot +
     labs(color = "Totaallijn")

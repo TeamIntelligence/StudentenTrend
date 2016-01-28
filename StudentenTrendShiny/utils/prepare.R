@@ -1,3 +1,5 @@
+system_name <- Sys.info()['sysname']
+
 # Load a R package. If not yet installed, install it
 LoadPackage <- function(packageName, ...) {
   if(!require(packageName, character.only = T)){
@@ -17,10 +19,6 @@ LoadFromServer <- function(vName, ...) {
 #Get better colors to show within the plots
 GetColors <- function(values){
   len <- length(unique(values))
-  
-  if(len <= 1) {
-    len <- 2
-  }
   
   customColorArray <- c("#8B5A2C", "#CD4F39", "#D14390", "#3C868C", "#CDBA96",
                         "#4F94CD", "#EE7E71", "#DA70D6", "#8B5A19", "#6BCE35",

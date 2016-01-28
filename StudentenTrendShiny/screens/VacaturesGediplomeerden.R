@@ -67,7 +67,6 @@ VacaturesGediplomeerdenServer <- function(input, output, session){
   })
   
   output$VacaGedipBarPlot <- renderPlot({
-
     plotCalcs <- VacaturesGediplomeerdenPlotCalc(input)
     
     ggplot(plotCalcs$vgSub, 
