@@ -17,8 +17,9 @@ LoadFromServer <- function(vName, ...) {
 }
 
 #Get better colors to show within the plots
-GetColors <- function(values){
-  len <- length(unique(values))
+GetColors <- function(values, rev=F){
+  unique_values <- sort(unique(values))
+  len           <- length(unique_values)
   
   customColorArray <- c("#8B5A2C", "#CD4F39", "#D14390", "#3C868C", "#CDBA96",
                         "#4F94CD", "#EE7E71", "#DA70D6", "#8B5A19", "#6BCE35",
@@ -28,8 +29,36 @@ GetColors <- function(values){
                         "#548B53", "#7CF5A0", "#CD853F", "#E93F34", "#8B8C15")
   
   if (len<=length(customColorArray)){
-    return(customColorArray[1:len])
+    colors <- customColorArray[1:len]
+    blackFound <- FALSE
+    grayFound  <- FALSE
+    
+    
+    
+    for(i in 1:length(unique_values)) {
+      value <- unique_values[i]
+      
+      if(grepl("Totaal aantal", value)) {
+        blackFound <- TRUE
+        colors[i] <- "black"
+      } else if(grepl("Totaal geselecteerd", value)) {
+        grayFound <- TRUE
+        colors[i] <- "gray48"
+      }
+    }
+    
+#     if(grayFound && blackFound && rev) {
+#       colors <- replace(colors, colors=="black", "blackTemp")
+#       colors <- replace(colors, colors=="gray48", "black")
+#       colors <- replace(colors, colors=="blackTemp", "gray48")
+#     }
+    
+    print(colors)
+    
+    return(colors)
   }
+  
+  return(values)
 }
 
 GetDefaultTitleFont <- function() {
