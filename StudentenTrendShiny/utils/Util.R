@@ -168,7 +168,7 @@ AddTotaalLines <- function(plot, data, forecast=FALSE,  ...) {
                 aes(y=aantal, group=soort, color=soort)) + 
       geom_point(data=data, ...,
                  aes(y=aantal, group=soort, color=soort)) +
-      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)]), labels=unique(data$soort[!is.na(data$soort)])) +
+      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)]), labels=rev(unique(data$soort[!is.na(data$soort)]))) +
       labs(color = "Totaallijn")
     
     if(forecast) {
