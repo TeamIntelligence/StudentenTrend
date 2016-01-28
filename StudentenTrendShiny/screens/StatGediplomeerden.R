@@ -1,4 +1,3 @@
-#hoi timpie
 StatGediplomeerdenUI <- function(PageName){
   return(
     tabItem(tabName = PageName,
