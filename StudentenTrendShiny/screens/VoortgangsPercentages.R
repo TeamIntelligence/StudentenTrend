@@ -66,7 +66,6 @@ VoortgangsPercentagesServer <- function(input, output, session) {
       j = 1
       
       for(i in 1:length(names(data))){
-        print(names(data)[i])
         if(length(grep("hbo", names(data)[i]) > 0)){
           HBOColRange <- c(i:(i+6))
           WOColRange <- c((i+7):(i+13))
@@ -106,7 +105,7 @@ VoortgangsPercentagesServer <- function(input, output, session) {
     if(!exists("morphedSet") || is.null(morphedSet)){
       morphedSet <- morphSet(studievoortgang)
     }    
-    
+
     if(!is.null(input$VoortgangsPercentages_yearRangeSlider) && !is.null(input$VoortgangsPercentages_check)){
       columnNames <- if(input$VoortgangsPercentages_voortgangType == "uitschrijf"){
                         c("iscedCode.iscedNaam", 
@@ -120,6 +119,10 @@ VoortgangsPercentagesServer <- function(input, output, session) {
       if(input$VoortgangsPercentages_check == "morphSet"){
         svSet <- morphedSet
         yLim <- 100
+        plotTitle <- switch(input$VoortgangsPercentages_voortgangType,
+                            "uitschrijf" = paste("Percentage van alle studenten dat uitgeschreven is binnen", input$VoortgangsPercentages_yearRangeSlider, "jaar\nt.o.v. alle uitgeschreven studenten"),
+                            "afgestudeerd" = paste("Percentage van alle studenten dat geslaagd is binnen", input$VoortgangsPercentages_yearRangeSlider, "jaar\nt.o.v. alle geslaagde studenten")
+        )
         
       } else {
         svSet <- studievoortgang
@@ -127,17 +130,15 @@ VoortgangsPercentagesServer <- function(input, output, session) {
                         "uitschrijf" = 35,
                         "afgestudeerd" = 100
         )
+        plotTitle <- switch(input$VoortgangsPercentages_voortgangType,
+                            "uitschrijf" = paste("Percentage van alle studenten dat uitgeschreven is binnen", input$VoortgangsPercentages_yearRangeSlider, "jaar\nt.o.v. alle gestarte studenten"),
+                            "afgestudeerd" = paste("Percentage van alle studenten dat geslaagd is binnen", input$VoortgangsPercentages_yearRangeSlider, "jaar\nt.o.v. alle gestarte studenten")
+        )
       }
 
       svSub <- switch (input$VoortgangsPercentages_voortgangType,
                        "uitschrijf" = aggregate (svSet[, columnNames][,2], list(svSet$iscedCode.iscedNaam), customMean),
                        "afgestudeerd" = aggregate (svSet[, columnNames][,2] + svSet[, columnNames][,3], list(svSet$iscedCode.iscedNaam), customMean)
-      )
-      
-      
-      plotTitle <- switch(input$VoortgangsPercentages_voortgangType,
-                          "uitschrijf" = paste("Percentage van alle studenten dat uitgeschreven is binnen", input$VoortgangsPercentages_yearRangeSlider, "jaar"),
-                          "afgestudeerd" = paste("Percentage van alle studenten dat geslaagd is binnen", input$VoortgangsPercentages_yearRangeSlider, "jaar")
       )
       
       colnames(svSub) <- c("sector", "mean")
