@@ -186,7 +186,7 @@ UniqueLabels <- function(data, rev) {
   return(list(values=unique_values, hasTotaal=!is.null(blackValue), hasSelect=!is.null(grayValue)))
 }
 
-AddTotaalLines <- function(plot, data, forecast=FALSE,  ...) {
+AddTotaalLines <- function(plot, data, name="Totaallijn", forecast=FALSE,  ...) {
   if("soort" %in% colnames(data)) {
     unique_values <- UniqueLabels(data, rev=!forecast)
     
@@ -195,7 +195,7 @@ AddTotaalLines <- function(plot, data, forecast=FALSE,  ...) {
                 aes(y=aantal, group=soort, color=soort)) + 
       geom_point(data=data, ...,
                  aes(y=aantal, group=soort, color=soort)) +
-      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)], rev=!forecast), labels=unique_values$values) 
+      scale_color_manual(values=GetColors(data$soort[!is.na(data$soort)], rev=!forecast), labels=unique_values$values, name = name) 
     
     if(!forecast) {
       plot <- plot +
