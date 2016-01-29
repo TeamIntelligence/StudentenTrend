@@ -17,8 +17,8 @@ LoadFromServer <- function(vName, ...) {
 }
 
 #Get better colors to show within the plots
-GetColors <- function(values){
-  unique_values <- unique(values)
+GetColors <- function(values, rev=F){
+  unique_values <- sort(unique(values))
   len           <- length(unique_values)
   
   customColorArray <- c("#8B5A2C", "#CD4F39", "#D14390", "#3C868C", "#CDBA96",
@@ -33,23 +33,27 @@ GetColors <- function(values){
     blackFound <- FALSE
     grayFound  <- FALSE
     
+    
+    
     for(i in 1:length(unique_values)) {
       value <- unique_values[i]
       
-      if(length(grep("Totaal aantal", value)) > 0) {
+      if(grepl("Totaal aantal", value)) {
         blackFound <- TRUE
         colors[i] <- "black"
-      } else if(length(grep("Totaal geselecteerd", value)) > 0) {
+      } else if(grepl("Totaal geselecteerd", value)) {
         grayFound <- TRUE
         colors[i] <- "gray48"
       }
     }
     
-    if(grayFound && blackFound) {
-      colors <- replace(colors, colors=="black", "blackTemp")
-      colors <- replace(colors, colors=="gray48", "black")
-      colors <- replace(colors, colors=="blackTemp", "gray48")
-    }
+#     if(grayFound && blackFound && rev) {
+#       colors <- replace(colors, colors=="black", "blackTemp")
+#       colors <- replace(colors, colors=="gray48", "black")
+#       colors <- replace(colors, colors=="blackTemp", "gray48")
+#     }
+    
+    print(colors)
     
     return(colors)
   }
