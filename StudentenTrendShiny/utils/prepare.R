@@ -38,10 +38,10 @@ GetColors <- function(values, rev=F){
     for(i in 1:length(unique_values)) {
       value <- unique_values[i]
       
-      if(grepl("Totaal aantal", value)) {
+      if(length(grep("Totaal aantal", value)) > 0) {
         blackFound <- TRUE
         colors[i] <- "black"
-      } else if(grepl("Totaal geselecteerd", value)) {
+      } else if(length(grep("Totaal geselecteerd", value)) > 0) {
         grayFound <- TRUE
         colors[i] <- "gray48"
       }
