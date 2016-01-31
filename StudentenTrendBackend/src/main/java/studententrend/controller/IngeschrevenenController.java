@@ -14,6 +14,9 @@ import studententrend.model.OnderwijsSoort;
 import studententrend.model.dao.IngeschrevenenRepository;
 import studententrend.model.dao.OnderwijsSoortRepository;
 
+/**
+ *	Returns all the data for the students that started a study
+ */
 @RestController
 @RequestMapping("/studenten")
 public class IngeschrevenenController {

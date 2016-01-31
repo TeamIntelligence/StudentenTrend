@@ -13,8 +13,7 @@ import studententrend.model.GediplomeerdenVacatures;
 import studententrend.model.dao.GediplomeerdenVacaturesRepository;
 
 /**
- * Called with the 
- * 
+ * Returns the data that holds the "Vervulde banen" sections
  */
 @RestController
 @RequestMapping("/studenten/vacatures")
@@ -23,6 +22,10 @@ public class GediplomeerdenVacaturesController {
 	@Autowired
 	GediplomeerdenVacaturesRepository gediplomeerdenVacaturesRepository;
 	
+	/**
+	 * Returns all the data within this table
+	 * @return
+	 */
 	@RequestMapping(
 			value = "", 
 			method = RequestMethod.GET,
@@ -39,6 +42,11 @@ public class GediplomeerdenVacaturesController {
 		return gediplomeerdenVacatures;
 	}
 	
+	/**
+	 * Filters the data by OndCode
+	 * @param ondCode
+	 * @return
+	 */
 	@RequestMapping(
 			value = "/{ondCode}", 
 			method = RequestMethod.GET,
